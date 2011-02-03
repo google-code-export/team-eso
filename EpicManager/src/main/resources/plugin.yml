@@ -1,0 +1,29 @@
+name: EpicManager
+main: com.bukkit.jblaske.EpicManager.EpicManager
+version: 0.1
+commands:
+  ban:
+    description: Ban player(s) from server
+    usage: /<command> <playerlist> - ban player(s) from server
+  unban:
+    description: Unban player(s) from server
+    usage: /<command> <playerlist> - unban player(s) from server
+  kick:
+    description: Kick player(s) from server
+    usage: /<command> <playerlist> - kick player(s) from server
+  sethome:
+    description: Set player's home spawn point
+    usage: |
+      - /<command> - set your home
+      - /<command> <player> - set another player's home to your location
+  rmhome:
+    description: Remove player's home spawn point
+    usage: |
+      - /<command> - remove your home
+      - /<command> <player> - remove another player's home
+  home:
+    description: Teleport to player's home
+    usage: |
+      - /<command> - teleport to your home
+      - /<command> <player> - teleport to another player's home
+
