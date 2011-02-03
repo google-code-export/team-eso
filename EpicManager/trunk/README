@@ -1,0 +1,14 @@
+===========================
+EpicManager - a general purpose bukkit plugin.
+
+This plugin implements multiple simple commands:
+
+
+
+INSTALATION
+ This project is most easily built with maven.
+
+ You can run:
+   mvn clean install
+
+   To build the package, which is found in the target/ folder.
