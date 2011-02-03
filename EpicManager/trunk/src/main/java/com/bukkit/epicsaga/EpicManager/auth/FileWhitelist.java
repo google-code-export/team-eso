@@ -24,6 +24,11 @@
 
 */
 
+/**
+ * @author sir.manic@gmail.com
+ * @license MIT License
+ */
+
 package com.bukkit.epicsaga.EpicManager.auth;
 
 import java.io.BufferedWriter;

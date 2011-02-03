@@ -23,7 +23,10 @@
 	THE SOFTWARE.
 
 */
-
+/**
+ * @author sir.manic@gmail.com
+ * @license MIT License
+ */
 package com.bukkit.epicsaga.EpicManager.home;
 
 import org.bukkit.Location;

@@ -24,6 +24,11 @@
 
 */
 
+/**
+ * @author sir.manic@gmail.com
+ * @license MIT License
+ */
+
 package com.bukkit.epicsaga.EpicManager.home;
 
 import org.bukkit.Location;
@@ -41,17 +46,17 @@ public interface GroupHomeStore {
 	 * @param groupName
 	 * @param location
 	 */
-	public void setGroupHome(String groupName, Location location);
+	void setGroupHome(String groupName, Location location);
 
 	/**
 	 *
 	 * @param groupName
 	 * @return the home Location for this group, or null if not set
 	 */
-	public Location getGroupHome(String groupName);
+	Location getGroupHome(String groupName);
 
 	/**
 	 *
 	 */
-	public void clearGroupHome(String groupName);
+	void clearGroupHome(String groupName);
 }

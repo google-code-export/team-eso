@@ -24,10 +24,16 @@
 
 */
 
+/**
+ * @author _sir_maniac
+ * @license MIT License
+ */
+
 package com.bukkit.epicsaga.EpicManager;
 
 public interface PluginFeature {
 	/**
+	 *
 	 *
 	 * @param em
 	 * @throws EpicManager.EnableError on fatal initialization error
