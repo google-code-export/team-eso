@@ -1,0 +1,53 @@
+#summary Details for EpicZones plugin.
+
+== Introduction ==
+Polygon based Area Protection.
+
+
+== Features ==
+    * Polygonal area creation (Not just cuboids!)
+    * Provide a Circular border to your map
+    * Hierarchical Permissions with Child and Parent Zones.
+    * Toggle Permissions by zone for (Build, Destroy, Entry)
+    * Display Entering and Exiting messages in chat
+    * Utilizes Groups from Permissions Plugin for defining Zone level Permissions.
+    * Enhanced /who
+     * /who - only tells you who is in the zone you are in, and child zones to that zone.
+     * /who all - tells you where everybody on the server is
+
+
+== Default Config.yml ==
+{{{
+defaultEnter: true
+defaultDestroy: true
+defaultBuild: true
+mapRadius: 1000
+}}}
+ * Default permissions are used, when nothing is specified for any given user/group.
+
+
+== Example Zones.txt ==
+{{{
+#ZoneName|Flags|Enter Message|Exit Message|Permissions|Floor|Ceiling|ParentZone|ChildZone|PointList
+test|pvp:false regen:false nomobs:false|Entering Test Zone...|Leaving Test Zone...|Admins[build:allow destroy:allow entry:allow],Member[build:allow destroy:allow entry:allow]|0|128||test2|-20:20 20:20 20:-20 -20:-20
+test2|pvp:false regen:false nomobs:false|Entering Test Zone 2...|Leaving Test Zone 2...|Admins[build:deny destroy:deny entry:deny],Member[build:allow destroy:allow entry:allow]|0|128|test||-10:20 10:10 10:-10 -10:-10
+}}}
+ * PVP, Regen and NoMobs have no effect currently, and do not need to be specified.
+ * ZoneName must be unique.
+
+
+== Permissions Explained ==
+    * Build
+     * Allows or Denies the ability to place blocks within the zone. (uses block location, not player location)
+     * Allows or Denies the ability to pour buckets of Water or Lava within the zone. (uses block location, not player location)
+    * Destroy
+     * Allows or Denies the ability to break blocks within the zone. (uses block location, not player location)
+     * Allows or Denies the ability to scoup buckets of Water or Lava within the zone. (uses block location, not player location)
+    * Entry
+     * Allows or Denies the player the ability to enter a zone.
+
+
+== Commands ==
+    * /who (no security yet)
+     * /who all (no security yet)
+    * /reloadez (no security yet)
