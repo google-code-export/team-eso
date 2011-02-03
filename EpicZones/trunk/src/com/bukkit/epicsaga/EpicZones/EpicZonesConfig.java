@@ -1,4 +1,4 @@
-package com.bukkit.jblaske.EpicZones;
+package com.bukkit.epicsaga.EpicZones;
 
 import java.io.BufferedWriter;
 import java.io.File;

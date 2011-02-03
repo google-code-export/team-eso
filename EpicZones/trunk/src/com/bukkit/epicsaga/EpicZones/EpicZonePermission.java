@@ -1,4 +1,4 @@
-package com.bukkit.jblaske.EpicZones;
+package com.bukkit.epicsaga.EpicZones;
 
 import java.util.HashMap;
 import java.util.Map;
