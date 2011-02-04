@@ -6,7 +6,12 @@
   <artifactId>EpicManager</artifactId>
   <name>EpicManager</name>
   <url>http://code.google.com/p/team-eso</url>
+  <organization>
+  	<name>Epic Saga Online</name>
+  	<url>www.epicsagaonline.com</url>
+  </organization>
   <build>
+  	  <finalName>${artifactId}</finalName>
       <plugins>
           <plugin>
               <groupId>org.apache.maven.plugins</groupId>
