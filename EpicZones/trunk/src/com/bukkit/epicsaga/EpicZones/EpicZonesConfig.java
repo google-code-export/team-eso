@@ -27,6 +27,7 @@ public class EpicZonesConfig extends Configuration {
     public boolean defaultEnter;
     public boolean defaultBuild;
     public boolean defaultDestroy;
+    public boolean enableRadius;
      
      
     public EpicZonesConfig(File file)
@@ -46,6 +47,7 @@ public class EpicZonesConfig extends Configuration {
     	defaultEnter = true;
     	defaultBuild = true;
     	defaultDestroy = true;
+    	enableRadius = true;
     }
      
     @Override
@@ -75,7 +77,7 @@ public class EpicZonesConfig extends Configuration {
             defaultEnter = getBoolean("defaultEnter", true);
             defaultBuild = getBoolean("defaultBuild", true);
             defaultDestroy = getBoolean("defaultDestroy", true);
-           
+            enableRadius = getBoolean("enableRadius", true);
         }
     }
   
@@ -91,6 +93,7 @@ public class EpicZonesConfig extends Configuration {
         root.put("defaultEnter", defaultEnter);
         root.put("defaultBuild", defaultBuild);
         root.put("defaultDestroy", defaultDestroy);
+        root.put("enableRadius",enableRadius);
           
         try {
             stream = new FileOutputStream(file);

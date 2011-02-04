@@ -48,7 +48,7 @@ public class EpicZonesPlayerListener extends PlayerListener
     	Point playerPoint = new Point(event.getTo().getBlockX(), event.getTo().getBlockZ());
     	//System.out.println("playerPoint: " + playerPoint.toString());
     	
-    	if(playerWithinBorder(playerPoint))    	
+    	if(playerWithinBorder(playerPoint, player))    	
     	{
     		
     		//player.sendMessage(EpicZones.permissions.getGroup(player.getName()));
@@ -300,14 +300,33 @@ public class EpicZonesPlayerListener extends PlayerListener
     	}
     }
     
-    private boolean playerWithinBorder(Point point)
+    private boolean playerWithinBorder(Point point, Player player)
     {
-    	boolean result;
     	
-    	result = (Math.sqrt(Math.pow(Math.abs(point.x), 2) + Math.pow(Math.abs(point.y), 2)) <= General.config.mapRadius);
-    	
-    	return result;
-    }
+    	if(General.config.enableRadius)
+    	{
+    
+	    	double xsquared = point.x * point.x;
+	    	double ysquared = point.y * point.y;
+	    	double distanceFromCenter = Math.sqrt(xsquared + ysquared);
+	    	
+	    	//player.sendMessage("Distance From Center: " + distanceFromCenter);
+	    	
+	    	if(distanceFromCenter <= General.config.mapRadius)
+	    	{
+	    		return true;
+	    	}
+	    	else
+	    	{
+	    		return false;
+	    	}
+
+    	}
+    	else
+    	{
+    		return true;
+    	}
+	}
 }
     
     
