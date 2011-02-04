@@ -1,6 +1,7 @@
 package com.bukkit.epicsaga.EpicZones;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
@@ -34,8 +35,7 @@ public class General {
 				return ezp;
 		}
 
-		return null;
-
+		throw new AssertionError("An unknown player has been found");
 	}
 
 	public static void addPlayer(int entityID, String name)
@@ -115,11 +115,11 @@ public class General {
 		boolean result = getDefaultPerm(flag);
 		String group = EpicZones.permissions.getGroup(player.getName());
 		EpicZonePermission p;
-	
+
 		p = zone.getPermission(group);
 
 		//System.out.println("Permissions: " + p.getPermissionObject());
-		
+
 		if(p == null)
 		{
 			p = zone.getPermission(player.getName());
@@ -127,12 +127,12 @@ public class General {
 
 		if(p != null)
 		{
-			
+
 			//We know permissions are defined for the player, reset the result to false, so that if permissions are not granted, they can be denied.
 			result = false;
-			
+
 			Map<String,String> flags = p.getPermissionFlags();
-			
+
 			//System.out.println("Flags: " + flags.toString());
 			//System.out.println("Flag Checked: " + flag);
 			if(flags.containsKey(flag) &&
@@ -150,7 +150,7 @@ public class General {
 		return result;
 	}
 
-	 public static void loadZones(File path)
+	 public static void loadZones(File path) throws FileNotFoundException
 	 {
 	        String line;
 	        if (path != null){
@@ -158,23 +158,18 @@ public class General {
 	        	myFile = file;
 	        }
 
-	        try {
-	            Scanner scanner = new Scanner(myFile);
-	            myZones.clear();
-	           try {
-	                while(scanner.hasNext())
-	                {
-	                    line = scanner.nextLine().trim();
-	                    if(line.startsWith("#") || line.isEmpty()){continue;}
-	                    General.myZones.add(new EpicZone(line));
-	                }
-	            }
-	            finally {
-	                scanner.close();
-	            }
-	        }
-	        catch(IOException e) {
-	            e.printStackTrace();
-	        }
+            Scanner scanner = new Scanner(myFile);
+            myZones.clear();
+           try {
+                while(scanner.hasNext())
+                {
+                    line = scanner.nextLine().trim();
+                    if(line.startsWith("#") || line.isEmpty()){continue;}
+                    General.myZones.add(new EpicZone(line));
+                }
+            }
+            finally {
+                scanner.close();
+            }
 	    }
 }

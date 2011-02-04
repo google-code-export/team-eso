@@ -1,6 +1,7 @@
 package com.bukkit.epicsaga.EpicZones;
 
 import java.awt.Point;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -16,6 +17,7 @@ import org.bukkit.event.player.PlayerItemEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
 
 //import sun.security.mscapi.KeyStore.MY;
 
@@ -48,7 +50,7 @@ public class EpicZonesPlayerListener extends PlayerListener
     	Point playerPoint = new Point(event.getTo().getBlockX(), event.getTo().getBlockZ());
     	//System.out.println("playerPoint: " + playerPoint.toString());
 
-    	if(playerWithinBorder(playerPoint, player))    	
+    	if(playerWithinBorder(playerPoint, player))
     	{
 
     		//player.sendMessage(EpicZones.permissions.getGroup(player.getName()));
@@ -107,6 +109,9 @@ public class EpicZonesPlayerListener extends PlayerListener
 
     public @Override void onPlayerLogin(PlayerLoginEvent event)
     {
+    	if(event.getResult() != Result.ALLOWED)
+    		return;
+
     	General.addPlayer(event.getPlayer().getEntityId(), event.getPlayer().getName());
     }
 
@@ -162,9 +167,15 @@ public class EpicZonesPlayerListener extends PlayerListener
 	    	{
 	    		General.config.load();
 				//General.config.save();
-				General.loadZones(null);
-				event.getPlayer().sendMessage("EpicZones Reloaded.");
-	    		event.setCancelled(true);
+				try {
+					General.loadZones(null);
+					event.getPlayer().sendMessage("EpicZones Reloaded.");
+		    		event.setCancelled(true);
+				}
+				catch (FileNotFoundException e) {
+					event.getPlayer().sendMessage("Error, zone file not found.");
+		    		event.setCancelled(true);
+				}
 	    	}
     	}
     }
@@ -302,16 +313,16 @@ public class EpicZonesPlayerListener extends PlayerListener
 
     private boolean playerWithinBorder(Point point, Player player)
     {
-    	
+
     	if(General.config.enableRadius)
     {
 
 	    	double xsquared = point.x * point.x;
 	    	double ysquared = point.y * point.y;
 	    	double distanceFromCenter = Math.sqrt(xsquared + ysquared);
-	    	
+
 	    	//player.sendMessage("Distance From Center: " + distanceFromCenter);
-	    	
+
 	    	if(distanceFromCenter <= General.config.mapRadius)
 	    	{
 	    		return true;

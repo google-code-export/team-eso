@@ -26,9 +26,9 @@ public class EpicZones extends JavaPlugin {
     private final EpicZonesBlockListener blockListener = new EpicZonesBlockListener(this);
     private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
     private final String CONFIG_FILE = "config.yml";
-           
+
     public static PermissionHandler permissions;
-    
+
     public EpicZones(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
         super(pluginLoader, instance, desc, folder, plugin, cLoader);
         File file = new File(folder+File.separator+CONFIG_FILE);
@@ -36,34 +36,36 @@ public class EpicZones extends JavaPlugin {
     }
 
     public void onEnable() {
+    	PluginDescriptionFile pdfFile = this.getDescription();
 
-    	// Register events
-    	PluginManager pm = getServer().getPluginManager();
-           
-    	setupPermissions();
-    	
     	try {
+	    	// Register events
+	    	PluginManager pm = getServer().getPluginManager();
+
+	    	setupPermissions();
+
 			checkConfigDir();
 			General.config.load();
 			General.config.save();
 			General.loadZones(this.getDataFolder());
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
 
-		pm.registerEvent(Event.Type.PLAYER_MOVE, this.playerListener, Event.Priority.Normal, this);
-    	pm.registerEvent(Event.Type.PLAYER_LOGIN, this.playerListener, Event.Priority.Normal, this);
-    	pm.registerEvent(Event.Type.PLAYER_QUIT, this.playerListener, Event.Priority.Normal, this);
-    	pm.registerEvent(Event.Type.PLAYER_COMMAND, this.playerListener, Event.Priority.Normal, this);
-    	pm.registerEvent(Event.Type.PLAYER_ITEM , this.playerListener, Event.Priority.Normal, this);
-    	
-    	pm.registerEvent(Event.Type.BLOCK_DAMAGED, this.blockListener, Event.Priority.Normal, this);
-    	pm.registerEvent(Event.Type.BLOCK_PLACED, this.blockListener, Event.Priority.Normal, this);
-    	
-    	
-    	PluginDescriptionFile pdfFile = this.getDescription();
-    	System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled." );
-        
+			pm.registerEvent(Event.Type.PLAYER_MOVE, this.playerListener, Event.Priority.Normal, this);
+	    	pm.registerEvent(Event.Type.PLAYER_LOGIN, this.playerListener, Event.Priority.Monitor, this);
+	    	pm.registerEvent(Event.Type.PLAYER_QUIT, this.playerListener, Event.Priority.Monitor, this);
+	    	pm.registerEvent(Event.Type.PLAYER_COMMAND, this.playerListener, Event.Priority.Normal, this);
+	    	pm.registerEvent(Event.Type.PLAYER_ITEM , this.playerListener, Event.Priority.Normal, this);
+
+	    	pm.registerEvent(Event.Type.BLOCK_DAMAGED, this.blockListener, Event.Priority.Normal, this);
+	    	pm.registerEvent(Event.Type.BLOCK_PLACED, this.blockListener, Event.Priority.Normal, this);
+
+
+	    	System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled." );
+
+		} catch (Throwable e) {
+	    	System.out.println( "["+pdfFile.getName()+"]" + " error starting: "+
+	    				e.getMessage()+" Disabling plugin" );
+        	this.getServer().getPluginManager().disablePlugin(this);
+		}
     }
     public void onDisable() {
     	PluginDescriptionFile pdfFile = this.getDescription();
@@ -80,8 +82,8 @@ public class EpicZones extends JavaPlugin {
     public void setDebugging(final Player player, final boolean value) {
         debugees.put(player, value);
     }
-    
-    private void setupPermissions() {
+
+    private void setupPermissions() throws Exception {
     	Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
     	if(test != null) {
     	// make sure Permissions gets enabled first
@@ -89,19 +91,19 @@ public class EpicZones extends JavaPlugin {
     	permissions = ((Permissions)test).getHandler();
     	}
     	else {
-    	//throw new EnableError("Permission plugin not available.");
+    	  throw new Exception("Permission plugin not available.");
     	}
     	}
 
     private void checkConfigDir() throws Exception
     {
         File dir = this.getDataFolder();
-         
+
         if(!dir.isDirectory() && !dir.mkdirs()) {
             throw new Exception( "Could not make configuration directory "+
                     dir.getPath());
         }
-         
+
     }
 }
 
