@@ -7,6 +7,9 @@ import java.util.Map;
 
 import org.bukkit.Location;
 
+import com.bukkit.epicsaga.EpicZones.EpicZonePermission;
+import com.bukkit.epicsaga.EpicZones.General;
+
 public class EpicZone {
 
 	private String name = "";
@@ -20,6 +23,8 @@ public class EpicZone {
 	private EpicZone parent = null;
 	private EpicZone child = null;
 
+	public EpicZone(){}
+	
 	public EpicZone(String zoneData)
 	{
 
@@ -54,7 +59,13 @@ public class EpicZone {
 
 	public EpicZonePermission getPermission(String name)
 	{
-		return permissions.get(name);
+		EpicZonePermission result;
+		//System.out.println("Getting Permissons For:" + name + " in zone: " + this.name);
+		result = permissions.get(name);
+		//if(result == null)
+		//{System.out.println("No Permissions Found");}
+		//{System.out.println(permissions.toString());}
+		return result;
 	}
 
 	public boolean pointWithin(Point point)
@@ -110,6 +121,7 @@ public class EpicZone {
 			for(int i = 0;i < dataList.length; i++)
 			{
 				permission = new EpicZonePermission(dataList[i]);
+				result.put(permission.getPermissionObject(), permission);
 			}
 		}
 		return result;

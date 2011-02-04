@@ -35,6 +35,7 @@ public class EpicZonesBlockListener extends BlockListener {
 	   EpicZonePlayer ezp = General.getPlayer(player.getName());
    	   Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
    	   int blockHeight = event.getBlock().getLocation().getBlockY();	  
+   	   boolean hasPerms = false;
    	   
 	   	for(EpicZone z: General.myZones)
 	   	{
@@ -44,14 +45,24 @@ public class EpicZonesBlockListener extends BlockListener {
     			{
     				if(!General.hasPermissions(ezp, z, "destroy"))
     				{
-    					if (ezp.getLastWarned().before(new Date())){
-    						player.sendMessage(NO_PERM_DESTROY);
-    						ezp.Warn();
-    						}
-    					event.setCancelled(true);
+    					hasPerms = false;
+    				}
+    				else
+    				{
+    					hasPerms = true;
+    					break;
     				}
     			}
 			 }
+	   	}
+	   	
+	   	if(!hasPerms)
+	   	{
+	   		if (ezp.getLastWarned().before(new Date())){
+				player.sendMessage(NO_PERM_DESTROY);
+				ezp.Warn();
+				}
+			event.setCancelled(true);
 	   	}
    }
    
@@ -62,6 +73,7 @@ public class EpicZonesBlockListener extends BlockListener {
 	   EpicZonePlayer ezp = General.getPlayer(player.getName());
    	   Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
    	   int blockHeight = event.getBlock().getLocation().getBlockY();
+   	   boolean hasPerms = false;
    	
 	   	for(EpicZone z: General.myZones)
 	   	{
@@ -71,14 +83,24 @@ public class EpicZonesBlockListener extends BlockListener {
 				{
 					if(!General.hasPermissions(ezp, z, "build"))
 					{
-						if (ezp.getLastWarned().before(new Date())){
-							player.sendMessage(NO_PERM_BUILD);
-							ezp.Warn();
-							}
-						event.setCancelled(true);
-					}
+    					hasPerms = false;
+    				}
+    				else
+    				{
+    					hasPerms = true;
+    					break;
+    				}
 				}
 			 }
+	   	}
+	   	
+	   	if(!hasPerms)
+	   	{
+	   		if (ezp.getLastWarned().before(new Date())){
+				player.sendMessage(NO_PERM_BUILD);
+				ezp.Warn();
+				}
+			event.setCancelled(true);
 	   	}
    }
 

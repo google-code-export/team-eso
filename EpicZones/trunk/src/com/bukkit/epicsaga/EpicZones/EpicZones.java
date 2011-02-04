@@ -11,7 +11,7 @@ import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 
-import com.bukkit.jblaske.EpicZones.General;
+import com.bukkit.epicsaga.EpicZones.General;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.permissions.PermissionHandler;
 import org.bukkit.plugin.Plugin;

@@ -304,7 +304,7 @@ public class EpicZonesPlayerListener extends PlayerListener
     {
     	boolean result;
     	
-    	result = (Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2)) <= General.config.mapRadius);
+    	result = (Math.sqrt(Math.pow(Math.abs(point.x), 2) + Math.pow(Math.abs(point.y), 2)) <= General.config.mapRadius);
     	
     	return result;
     }

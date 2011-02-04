@@ -15,6 +15,7 @@ public class EpicZonePermission {
 	{
 		this.permissionObject = permissionData.substring(0,permissionData.indexOf("["));
 		this.permissionFlags = buildFlags(permissionData.substring(permissionData.indexOf("[") + 1, permissionData.length() - 1));
+		//System.out.println("permissionObject: " + permissionObject);
 		//System.out.println("permissionFlags: " + permissionFlags.toString());
 	}
 

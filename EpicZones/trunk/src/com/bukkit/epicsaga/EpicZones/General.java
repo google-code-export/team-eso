@@ -12,10 +12,10 @@ import org.bukkit.plugin.Plugin;
 
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
-import com.bukkit.jblaske.EpicZones.EpicZone;
-import com.bukkit.jblaske.EpicZones.EpicZonePermission;
-import com.bukkit.jblaske.EpicZones.EpicZonePlayer;
-import com.bukkit.jblaske.EpicZones.EpicZones;
+import com.bukkit.epicsaga.EpicZones.EpicZone;
+import com.bukkit.epicsaga.EpicZones.EpicZonePermission;
+import com.bukkit.epicsaga.EpicZones.EpicZonePlayer;
+import com.bukkit.epicsaga.EpicZones.EpicZones;
 
 public class General {
 
@@ -115,9 +115,11 @@ public class General {
 		boolean result = getDefaultPerm(flag);
 		String group = EpicZones.permissions.getGroup(player.getName());
 		EpicZonePermission p;
-
+	
 		p = zone.getPermission(group);
 
+		//System.out.println("Permissions: " + p.getPermissionObject());
+		
 		if(p == null)
 		{
 			p = zone.getPermission(player.getName());
@@ -131,10 +133,13 @@ public class General {
 			
 			Map<String,String> flags = p.getPermissionFlags();
 			
+			//System.out.println("Flags: " + flags.toString());
+			//System.out.println("Flag Checked: " + flag);
 			if(flags.containsKey(flag) &&
 					flags.get(flag).equalsIgnoreCase("allow"))
 			{
 				result = true;
+				//System.out.println("Allowed!");
 			}
 //			else if(p.getPermissionObject().equalsIgnoreCase(player.getName()))
 //			{
