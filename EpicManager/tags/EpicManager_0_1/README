@@ -3,12 +3,20 @@ EpicManager - a general purpose bukkit plugin.
 
 This plugin implements multiple simple commands:
 
+/ban
+/unban
+/kick
+/sethome
+/home
+/rmhome
 
 
 INSTALATION
  This project is most easily built with maven.
 
- You can run:
-   mvn clean install
+ Type the following in the project directory:
 
-   To build the package, which is found in the target/ folder.
+ >  mvn clean install
+
+ Maven downloads dependencies and builds the jar.  The jar will be in the
+ /target directory.
