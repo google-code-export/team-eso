@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.bukkit.jblaske</groupId>
+  <groupId>com.bukkit.epicsaga</groupId>
   <version>0.1</version>
   <artifactId>EpicManager</artifactId>
   <name>EpicManager</name>
@@ -19,11 +19,21 @@
           </plugin>
       </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>team-eso-repo</id>
+      <url>http://team-eso.googlecode.com/svn/deprepo</url>
+    </repository>
+    <repository>
+      <id>bukkut-repo</id>
+      <url>http://artifacts.lukegb.com/artifactory/repo</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>com.nijikokun</groupId>
       <artifactId>Permissions</artifactId>
-      <version>1.0</version>
+      <version>2.0</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
