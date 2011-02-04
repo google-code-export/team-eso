@@ -3,9 +3,9 @@ package com.bukkit.epicsaga.EpicZones;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -23,44 +23,44 @@ import org.bukkit.event.player.PlayerMoveEvent;
  * Handle events for all Player related events
  * @author jblaske
  */
-public class EpicZonesPlayerListener extends PlayerListener 
+public class EpicZonesPlayerListener extends PlayerListener
 {
     private final EpicZones plugin;
     private final String NO_PERM_ENTER = "You do not have permission to enter ";
     private final String NO_PERM_BORDER = "You have reached the border of the map.";
     private final String NO_PERM_BUCKET = "You do not have permissions to do that in this zone.";
     private final int EMPTY_BUCKET = 325;
-    private Map<Integer,Integer> bucketTypes = new HashMap<Integer,Integer>();
-    
-    public EpicZonesPlayerListener(EpicZones instance) 
+    private Set<Integer> bucketTypes = new HashSet<Integer>();
+
+    public EpicZonesPlayerListener(EpicZones instance)
     {
         plugin = instance;
-        bucketTypes.put(326, 326);
-        bucketTypes.put(327, 327);
+        bucketTypes.add(326);
+        bucketTypes.add(327);
     }
 
-    public @Override void onPlayerMove(PlayerMoveEvent event) 
+    public @Override void onPlayerMove(PlayerMoveEvent event)
     {
-    	
+
     	Player player = event.getPlayer();
     	EpicZonePlayer ezp = General.getPlayer(player.getName());
     	int playerHeight = event.getTo().getBlockY();
     	Point playerPoint = new Point(event.getTo().getBlockX(), event.getTo().getBlockZ());
     	//System.out.println("playerPoint: " + playerPoint.toString());
-    	
+
     	if(playerWithinBorder(playerPoint, player))    	
     	{
-    		
+
     		//player.sendMessage(EpicZones.permissions.getGroup(player.getName()));
-    		
+
 	    	if(ezp.getCurrentLocation() == null){ezp.setCurrentLocation(event.getTo());}
-	    	
+
 	    	if(ezp.getCurrentZone() != null && !ezp.getCurrentZone().pointWithin(playerPoint))
 	    	{
 	    		player.sendMessage(ezp.getCurrentZone().getExitText());
 	    		ezp.setCurrentZone(null);
 	    	}
-	    	
+
 	    	for(EpicZone z: General.myZones)
 	    	{
 	    		if (ezp.getCurrentZone() == null || z != ezp.getCurrentZone())
@@ -104,12 +104,12 @@ public class EpicZonesPlayerListener extends PlayerListener
 			event.setCancelled(true);
     	}
     }
-        
+
     public @Override void onPlayerLogin(PlayerLoginEvent event)
     {
     	General.addPlayer(event.getPlayer().getEntityId(), event.getPlayer().getName());
     }
-    
+
     public @Override void onPlayerQuit(PlayerEvent event)
     {
     	General.removePlayer(event.getPlayer().getEntityId());
@@ -120,23 +120,23 @@ public class EpicZonesPlayerListener extends PlayerListener
     	if(!event.isCancelled())
 	    {
 	    	String[] split = event.getMessage().split("\\s");
-	    	
+
 	    	if (split[0].equalsIgnoreCase("/who"))
 	    	{
 	    		int pageNumber = 1;
-	    		
+
 	    		if (split.length > 1)
 	    		{
 	    			if (split[1].equalsIgnoreCase("all"))
 	    			{
 	    				if (split.length > 2)
 	    				{
-	    					try  
-	    				    {  
-	    				      pageNumber = Integer.parseInt(split[2]);  
-	    				    }  
-	    				    catch(NumberFormatException nfe)  
-	    				    {  
+	    					try
+	    				    {
+	    				      pageNumber = Integer.parseInt(split[2]);
+	    				    }
+	    				    catch(NumberFormatException nfe)
+	    				    {
 	    				      pageNumber = 1;
 	    				    }
 	    				}
@@ -145,12 +145,12 @@ public class EpicZonesPlayerListener extends PlayerListener
 	    			}
 	    			else
 	    			{
-	    				try  
-					    {  
-					      pageNumber = Integer.parseInt(split[1]);  
-					    }  
-					    catch(NumberFormatException nfe)  
-					    {  
+	    				try
+					    {
+					      pageNumber = Integer.parseInt(split[1]);
+					    }
+					    catch(NumberFormatException nfe)
+					    {
 					      pageNumber = 1;
 					    }
 	    			}
@@ -168,17 +168,17 @@ public class EpicZonesPlayerListener extends PlayerListener
 	    	}
     	}
     }
-    
+
     public @Override void onPlayerItem(PlayerItemEvent event)
     {
-    	
-    	if (bucketTypes.get(event.getPlayer().getItemInHand().getTypeId()) != null)
+
+    	if (bucketTypes.contains((event.getPlayer().getItemInHand().getTypeId())))
 	    {
-		   
+
 		   Player player = event.getPlayer();
 		   EpicZonePlayer ezp = General.getPlayer(player.getName());
 	   	   Point blockPoint = new Point(event.getBlockClicked().getLocation().getBlockX(), event.getBlockClicked().getLocation().getBlockZ());
-	   	   int blockHeight = event.getBlockClicked().getLocation().getBlockY();	  
+	   	   int blockHeight = event.getBlockClicked().getLocation().getBlockY();
 
 		   	for(EpicZone z: General.myZones)
 		   	{
@@ -196,15 +196,15 @@ public class EpicZonesPlayerListener extends PlayerListener
 	    				}
 	    			}
 				 }
-		   	}  
+		   	}
 	    }
     	else if(event.getPlayer().getItemInHand().getTypeId() == EMPTY_BUCKET)
     	{
 			Player player = event.getPlayer();
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
 			Point blockPoint = new Point(event.getBlockClicked().getLocation().getBlockX(), event.getBlockClicked().getLocation().getBlockZ());
-			int blockHeight = event.getBlockClicked().getLocation().getBlockY();	  
-		
+			int blockHeight = event.getBlockClicked().getLocation().getBlockY();
+
 		   	for(EpicZone z: General.myZones)
 		   	{
 		   		if(blockHeight >= z.getFloor() && blockHeight <= z.getCeiling())
@@ -222,20 +222,20 @@ public class EpicZonesPlayerListener extends PlayerListener
 						}
 					}
 				 }
-		   	}  	
+		   	}
     	}
-    	
+
     }
-    
+
     private void buildWho(Player player, int pageNumber, boolean allZones)
     {
-    	
+
     	EpicZone currentZone = General.getPlayer(player.getName()).getCurrentZone();
     	if(currentZone == null){allZones = true;}
     	ArrayList<EpicZonePlayer> players = getPlayers(currentZone, allZones);
     	int playersPerPage = 8;
     	int playerCount = players.size();
-   	      	
+
     	if (allZones)
     	{
     		player.sendMessage(playerCount + " Players Online [Page " + pageNumber + " of " + ((int)Math.ceil(playerCount / playersPerPage) + 1) + "]");
@@ -259,10 +259,10 @@ public class EpicZonesPlayerListener extends PlayerListener
             	}
     		}
     }
-    
+
     private String buildWhoPlayerName(ArrayList<EpicZonePlayer> players, int index, boolean allZones )
     {
-    	   	
+
     	if (allZones)
     	{
     		if(players.get(index).getCurrentZone() != null)
@@ -279,7 +279,7 @@ public class EpicZonesPlayerListener extends PlayerListener
     		return players.get(index).getName();
     	}
     }
-    
+
     private ArrayList<EpicZonePlayer> getPlayers(EpicZone currentZone, boolean allZones)
     {
     	if (allZones)
@@ -299,13 +299,13 @@ public class EpicZonesPlayerListener extends PlayerListener
     		return result;
     	}
     }
-    
+
     private boolean playerWithinBorder(Point point, Player player)
     {
     	
     	if(General.config.enableRadius)
-    	{
-    
+    {
+
 	    	double xsquared = point.x * point.x;
 	    	double ysquared = point.y * point.y;
 	    	double distanceFromCenter = Math.sqrt(xsquared + ysquared);
@@ -321,14 +321,14 @@ public class EpicZonesPlayerListener extends PlayerListener
 	    		return false;
 	    	}
 
-    	}
+    }
     	else
     	{
     		return true;
     	}
 	}
 }
-    
-    
-   
+
+
+
 
