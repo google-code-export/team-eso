@@ -46,6 +46,8 @@ import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 
+//TODO: move file management part into a single base class
+
 /**
  * A flat file with usernames and their home locations
  *

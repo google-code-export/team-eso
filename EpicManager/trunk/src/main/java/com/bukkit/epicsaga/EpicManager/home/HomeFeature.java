@@ -32,12 +32,13 @@
 package com.bukkit.epicsaga.EpicManager.home;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -88,7 +89,8 @@ public class HomeFeature implements PluginFeature {
 
 	private HomeStore homes;
 	private GroupHomeStore groupHomes;
-    private Set<String> deadPlayers = new TreeSet<String>();
+    private Set<String> deadPlayers = new HashSet<String>();
+    private Set<String> spawningPlayers = new HashSet<String>();
 
 	public void onEnable(EpicManager em) throws EpicManager.EnableError {
 		plugin = em;
@@ -109,6 +111,7 @@ public class HomeFeature implements PluginFeature {
 		PluginManager pm = em.getServer().getPluginManager();
 
         pm.registerEvent(Event.Type.PLAYER_TELEPORT, pListener, Priority.Highest, em);
+        pm.registerEvent(Event.Type.PLAYER_MOVE, pListener, Priority.Highest, em);
         pm.registerEvent(Event.Type.ENTITY_DEATH, eListener, Priority.Monitor, em);
 	}
 
@@ -123,8 +126,6 @@ public class HomeFeature implements PluginFeature {
 			if(!(event.getEntity() instanceof Player))
 				return;
 
-//			System.out.println("(((((((((((((( death ))))))))");
-
 			Player player = (Player) event.getEntity();
 			deadPlayers.add(player.getName());
 		}
@@ -135,55 +136,68 @@ public class HomeFeature implements PluginFeature {
     //TODO cancel onPlayerMoved event to prevent a "player moved wrongly!" check.
 	private PlayerListener pListener = new PlayerListener() {
 
-		private boolean tried = false;
 
-		// teleport a user to a home or grouphome
+		/*
+		 * Teleport to a home or group after death.  This requires the next
+		 * PLAYER_MOVE event to be canceled.
+		 *
+		 */
 		@Override
-		public void onPlayerTeleport(PlayerMoveEvent event) {
-			//System.out.println("================== teleport ============");
+		public void onPlayerTeleport (PlayerMoveEvent event) {
+
 			String playerName = event.getPlayer().getName();
-
-			System.out.println("PlayerName: "+playerName);
-
 			if(!deadPlayers.contains(playerName))
 				return;
 
 			// if dead, teleport to their home if they have one
 			Location dest = homes.getHome(playerName);
-			if(dest == null)
-			{
+			if(dest == null) {
 				String group = EpicManager.permissions.getGroup(playerName);
 				if(group == null) {
-					System.out.println("*** Group is null");
 					return;
 				}
 
 				dest = groupHomes.getGroupHome(group);
 				if(dest == null)
 					return;
-//				System.out.println("================== Teleporting to grouphome ");
 			}
-//			else
-//				System.out.println("================== Teleporting to home ");
 
-//			System.out.println("====  canceled: "+event.isCancelled());
-//			System.out.println(event.getFrom());
-//			System.out.println(event.getTo());
 
-			event.setCancelled(false);
-//			if(!tried) {
-//				event.setTo(dest);
-//				tried = true;
-//			}
-//			else {
-				event.setTo(dest);
-				deadPlayers.remove(playerName);
-//				tried = false;
-//			}
+			World world = event.getPlayer().getWorld();
+
+			int chunkx = dest.getBlockX() >> 4;
+			int chunkz = dest.getBlockZ() >> 4;
+
+			if (!world.isChunkLoaded(chunkx, chunkz)) {
+				world.loadChunk(chunkx, chunkz);
+			}
+
+			event.setTo(dest);
+			deadPlayers.remove(playerName);
+			spawningPlayers.add(playerName);
 
 			return;
 		}
+
+		/*
+		 *  ignore the next report from the client
+		 *  (Packet 10), which seem to always be wrong after a
+		 *  change in spawn location (and tiggers a "moved wrongly" cheat
+		 *  response)
+		 */
+		@Override
+		public void onPlayerMove(PlayerMoveEvent event) {
+
+			String playerName = event.getPlayer().getName();
+			if(!spawningPlayers.contains(playerName))
+				return;
+
+			spawningPlayers.remove(playerName);
+
+			event.setCancelled(true);
+		}
 	};
+
 
 	@SuppressWarnings("serial")
 	private static class PermissionException extends Exception {
@@ -234,8 +248,6 @@ public class HomeFeature implements PluginFeature {
 
 	private final CommandHandler rmHomeCommand = new CommandHandler() {
 	    public boolean onCommand(String command, CommandSender op, String[] args) {
-	    	System.out.println("*** rmhome");
-
 	    	if(!(op instanceof Player))
 	    		return true;
 

@@ -94,8 +94,6 @@ public class EpicManager extends JavaPlugin {
 
         config = new EMConfig(file);
 
-        System.out.println("Features:" + features.toString());
-
         // NOTE: Event registration should be done in onEnable not here as all events are unregistered when a plugin is disabled
     }
 
