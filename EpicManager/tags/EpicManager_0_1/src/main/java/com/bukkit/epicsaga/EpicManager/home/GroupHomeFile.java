@@ -112,7 +112,10 @@ public class GroupHomeFile implements GroupHomeStore {
 	 * since setHome won't be used very often.
 	 */
 	public void setGroupHome(String groupName, Location location) {
-		groupHomes.put(groupName, location);
+		groupHomes.put(groupName,
+				new Location(location.getWorld(),
+							  location.getBlockX(), location.getBlockY(),
+							  location.getZ()));
 		save();
 	}
 

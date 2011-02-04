@@ -5,7 +5,7 @@
   <version>0.1</version>
   <artifactId>EpicManager</artifactId>
   <name>EpicManager</name>
-  <url>http://www.epicsagaonline.com</url>
+  <url>http://code.google.com/p/team-eso</url>
   <build>
       <plugins>
           <plugin>

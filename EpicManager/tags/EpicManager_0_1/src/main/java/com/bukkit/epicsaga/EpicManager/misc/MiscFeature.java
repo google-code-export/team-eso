@@ -84,7 +84,6 @@ public class MiscFeature implements PluginFeature {
 		    	if(player != null) {
 		    		String opName;
 
-		    		//TODO: make kick message configurable
 		    		player.kickPlayer(plugin.config.kickMessage);
 		    		op.sendMessage(ChatColor.YELLOW+"Player kicked from server.");
 
