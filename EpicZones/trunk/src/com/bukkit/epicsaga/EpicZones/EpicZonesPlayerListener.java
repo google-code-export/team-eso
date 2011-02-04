@@ -28,10 +28,10 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 public class EpicZonesPlayerListener extends PlayerListener
 {
     private final EpicZones plugin;
-    private final String NO_PERM_ENTER = "You do not have permission to enter ";
-    private final String NO_PERM_BORDER = "You have reached the border of the map.";
-    private final String NO_PERM_BUCKET = "You do not have permissions to do that in this zone.";
-    private final int EMPTY_BUCKET = 325;
+    private static final String NO_PERM_ENTER = "You do not have permission to enter ";
+    private static final String NO_PERM_BORDER = "You have reached the border of the map.";
+    private static final String NO_PERM_BUCKET = "You do not have permissions to do that in this zone.";
+    private static final int EMPTY_BUCKET = 325;
     private Set<Integer> bucketTypes = new HashSet<Integer>();
 
     public EpicZonesPlayerListener(EpicZones instance)
@@ -260,7 +260,7 @@ public class EpicZonesPlayerListener extends PlayerListener
     	}
     		else
     		{
-    			player.sendMessage(playerCount + " Players Online in " + currentZone.getName() + " [Page " + pageNumber + " of " + ((int)Math.ceil(playerCount / playersPerPage) + 1) + "]");
+    			player.sendMessage(playerCount + " Players Online in " + currentZone.getName() + " [Page " + pageNumber + " of " + ((int)Math.ceil((double)playerCount / playersPerPage) + 1) + "]");
     			for(int i = (pageNumber - 1) * playersPerPage; i < pageNumber * playersPerPage; i++)
             	{
     				if (players.size() > i)

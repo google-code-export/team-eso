@@ -99,11 +99,11 @@ public class General {
 
 	private static boolean getDefaultPerm(String flag)
 	{
-		if(flag == "entry")
+		if(flag.equals("entry"))
 			return config.defaultEnter;
-		if(flag == "destroy")
+		if(flag.equals("destroy"))
 			return config.defaultDestroy;
-		if(flag == "build")
+		if(flag.equals("build"))
 			return config.defaultBuild;
 
 		return false;

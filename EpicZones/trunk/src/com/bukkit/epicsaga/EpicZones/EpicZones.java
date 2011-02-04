@@ -25,7 +25,7 @@ public class EpicZones extends JavaPlugin {
     private final EpicZonesPlayerListener playerListener = new EpicZonesPlayerListener(this);
     private final EpicZonesBlockListener blockListener = new EpicZonesBlockListener(this);
     private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
-    private final String CONFIG_FILE = "config.yml";
+    private static final String CONFIG_FILE = "config.yml";
 
     public static PermissionHandler permissions;
 

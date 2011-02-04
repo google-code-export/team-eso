@@ -21,22 +21,22 @@ import org.bukkit.event.block.BlockRightClickEvent;
  */
 public class EpicZonesBlockListener extends BlockListener {
     private final EpicZones plugin;
-    private final String NO_PERM_DESTROY = "You do not have permissions to destroy in this zone.";
-	private final String NO_PERM_BUILD = "You do not have permissions to build in this zone.";
-		
+    private static final String NO_PERM_DESTROY = "You do not have permissions to destroy in this zone.";
+	private static final String NO_PERM_BUILD = "You do not have permissions to build in this zone.";
+
     public EpicZonesBlockListener(final EpicZones plugin) {
         this.plugin = plugin;
     }
 
    public @Override void onBlockDamage(BlockDamageEvent event)
    {
-	   
+
 	   Player player = event.getPlayer();
 	   EpicZonePlayer ezp = General.getPlayer(player.getName());
    	   Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
-   	   int blockHeight = event.getBlock().getLocation().getBlockY();	  
+   	   int blockHeight = event.getBlock().getLocation().getBlockY();
    	   boolean hasPerms = false;
-   	   
+
 	   	for(EpicZone z: General.myZones)
 	   	{
 	   		if(blockHeight >= z.getFloor() && blockHeight <= z.getCeiling())
@@ -55,7 +55,7 @@ public class EpicZonesBlockListener extends BlockListener {
     			}
 			 }
 	   	}
-	   	
+
 	   	if(!hasPerms)
 	   	{
 	   		if (ezp.getLastWarned().before(new Date())){
@@ -65,16 +65,16 @@ public class EpicZonesBlockListener extends BlockListener {
 			event.setCancelled(true);
 	   	}
    }
-   
+
    public @Override void onBlockPlace(BlockPlaceEvent event)
    {
-	   
+
 	   Player player = event.getPlayer();
 	   EpicZonePlayer ezp = General.getPlayer(player.getName());
    	   Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
    	   int blockHeight = event.getBlock().getLocation().getBlockY();
    	   boolean hasPerms = false;
-   	
+
 	   	for(EpicZone z: General.myZones)
 	   	{
 	   		if(blockHeight >= z.getFloor() && blockHeight <= z.getCeiling())
@@ -93,7 +93,7 @@ public class EpicZonesBlockListener extends BlockListener {
 				}
 			 }
 	   	}
-	   	
+
 	   	if(!hasPerms)
 	   	{
 	   		if (ezp.getLastWarned().before(new Date())){
