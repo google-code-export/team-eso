@@ -1,5 +1,5 @@
 name: EpicManager
-main: com.bukkit.jblaske.EpicManager.EpicManager
+main: com.bukkit.epicsaga.EpicManager.EpicManager
 version: 0.1
 commands:
   ban:
