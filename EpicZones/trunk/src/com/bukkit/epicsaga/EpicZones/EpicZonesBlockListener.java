@@ -37,13 +37,14 @@ public class EpicZonesBlockListener extends BlockListener {
    	   int blockHeight = event.getBlock().getLocation().getBlockY();
    	   boolean hasPerms = false;
 
-	   	for(EpicZone z: General.myZones)
+	   	for(String zoneTag: General.myZoneTags)
 	   	{
+	   		EpicZone z = General.myZones.get(zoneTag);
 	   		if(blockHeight >= z.getFloor() && blockHeight <= z.getCeiling())
 			 {
     			if(z.pointWithin(blockPoint))
     			{
-    				if(!General.hasPermissions(ezp, z, "destroy"))
+    				if(!General.hasPermissions(player, z, "destroy"))
     				{
     					hasPerms = false;
     				}
@@ -75,13 +76,14 @@ public class EpicZonesBlockListener extends BlockListener {
    	   int blockHeight = event.getBlock().getLocation().getBlockY();
    	   boolean hasPerms = false;
 
-	   	for(EpicZone z: General.myZones)
-	   	{
+   	for(String zoneTag: General.myZoneTags)
+   	{
+   		EpicZone z = General.myZones.get(zoneTag);
 	   		if(blockHeight >= z.getFloor() && blockHeight <= z.getCeiling())
 			 {
 				if(z.pointWithin(blockPoint))
 				{
-					if(!General.hasPermissions(ezp, z, "build"))
+					if(!General.hasPermissions(player, z, "build"))
 					{
     					hasPerms = false;
     				}

@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Scanner;
+import java.util.Set;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -20,7 +22,8 @@ import com.bukkit.epicsaga.EpicZones.EpicZones;
 
 public class General {
 
-	public static ArrayList<EpicZone> myZones = new ArrayList<EpicZone>();
+	public static Map<String, EpicZone> myZones = new HashMap<String, EpicZone>();
+	public static ArrayList<String> myZoneTags = new ArrayList<String>();
 	public static ArrayList<EpicZonePlayer> myPlayers = new ArrayList<EpicZonePlayer>();
 	public static PermissionHandler Perms;
 	private static final String ZONE_FILE = "zones.txt";
@@ -60,41 +63,39 @@ public class General {
 
 	}
 
-	public static EpicZone getZone(String zoneName)
+//	public static EpicZone getZone(String zoneName)
+//	{
+//
+//		EpicZone result = null;
+//
+//		if (myZones != null)
+//		{
+//			for(EpicZone ez: myZones)
+//			{
+//				if(zoneName.equalsIgnoreCase(ez.getName()))
+//				{
+//					result = ez;
+//					break;
+//				}
+//			}
+//		}
+//
+//		return result;
+//
+//	}
+
+	public static boolean hasPermissions(Player player, EpicZone zone, String flag)
 	{
 
-		EpicZone result = null;
-
-		if (myZones != null)
+		if(General.Perms.has(player, "epiczones." + zone.getTag() + "." + flag))
 		{
-			for(EpicZone ez: myZones)
-			{
-				if(zoneName.equalsIgnoreCase(ez.getName()))
-				{
-					result = ez;
-					break;
-				}
-			}
+			return true;
 		}
-
-		return result;
-
-	}
-
-	public static boolean hasPermissions(EpicZonePlayer player, EpicZone zone, String flag)
-	{
-
-		boolean result = false;
-
-		result = testPerms(player, zone, flag);
-
-		if(result == false && zone.getParent() != null)
+		else
 		{
-			result = testPerms(player, zone.getParent(), flag);
+			return getDefaultPerm(flag);	
 		}
-
-		return result;
-
+	
 	}
 
 	private static boolean getDefaultPerm(String flag)
@@ -109,46 +110,46 @@ public class General {
 		return false;
 	}
 
-	private static boolean testPerms(EpicZonePlayer player, EpicZone zone, String flag)
-	{
-
-		boolean result = getDefaultPerm(flag);
-		String group = EpicZones.permissions.getGroup(player.getName());
-		EpicZonePermission p;
-
-		p = zone.getPermission(group);
-
-		//System.out.println("Permissions: " + p.getPermissionObject());
-
-		if(p == null)
-		{
-			p = zone.getPermission(player.getName());
-		}
-
-		if(p != null)
-		{
-
-			//We know permissions are defined for the player, reset the result to false, so that if permissions are not granted, they can be denied.
-			result = false;
-
-			Map<String,String> flags = p.getPermissionFlags();
-
-			//System.out.println("Flags: " + flags.toString());
-			//System.out.println("Flag Checked: " + flag);
-			if(flags.containsKey(flag) &&
-					flags.get(flag).equalsIgnoreCase("allow"))
-			{
-				result = true;
-				//System.out.println("Allowed!");
-			}
-//			else if(p.getPermissionObject().equalsIgnoreCase(player.getName()))
+//	private static boolean testPerms(EpicZonePlayer player, EpicZone zone, String flag)
+//	{
+//
+//		boolean result = getDefaultPerm(flag);
+//		String group = EpicZones.permissions.getGroup(player.getName());
+//		EpicZonePermission p;
+//
+//		p = zone.getPermission(group);
+//
+//		//System.out.println("Permissions: " + p.getPermissionObject());
+//
+//		if(p == null)
+//		{
+//			p = zone.getPermission(player.getName());
+//		}
+//
+//		if(p != null)
+//		{
+//
+//			//We know permissions are defined for the player, reset the result to false, so that if permissions are not granted, they can be denied.
+//			result = false;
+//
+//			Map<String,String> flags = p.getPermissionFlags();
+//
+//			//System.out.println("Flags: " + flags.toString());
+//			//System.out.println("Flag Checked: " + flag);
+//			if(flags.containsKey(flag) &&
+//					flags.get(flag).equalsIgnoreCase("allow"))
 //			{
-//				result = false;
+//				result = true;
+//				//System.out.println("Allowed!");
 //			}
-		}
-
-		return result;
-	}
+////			else if(p.getPermissionObject().equalsIgnoreCase(player.getName()))
+////			{
+////				result = false;
+////			}
+//		}
+//
+//		return result;
+//	}
 
 	 public static void loadZones(File path) throws FileNotFoundException
 	 {
@@ -163,13 +164,33 @@ public class General {
            try {
                 while(scanner.hasNext())
                 {
+                	EpicZone newZone;
                     line = scanner.nextLine().trim();
                     if(line.startsWith("#") || line.isEmpty()){continue;}
-                    General.myZones.add(new EpicZone(line));
+                    newZone = new EpicZone(line);;
+                    General.myZones.put(newZone.getName(), newZone);
+                    General.myZoneTags.add(newZone.getTag());
                 }
             }
             finally {
                 scanner.close();
             }
+            
+            
 	    }
+	 
+	 private static EpicZone reconcileChildren(EpicZone zone)
+	 {
+		 
+		 if(zone.getChildren() != null)
+		 {
+			 for(String child: zone.getChildrenNames())
+			 {
+				 zone.addChild(myZones.get(child));
+			 }
+		 }
+		 
+		 return zone;
+		 
+	 }
 }

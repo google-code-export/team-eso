@@ -1,7 +1,5 @@
 package com.bukkit.epicsaga.EpicZones;
 
-
-
 import org.bukkit.Location;
 
 import java.util.Calendar;

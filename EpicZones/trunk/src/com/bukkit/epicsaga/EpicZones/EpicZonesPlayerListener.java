@@ -63,8 +63,9 @@ public class EpicZonesPlayerListener extends PlayerListener
 	    		ezp.setCurrentZone(null);
 	    	}
 
-	    	for(EpicZone z: General.myZones)
-	    	{
+	    	for(String zoneTag: General.myZoneTags)
+		   	{
+		   		EpicZone z = General.myZones.get(zoneTag);
 	    		if (ezp.getCurrentZone() == null || z != ezp.getCurrentZone())
 	    		{
 	    			 if (ezp.getCurrentZone() == null || ezp.getCurrentZone().getParent() == null || z != ezp.getCurrentZone().getParent())
@@ -73,7 +74,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 	    				 {
 			    			if(z.pointWithin(playerPoint))
 			    			{
-			    				if(General.hasPermissions(ezp, z, "entry"))
+			    				if(General.hasPermissions(player, z, "entry"))
 			    				{
 									ezp.setCurrentZone(z);
 									player.sendMessage(z.getEnterText());
@@ -191,13 +192,14 @@ public class EpicZonesPlayerListener extends PlayerListener
 	   	   Point blockPoint = new Point(event.getBlockClicked().getLocation().getBlockX(), event.getBlockClicked().getLocation().getBlockZ());
 	   	   int blockHeight = event.getBlockClicked().getLocation().getBlockY();
 
-		   	for(EpicZone z: General.myZones)
-		   	{
+	   	for(String zoneTag: General.myZoneTags)
+	   	{
+	   		EpicZone z = General.myZones.get(zoneTag);
 		   		if(blockHeight >= z.getFloor() && blockHeight <= z.getCeiling())
 				 {
 	    			if(z.pointWithin(blockPoint))
 	    			{
-	    				if(!General.hasPermissions(ezp, z, "build"))
+	    				if(!General.hasPermissions(player, z, "build"))
 	    				{
 	    					if (ezp.getLastWarned().before(new Date())){
 	    						player.sendMessage(NO_PERM_BUCKET);
@@ -216,13 +218,14 @@ public class EpicZonesPlayerListener extends PlayerListener
 			Point blockPoint = new Point(event.getBlockClicked().getLocation().getBlockX(), event.getBlockClicked().getLocation().getBlockZ());
 			int blockHeight = event.getBlockClicked().getLocation().getBlockY();
 
-		   	for(EpicZone z: General.myZones)
+			for(String zoneTag: General.myZoneTags)
 		   	{
+		   		EpicZone z = General.myZones.get(zoneTag);
 		   		if(blockHeight >= z.getFloor() && blockHeight <= z.getCeiling())
 				 {
 					if(z.pointWithin(blockPoint))
 					{
-						if(!General.hasPermissions(ezp, z, "destroy"))
+						if(!General.hasPermissions(player, z, "destroy"))
 						{
 							if (ezp.getLastWarned().before(new Date()))
 							{
@@ -339,7 +342,3 @@ public class EpicZonesPlayerListener extends PlayerListener
     	}
 	}
 }
-
-
-
-

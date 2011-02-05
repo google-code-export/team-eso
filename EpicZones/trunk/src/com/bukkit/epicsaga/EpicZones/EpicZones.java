@@ -10,7 +10,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
-
 import com.bukkit.epicsaga.EpicZones.General;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.permissions.PermissionHandler;
@@ -43,7 +42,6 @@ public class EpicZones extends JavaPlugin {
 	    	PluginManager pm = getServer().getPluginManager();
 
 	    	setupPermissions();
-
 			checkConfigDir();
 			General.config.load();
 			General.config.save();
