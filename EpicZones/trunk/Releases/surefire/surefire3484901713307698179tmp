@@ -1,0 +1,30 @@
+#surefire
+#Fri Feb 04 23:36:35 CST 2011
+testClassesDirectory=C\:\\Users\\Irme\\Documents\\Eclipse Projects\\EpicZones\\trunk\\Releases\\test-classes
+classPathUrl.4=C\:\\Users\\Irme\\.m2\\repository\\com\\googlecode\\json-simple\\json-simple\\1.1\\json-simple-1.1.jar
+classPathUrl.3=C\:\\Users\\Irme\\.m2\\repository\\org\\bukkit\\bukkit\\0.0.1-SNAPSHOT\\bukkit-0.0.1-SNAPSHOT.jar
+classPathUrl.2=C\:\\Users\\Irme\\.m2\\repository\\com\\nijikokun\\Permissions\\2.0\\Permissions-2.0.jar
+useManifestOnlyJar=true
+classPathUrl.1=C\:\\Users\\Irme\\Documents\\Eclipse Projects\\EpicZones\\trunk\\Releases\\classes
+reportsDirectory=C\:\\Users\\Irme\\Documents\\Eclipse Projects\\EpicZones\\trunk\\Releases\\surefire-reports
+classPathUrl.0=C\:\\Users\\Irme\\Documents\\Eclipse Projects\\EpicZones\\trunk\\Releases\\test-classes
+dirscanner.0=directoryScannerOptions
+providerConfiguration=org.apache.maven.surefire.junit.JUnit3Provider
+testSuiteDefinitionTestSourceDirectory=C\:\\Users\\Irme\\Documents\\Eclipse Projects\\EpicZones\\trunk\\src\\test\\java
+surefireClassPathUrl.1=C\:\\Users\\Irme\\.m2\\repository\\org\\apache\\maven\\surefire\\surefire-api\\2.7.1\\surefire-api-2.7.1.jar
+surefireClassPathUrl.0=C\:\\Users\\Irme\\.m2\\repository\\org\\apache\\maven\\surefire\\surefire-junit3\\2.7.1\\surefire-junit3-2.7.1.jar
+report.2=org.apache.maven.surefire.report.XMLReporter
+useSystemClassLoader=true
+report.1=org.apache.maven.surefire.report.BriefFileReporter
+report.0=org.apache.maven.surefire.report.ForkingConsoleReporter
+excludes0=**/*$*
+isTrimStackTrace=true
+dirscanner.0.params=C\:\\Users\\Irme\\Documents\\Eclipse Projects\\EpicZones\\trunk\\Releases\\test-classes|[**/Test*.java, **/*Test.java, **/*TestCase.java]|[**/*$*]
+includes2=**/*TestCase.java
+enableAssertions=true
+failIfNoTests=false
+includes1=**/*Test.java
+dirscanner.0.types=java.io.File|java.util.ArrayList|java.util.ArrayList
+includes0=**/Test*.java
+childDelegation=false
+classPathUrl.5=C\:\\Users\\Irme\\.m2\\repository\\org\\yaml\\snakeyaml\\1.7\\snakeyaml-1.7.jar
