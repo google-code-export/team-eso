@@ -249,7 +249,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 
     	if (allZones)
     	{
-    		player.sendMessage(playerCount + " Players Online [Page " + pageNumber + " of " + ((int)Math.ceil(playerCount / playersPerPage) + 1) + "]");
+    		player.sendMessage(playerCount + " Players Online [Page " + pageNumber + " of " + ((int)Math.ceil((double)playerCount / (double)playersPerPage) + 1) + "]");
     		for(int i = (pageNumber - 1) * playersPerPage; i < (pageNumber * playersPerPage); i++)
         	{
     			if (players.size() > i)
