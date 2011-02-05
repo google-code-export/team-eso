@@ -25,7 +25,7 @@ public class EpicZone {
 	private EpicZone parent = null;
 	private Map<String, EpicZone> children = new HashMap<String, EpicZone>();
 	private Set<String> childrenNames = new HashSet<String>();
-	
+
 	public EpicZone(String zoneData)
 	{
 
@@ -43,9 +43,9 @@ public class EpicZone {
 			this.parent = null;
 			this.children = null;
 			this.pointList = buildPointList(split[8]);
-			
+
 			buildChildren(split[7]);
-			
+
 			System.out.println("Loaded Zone [" + this.name + "]");
 		}
 
@@ -68,7 +68,7 @@ public class EpicZone {
 		if(this.children == null){this.children = new HashMap<String, EpicZone>();}
 		this.children.put(childZone.getTag(), childZone);
 	}
-	
+
 //	public EpicZonePermission getPermission(String name)
 //	{
 //		EpicZonePermission result;
@@ -80,27 +80,135 @@ public class EpicZone {
 //		return result;
 //	}
 
-	public boolean pointWithin(Point point)
+
+	/**
+	 *
+	 * thrown when the the test point is definitely inside the polygon, and
+	 * no side counting is neccessary.
+	 *
+	 * @author _sir_maniac
+	 *
+	 */
+	@SuppressWarnings("serial")
+	private class Inside extends Exception {
+	};
+
+//	private String pStr(Point point) {
+//		return point.x+","+point.y;
+//	}
+
+
+	/**
+	 * Return true if the line segment (last, cur) is to the right of test.
+	 *
+	 * Based on PNPOLY algorithm by W. Randolph Franklin, modified to include
+	 *  most edges on trailing x and y sides.
+	 *
+	 *
+	 * @param test
+	 * @param last
+	 * @param cur
+	 * @param next
+	 * @throws Inside when test is the same as last or cur, which is always
+	 *         inside, so no more counting is needed.
+	 *
+	 * @see http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+	 * @see http://alienryderflex.com/polygon/
+	 *
+	 */
+	private boolean sideIsRightOf(Point test, Point last, Point cur, Point next)
+					throws Inside
 	{
+		//System.out.print("test: "+pStr(test)+" last:"+pStr(last)+" cur:"+pStr(cur)+" next:"+pStr(next));
 
-        int j = this.pointList.size() - 1;
-        boolean result = false;
+		double xIntersect;
+    	// point.y is in range of current segment
+		if ((cur.y > test.y) != (last.y > test.y))
+		{
+			xIntersect = (double)(last.x-cur.x) *
+						 (double)(test.y-cur.y) /
+						 (double)(last.y-cur.y) +
+						 cur.x;
+		}
+    	// count upper points only if ajoining segments don't
+    	else if (((cur.y == test.y || last.y == test.y)) &&
+    			(cur.y >= last.y) && (cur.y >= next.y) && (last.y != next.y))
+    	{
+			if(cur.x == test.x) // matches a point, definitely inside
+			{
+				throw new Inside();
+			}
+			xIntersect = cur.x;
+    	}
+    	else
+    	{
+    		//System.out.println("\t\t\t***nocount***");
+    		return false;
+    	}
 
-        for (int i = 0; i < this.pointList.size(); i++)
+		//System.out.print("\txIntersect:"+xIntersect);
+
+
+    	if(test.x < xIntersect ||
+    	  //count right ends, only if the next segment doesn't
+    	  (test.x == Math.ceil(xIntersect) && (next.x < cur.x)))
         {
-            if (this.pointList.get(i).y < point.y && this.pointList.get(j).y >= point.y ||
-            		this.pointList.get(j).y < point.y && this.pointList.get(i).y >= point.y)
-            {
-                if (this.pointList.get(i).x +
-                    (point.y - this.pointList.get(i).y)/(this.pointList.get(j).y - this.pointList.get(i).y)*(this.pointList.get(j).x - this.pointList.get(i).x) < point.x)
-                {
-                	result = !result;
-                }
-            }
-            j = i;
+    		//System.out.println("  --count--");
+        	return true;
         }
 
-        return result;
+		//System.out.println("  ***nocount***");
+    	return false;
+	}
+
+	/**
+	 * Determines if a point is inside a polygon.  Guaranteed to include all
+	 *   points within a square, but accuracy isn't guaranteed for more complex
+	 *   shapes.
+	 *
+	 * Based on PNPOLY algorithm by W. Randolph Franklin, modified to include
+	 *  most edges on trailing x and y sides.
+     *
+	 * @param point
+	 * @return true if point is on inside.
+	 *
+	 * @see http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+	 * @see http://alienryderflex.com/polygon/
+	 */
+	public boolean pointWithin(Point point)
+	{
+        boolean inside = false;
+
+    	int npoints = pointList.size();
+    	Point prev, cur, next;
+
+
+    	cur = pointList.get(npoints-1);
+    	next = pointList.get(0);
+
+    	try {
+	    	for (int i = 1; i < npoints; i++)
+	        {
+	    		prev = cur;
+	    		cur = next;
+	    		next = pointList.get(i);
+
+	    		if(sideIsRightOf(point, prev, cur, next))
+	    			inside = !inside;
+	        }
+
+	    	prev = cur;
+	    	cur = next;
+	    	next = pointList.get(0);
+			if(sideIsRightOf(point, prev, cur, next))
+				inside = !inside;
+
+			return inside;
+    	}
+    	catch(Inside i)
+    	{
+    		return true;
+    	}
 
 	}
 
@@ -122,12 +230,12 @@ public class EpicZone {
 		return result;
 	}
 
-	
+
 	private void buildChildren(String data)
 	{
 		Map<String, EpicZone> result = new HashMap<String, EpicZone>();
 
-		if(data.length() > 0)
+		if(data.length()>0)
 		{
 			String[] dataList = data.split("\\s");
 
@@ -136,9 +244,9 @@ public class EpicZone {
 				this.childrenNames.add(dataList[0]);
 			}
 		}
-		
+
 	}
-	
+
 //	private Map<String,EpicZonePermission> buildPermissions(String data)
 //	{
 //		Map<String,EpicZonePermission> result = new HashMap<String,EpicZonePermission>();
@@ -146,7 +254,7 @@ public class EpicZone {
 //		{
 //			String[] dataList = data.split(",");
 //			EpicZonePermission permission;
-//			
+//
 //			for(int i = 0;i < dataList.length; i++)
 //			{
 //				permission = new EpicZonePermission(dataList[i]);
@@ -166,6 +274,7 @@ public class EpicZone {
 			String[] split = dataList[i].split(":");
 			result.add(new Point(Integer.valueOf(split[0]), Integer.valueOf(split[1])));
 		}
+
 		return result;
 	}
 
