@@ -48,7 +48,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 		EpicZonePlayer ezp = General.getPlayer(player.getName());
 		int playerHeight = event.getTo().getBlockY();
 		Point playerPoint = new Point(event.getTo().getBlockX(), event.getTo().getBlockZ());
-		EpicZone currentZone = null;
+		EpicZone foundZone = null;
 
 		if(playerWithinBorder(playerPoint, player))
 		{
@@ -59,39 +59,40 @@ public class EpicZonesPlayerListener extends PlayerListener
 			{
 
 				String resultTag;
-				currentZone = ezp.getCurrentZone();
-				resultTag = General.isPointInZone(currentZone, playerHeight, playerPoint);
+				foundZone = ezp.getCurrentZone();
+				resultTag = General.isPointInZone(foundZone, playerHeight, playerPoint);
 				if(resultTag.length() > 0)
 				{
-					currentZone = General.myZones.get(resultTag);
+					if(!resultTag.equals(ezp.getCurrentZone().getTag()))
+					{
+						foundZone = General.myZones.get(resultTag);
+					}
 				}
-
-				if(!resultTag.equalsIgnoreCase(ezp.getCurrentZone().getTag()))
+				else
 				{
-					player.sendMessage(ezp.getCurrentZone().getExitText());
-					ezp.setCurrentZone(null);
+					foundZone = null;
 				}
 
 			}
 			else
 			{
-				currentZone = General.getZoneForPoint(player, ezp, playerHeight, playerPoint);
+				foundZone = General.getZoneForPoint(player, ezp, playerHeight, playerPoint);
 			}
 
 
-			if(currentZone != null)
+			if(foundZone != null)
 			{
 
-				if (ezp.getCurrentZone() == null || currentZone != ezp.getCurrentZone())
+				if (ezp.getCurrentZone() == null || foundZone != ezp.getCurrentZone())
 				{
-					if(General.hasPermissions(player, currentZone, "entry"))
+					if(General.hasPermissions(player, foundZone, "entry"))
 					{
-						ezp.setCurrentZone(currentZone);
-						player.sendMessage(currentZone.getEnterText());
+						ezp.setCurrentZone(foundZone);
+						player.sendMessage(foundZone.getEnterText());
 					}
 					else
 					{
-						WarnPlayer(player, ezp, NO_PERM_ENTER + currentZone.getName());
+						WarnPlayer(player, ezp, NO_PERM_ENTER + foundZone.getName());
 						player.teleportTo(ezp.getCurrentLocation());
 						event.setTo(ezp.getCurrentLocation());
 						event.setCancelled(true);
@@ -101,7 +102,11 @@ public class EpicZonesPlayerListener extends PlayerListener
 			}
 			else
 			{
-				ezp.setCurrentZone(null);
+				if (ezp.getCurrentZone() != null)
+				{
+					player.sendMessage(ezp.getCurrentZone().getExitText());
+					ezp.setCurrentZone(null);
+				}
 			}
 		}
 		else

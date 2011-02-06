@@ -209,11 +209,11 @@ public class General {
 			EpicZone zone = myZones.get(zoneTag);
 			if(zone.hasChildren())
 			{
-				//System.out.println("Fetching Children For " + zone.getTag() + ".");
+				System.out.println("Attaching Child Zones To " + zone.getName() + "[" + zone.getTag() + "].");
 				for(String child: zone.getChildrenTags())
 				{
 					EpicZone childZone = myZones.get(child);
-					//System.out.println("Child Zone Found [" + childZone.getTag() + "]");
+					System.out.println("\t" + childZone.getName() + "[" + childZone.getTag() + "] added as a child of " + zone.getName() + "[" + zone.getTag() + "].");
 
 					childZone.setParent(zone);
 					zone.addChild(childZone);
