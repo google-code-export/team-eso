@@ -20,90 +20,59 @@ import org.bukkit.event.block.BlockRightClickEvent;
  * @author jblaske
  */
 public class EpicZonesBlockListener extends BlockListener {
-    private final EpicZones plugin;
-    private static final String NO_PERM_DESTROY = "You do not have permissions to destroy in this zone.";
+	private final EpicZones plugin;
+	private static final String NO_PERM_DESTROY = "You do not have permissions to destroy in this zone.";
 	private static final String NO_PERM_BUILD = "You do not have permissions to build in this zone.";
 
-    public EpicZonesBlockListener(final EpicZones plugin) {
-        this.plugin = plugin;
-    }
+	public EpicZonesBlockListener(final EpicZones plugin) {
+		this.plugin = plugin;
+	}
 
-   public @Override void onBlockDamage(BlockDamageEvent event)
-   {
+	public @Override void onBlockDamage(BlockDamageEvent event)
+	{
 
-	   Player player = event.getPlayer();
-	   EpicZonePlayer ezp = General.getPlayer(player.getName());
-   	   Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
-   	   int blockHeight = event.getBlock().getLocation().getBlockY();
-   	   boolean hasPerms = false;
+		Player player = event.getPlayer();
+		EpicZonePlayer ezp = General.getPlayer(player.getName());
+		Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
+		int blockHeight = event.getBlock().getLocation().getBlockY();
+		boolean hasPerms = false;
+		EpicZone currentZone = null;
 
-	   	for(String zoneTag: General.myZoneTags)
-	   	{
-	   		EpicZone z = General.myZones.get(zoneTag);
-	   		if(blockHeight >= z.getFloor() && blockHeight <= z.getCeiling())
-			 {
-    			if(z.pointWithin(blockPoint))
-    			{
-    				if(!General.hasPermissions(player, z, "destroy"))
-    				{
-    					hasPerms = false;
-    				}
-    				else
-    				{
-    					hasPerms = true;
-    					break;
-    				}
-    			}
-			 }
-	   	}
+		currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint);
+		hasPerms = General.hasPermissions(player, currentZone, "destroy");
 
-	   	if(!hasPerms)
-	   	{
-	   		if (ezp.getLastWarned().before(new Date())){
+		if(!hasPerms)
+		{
+			if (ezp.getLastWarned().before(new Date())){
 				player.sendMessage(NO_PERM_DESTROY);
 				ezp.Warn();
-				}
+			}
 			event.setCancelled(true);
-	   	}
-   }
+		}
+	}
 
-   public @Override void onBlockPlace(BlockPlaceEvent event)
-   {
+	public @Override void onBlockPlace(BlockPlaceEvent event)
+	{
 
-	   Player player = event.getPlayer();
-	   EpicZonePlayer ezp = General.getPlayer(player.getName());
-   	   Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
-   	   int blockHeight = event.getBlock().getLocation().getBlockY();
-   	   boolean hasPerms = false;
+		Player player = event.getPlayer();
+		EpicZonePlayer ezp = General.getPlayer(player.getName());
+		Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
+		int blockHeight = event.getBlock().getLocation().getBlockY();
+		boolean hasPerms = false;
 
-   	for(String zoneTag: General.myZoneTags)
-   	{
-   		EpicZone z = General.myZones.get(zoneTag);
-	   		if(blockHeight >= z.getFloor() && blockHeight <= z.getCeiling())
-			 {
-				if(z.pointWithin(blockPoint))
-				{
-					if(!General.hasPermissions(player, z, "build"))
-					{
-    					hasPerms = false;
-    				}
-    				else
-    				{
-    					hasPerms = true;
-    					break;
-    				}
-				}
-			 }
-	   	}
+		EpicZone currentZone = null;
 
-	   	if(!hasPerms)
-	   	{
-	   		if (ezp.getLastWarned().before(new Date())){
+		currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint);
+		hasPerms = General.hasPermissions(player, currentZone, "build");
+
+		if(!hasPerms)
+		{
+			if (ezp.getLastWarned().before(new Date())){
 				player.sendMessage(NO_PERM_BUILD);
 				ezp.Warn();
-				}
+			}
 			event.setCancelled(true);
-	   	}
-   }
+		}
+	}
 
 }
