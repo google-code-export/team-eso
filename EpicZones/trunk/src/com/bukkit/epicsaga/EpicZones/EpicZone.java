@@ -25,6 +25,8 @@ public class EpicZone {
 	private EpicZone parent = null;
 	private Map<String, EpicZone> children = new HashMap<String, EpicZone>();
 	private Set<String> childrenNames = new HashSet<String>();
+	private boolean hasChildrenFlag = false;
+	private boolean hasParentFlag = false;
 
 	public EpicZone(String zoneData)
 	{
@@ -61,155 +63,151 @@ public class EpicZone {
 	public String getExitText(){return exitText;}
 	public EpicZone getParent(){return parent;}
 	public Map<String, EpicZone> getChildren(){return children;}
-	public Set<String> getChildrenNames(){return childrenNames;}
-
+	public Set<String> getChildrenTags(){return childrenNames;}
+	public boolean hasChildren(){return hasChildrenFlag;}
+	public boolean hasParent(){return hasParentFlag;}
 	public void addChild(EpicZone childZone)
 	{
 		if(this.children == null){this.children = new HashMap<String, EpicZone>();}
 		this.children.put(childZone.getTag(), childZone);
 	}
 
-//	public EpicZonePermission getPermission(String name)
-//	{
-//		EpicZonePermission result;
-//		//System.out.println("Getting Permissons For:" + name + " in zone: " + this.name);
-//		result = permissions.get(name);
-//		//if(result == null)
-//		//{System.out.println("No Permissions Found");}
-//		//{System.out.println(permissions.toString());}
-//		return result;
-//	}
+	 /**
+    *
+    * thrown when the the test point is definitely inside the polygon, and
+    * no side counting is neccessary.
+    *
+    * @author _sir_maniac
+    *
+    */
+   @SuppressWarnings("serial")
+   private class Inside extends Exception {
+   };
+
+// private String pStr(Point point) {
+//         return point.x+","+point.y;
+// }
 
 
-	/**
-	 *
-	 * thrown when the the test point is definitely inside the polygon, and
-	 * no side counting is neccessary.
-	 *
-	 * @author _sir_maniac
-	 *
-	 */
-	@SuppressWarnings("serial")
-	private class Inside extends Exception {
-	};
+   /**
+    * Return true if the line segment (last, cur) is to the right of test.
+    *
+    * Based on PNPOLY algorithm by W. Randolph Franklin, modified to include
+    *  most edges on trailing x and y sides.
+    *
+    *
+    * @param test
+    * @param last
+    * @param cur
+    * @param next
+    * @throws Inside when test is the same as last or cur, which is always
+    *         inside, so no more counting is needed.
+    *
+    * @see http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+    * @see http://alienryderflex.com/polygon/
+    *
+    */
+   private boolean sideIsRightOf(Point test, Point last, Point cur, Point next)
+                                   throws Inside
+   {
+           //System.out.print("test: "+pStr(test)+" last:"+pStr(last)+" cur:"+pStr(cur)+" next:"+pStr(next));
 
-//	private String pStr(Point point) {
-//		return point.x+","+point.y;
-//	}
+           double xIntersect;
+   // point.y is in range of current segment
+           if ((cur.y > test.y) != (last.y > test.y))
+           {
+                   xIntersect = (double)(last.x-cur.x) *
+                                            (double)(test.y-cur.y) /
+                                            (double)(last.y-cur.y) +
+                                            cur.x;
+           }
+   // count upper points only if ajoining segments don't
+   else if (((cur.y == test.y || last.y == test.y)) &&
+                   (cur.y >= last.y) && (cur.y >= next.y) && (last.y != next.y))
+   {
+                   if(cur.x == test.x) // matches a point, definitely inside
+                   {
+                           throw new Inside();
+                   }
+                   xIntersect = cur.x;
+   }
+   else
+   {
+           //System.out.println("\t\t\t***nocount***");
+           return false;
+   }
+
+           //System.out.print("\txIntersect:"+xIntersect);
 
 
-	/**
-	 * Return true if the line segment (last, cur) is to the right of test.
-	 *
-	 * Based on PNPOLY algorithm by W. Randolph Franklin, modified to include
-	 *  most edges on trailing x and y sides.
-	 *
-	 *
-	 * @param test
-	 * @param last
-	 * @param cur
-	 * @param next
-	 * @throws Inside when test is the same as last or cur, which is always
-	 *         inside, so no more counting is needed.
-	 *
-	 * @see http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-	 * @see http://alienryderflex.com/polygon/
-	 *
-	 */
-	private boolean sideIsRightOf(Point test, Point last, Point cur, Point next)
-					throws Inside
+   if(test.x < xIntersect ||
+     //count right ends, only if the next segment doesn't
+     (test.x == Math.ceil(xIntersect) && (next.x < cur.x)))
+   {
+           //System.out.println("  --count--");
+           return true;
+   }
+
+           //System.out.println("  ***nocount***");
+   return false;
+   }
+
+   /**
+    * Determines if a point is inside a polygon.  Guaranteed to include all
+    *   points within a square, but accuracy isn't guaranteed for more complex
+    *   shapes.
+    *
+    * Based on PNPOLY algorithm by W. Randolph Franklin, modified to include
+    *  most edges on trailing x and y sides.
+*
+    * @param point
+    * @return true if point is on inside.
+    *
+    * @see http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+    * @see http://alienryderflex.com/polygon/
+    */
+   public boolean pointWithin(Point point)
+   {
+   boolean inside = false;
+
+   int npoints = pointList.size();
+   Point prev, cur, next;
+
+
+   cur = pointList.get(npoints-1);
+   next = pointList.get(0);
+
+   try {
+           for (int i = 1; i < npoints; i++)
+           {
+                   prev = cur;
+                   cur = next;
+                   next = pointList.get(i);
+
+                   if(sideIsRightOf(point, prev, cur, next))
+                           inside = !inside;
+           }
+
+           prev = cur;
+           cur = next;
+           next = pointList.get(0);
+                   if(sideIsRightOf(point, prev, cur, next))
+                           inside = !inside;
+
+                   return inside;
+   }
+   catch(Inside i)
+   {
+           return true;
+   }
+
+   }
+
+
+	public void setParent(EpicZone parent)
 	{
-		//System.out.print("test: "+pStr(test)+" last:"+pStr(last)+" cur:"+pStr(cur)+" next:"+pStr(next));
-
-		double xIntersect;
-    	// point.y is in range of current segment
-		if ((cur.y > test.y) != (last.y > test.y))
-		{
-			xIntersect = (double)(last.x-cur.x) *
-						 (double)(test.y-cur.y) /
-						 (double)(last.y-cur.y) +
-						 cur.x;
-		}
-    	// count upper points only if ajoining segments don't
-    	else if (((cur.y == test.y || last.y == test.y)) &&
-    			(cur.y >= last.y) && (cur.y >= next.y) && (last.y != next.y))
-    	{
-			if(cur.x == test.x) // matches a point, definitely inside
-			{
-				throw new Inside();
-			}
-			xIntersect = cur.x;
-    	}
-    	else
-    	{
-    		//System.out.println("\t\t\t***nocount***");
-    		return false;
-    	}
-
-		//System.out.print("\txIntersect:"+xIntersect);
-
-
-    	if(test.x < xIntersect ||
-    	  //count right ends, only if the next segment doesn't
-    	  (test.x == Math.ceil(xIntersect) && (next.x < cur.x)))
-        {
-    		//System.out.println("  --count--");
-        	return true;
-        }
-
-		//System.out.println("  ***nocount***");
-    	return false;
-	}
-
-	/**
-	 * Determines if a point is inside a polygon.  Guaranteed to include all
-	 *   points within a square, but accuracy isn't guaranteed for more complex
-	 *   shapes.
-	 *
-	 * Based on PNPOLY algorithm by W. Randolph Franklin, modified to include
-	 *  most edges on trailing x and y sides.
-     *
-	 * @param point
-	 * @return true if point is on inside.
-	 *
-	 * @see http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-	 * @see http://alienryderflex.com/polygon/
-	 */
-	public boolean pointWithin(Point point)
-	{
-        boolean inside = false;
-
-    	int npoints = pointList.size();
-    	Point prev, cur, next;
-
-
-    	cur = pointList.get(npoints-1);
-    	next = pointList.get(0);
-
-    	try {
-	    	for (int i = 1; i < npoints; i++)
-	        {
-	    		prev = cur;
-	    		cur = next;
-	    		next = pointList.get(i);
-
-	    		if(sideIsRightOf(point, prev, cur, next))
-	    			inside = !inside;
-	        }
-
-	    	prev = cur;
-	    	cur = next;
-	    	next = pointList.get(0);
-			if(sideIsRightOf(point, prev, cur, next))
-				inside = !inside;
-
-			return inside;
-    	}
-    	catch(Inside i)
-    	{
-    		return true;
-    	}
-
+		this.parent = parent;
+		this.hasParentFlag = true;
 	}
 
 	private ArrayList<SimpleEntry<String, String>> buildFlags(String data)
@@ -233,7 +231,6 @@ public class EpicZone {
 
 	private void buildChildren(String data)
 	{
-		Map<String, EpicZone> result = new HashMap<String, EpicZone>();
 
 		if(data.length()>0)
 		{
@@ -241,28 +238,12 @@ public class EpicZone {
 
 			for(int i = 0;i < dataList.length; i++)
 			{
-				this.childrenNames.add(dataList[0]);
+				this.childrenNames.add(dataList[i]);
+				this.hasChildrenFlag = true;
 			}
 		}
 
 	}
-
-//	private Map<String,EpicZonePermission> buildPermissions(String data)
-//	{
-//		Map<String,EpicZonePermission> result = new HashMap<String,EpicZonePermission>();
-//		if(data.length()>0)
-//		{
-//			String[] dataList = data.split(",");
-//			EpicZonePermission permission;
-//
-//			for(int i = 0;i < dataList.length; i++)
-//			{
-//				permission = new EpicZonePermission(dataList[i]);
-//				result.put(permission.getPermissionObject(), permission);
-//			}
-//		}
-//		return result;
-//	}
 
 	private ArrayList<Point> buildPointList(String data)
 	{
