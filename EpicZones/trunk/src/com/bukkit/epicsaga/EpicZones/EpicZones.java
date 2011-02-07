@@ -48,6 +48,7 @@ public class EpicZones extends JavaPlugin {
 			General.loadZones(this.getDataFolder());
 
 			pm.registerEvent(Event.Type.PLAYER_MOVE, this.playerListener, Event.Priority.Normal, this);
+			pm.registerEvent(Event.Type.PLAYER_TELEPORT, this.playerListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_LOGIN, this.playerListener, Event.Priority.Monitor, this);
 			pm.registerEvent(Event.Type.PLAYER_QUIT, this.playerListener, Event.Priority.Monitor, this);
 			pm.registerEvent(Event.Type.PLAYER_COMMAND, this.playerListener, Event.Priority.Normal, this);
@@ -56,6 +57,10 @@ public class EpicZones extends JavaPlugin {
 			pm.registerEvent(Event.Type.BLOCK_DAMAGED, this.blockListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_PLACED, this.blockListener, Event.Priority.Normal, this);
 
+			for(Player p:getServer().getOnlinePlayers())
+			{
+				General.addPlayer(p.getEntityId(), p.getName());
+			}
 
 			System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled." );
 
@@ -66,7 +71,7 @@ public class EpicZones extends JavaPlugin {
 		}
 	}
 	public void onDisable() {
-		PluginDescriptionFile pdfFile = this.getDescription();
+		PluginDescriptionFile pdfFile = this.getDescription();	
 		System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is disabled." );
 	}
 	public boolean isDebugging(final Player player) {

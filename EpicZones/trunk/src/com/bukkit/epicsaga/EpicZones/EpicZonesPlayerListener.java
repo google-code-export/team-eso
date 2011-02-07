@@ -48,12 +48,47 @@ public class EpicZonesPlayerListener extends PlayerListener
 		EpicZonePlayer ezp = General.getPlayer(player.getName());
 		int playerHeight = event.getTo().getBlockY();
 		Point playerPoint = new Point(event.getTo().getBlockX(), event.getTo().getBlockZ());
+
+		if(ezp.getCurrentLocation() == null){ezp.setCurrentLocation(event.getFrom());}
+		if(!PlayerWithinZoneLogic(player, ezp, playerHeight, playerPoint))
+		{
+			event.setTo(ezp.getCurrentLocation());
+			event.setCancelled(true);
+		}
+		else
+		{
+			ezp.setCurrentLocation(event.getTo());
+		}
+
+	}
+
+	public @Override void onPlayerTeleport(PlayerMoveEvent event)
+	{
+
+		Player player = event.getPlayer();
+		EpicZonePlayer ezp = General.getPlayer(player.getName());
+		int playerHeight = event.getTo().getBlockY();
+		Point playerPoint = new Point(event.getTo().getBlockX(), event.getTo().getBlockZ());
+
+		if(ezp.getCurrentLocation() == null){ezp.setCurrentLocation(event.getFrom());}
+		if(!PlayerWithinZoneLogic(player, ezp, playerHeight, playerPoint))
+		{
+			event.setTo(ezp.getCurrentLocation());
+			event.setCancelled(true);
+		}
+		{
+			ezp.setCurrentLocation(event.getTo());
+		}
+
+	}
+
+	private boolean PlayerWithinZoneLogic(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint)
+	{
+
 		EpicZone foundZone = null;
 
 		if(playerWithinBorder(playerPoint, player))
 		{
-
-			if(ezp.getCurrentLocation() == null){ezp.setCurrentLocation(event.getTo());}
 
 			if(ezp.getCurrentZone() != null)
 			{
@@ -94,8 +129,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 					{
 						WarnPlayer(player, ezp, NO_PERM_ENTER + foundZone.getName());
 						player.teleportTo(ezp.getCurrentLocation());
-						event.setTo(ezp.getCurrentLocation());
-						event.setCancelled(true);
+						return false;
 					}
 				}
 
@@ -113,66 +147,11 @@ public class EpicZonesPlayerListener extends PlayerListener
 		{
 			WarnPlayer(player, ezp, NO_PERM_BORDER);
 			player.teleportTo(ezp.getCurrentLocation());
-			event.setTo(ezp.getCurrentLocation());
-			event.setCancelled(true);
+			return false;
 		}
 
+		return true;
 
-
-		//    		//player.sendMessage(EpicZones.permissions.getGroup(player.getName()));
-		//
-		//	    	//if(ezp.getCurrentLocation() == null){ezp.setCurrentLocation(event.getTo());}
-		//
-		////	    	if(ezp.getCurrentZone() != null && !ezp.getCurrentZone().pointWithin(playerPoint))
-		////	    	{
-		////	    		player.sendMessage(ezp.getCurrentZone().getExitText());
-		////	    		ezp.setCurrentZone(null);
-		////	    	}
-		//
-		//	    	for(String zoneTag: General.myZoneTags)
-		//		   	{
-		//		   		EpicZone z = General.myZones.get(zoneTag);
-		//	    		if (ezp.getCurrentZone() == null || z != ezp.getCurrentZone())
-		//	    		{
-		//	    			
-		//	    			 if (ezp.getCurrentZone() == null || ezp.getCurrentZone().getParent() == null || z != ezp.getCurrentZone().getParent())
-		//	    			 {
-		//	    				 if(playerHeight >= z.getFloor() && playerHeight <= z.getCeiling())
-		//	    				 {
-		//			    			if(z.pointWithin(playerPoint))
-		//			    			{
-		//			    				if(General.hasPermissions(player, z, "entry"))
-		//			    				{
-		//									ezp.setCurrentZone(z);
-		//									player.sendMessage(z.getEnterText());
-		//			    				}
-		//			    				else
-		//			    				{
-		//			    					if (ezp.getLastWarned().before(new Date())){
-		//			    						player.sendMessage(NO_PERM_ENTER + z.getName());
-		//			    						ezp.Warn();
-		//			    						}
-		//			    					player.teleportTo(ezp.getCurrentLocation());
-		//			    					event.setTo(ezp.getCurrentLocation());
-		//			    					event.setCancelled(true);
-		//			    				}
-		//			    			}
-		//	    				 }
-		//	    			 }
-		//	    		}
-		//	    	}
-		//	    	ezp.setCurrentLocation(event.getTo());
-		//    	}
-		//    	else
-		//    	{
-		//    		if (ezp.getLastWarned().before(new Date())){
-		//				player.sendMessage(NO_PERM_BORDER);
-		//				ezp.Warn();
-		//				}
-		//			player.teleportTo(ezp.getCurrentLocation());
-		//			event.setTo(ezp.getCurrentLocation());
-		//			event.setCancelled(true);
-		//    	}
 	}
 
 	private void WarnPlayer(Player player, EpicZonePlayer ezp, String message)
@@ -183,8 +162,6 @@ public class EpicZonesPlayerListener extends PlayerListener
 			ezp.Warn();
 		}
 	}
-
-
 
 	public @Override void onPlayerLogin(PlayerLoginEvent event)
 	{
@@ -224,7 +201,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 								pageNumber = 1;
 							}
 						}
-						buildWho(event.getPlayer(), pageNumber, true);
+						buildWho(General.getPlayer(event.getPlayer().getName()), event.getPlayer(), pageNumber, true);
 						return;
 					}
 					else
@@ -239,7 +216,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 						}
 					}
 				}
-				buildWho(event.getPlayer(), pageNumber, false);
+				buildWho(General.getPlayer(event.getPlayer().getName()), event.getPlayer(), pageNumber, false);
 				event.setCancelled(true);
 			}
 			else if(split[0].equalsIgnoreCase("/reloadez"))
@@ -269,25 +246,23 @@ public class EpicZonesPlayerListener extends PlayerListener
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
 			Point blockPoint = new Point(event.getBlockClicked().getLocation().getBlockX(), event.getBlockClicked().getLocation().getBlockZ());
 			int blockHeight = event.getBlockClicked().getLocation().getBlockY();
+			boolean hasPerms = false;
 
-			for(String zoneTag: General.myZoneTags)
+			EpicZone currentZone = null;
+
+			currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint);
+			hasPerms = General.hasPermissions(player, currentZone, "build");
+
+			if(!hasPerms)
 			{
-				EpicZone z = General.myZones.get(zoneTag);
-				if(blockHeight >= z.getFloor() && blockHeight <= z.getCeiling())
+				if (ezp.getLastWarned().before(new Date()))
 				{
-					if(z.pointWithin(blockPoint))
-					{
-						if(!General.hasPermissions(player, z, "build"))
-						{
-							if (ezp.getLastWarned().before(new Date())){
-								player.sendMessage(NO_PERM_BUCKET);
-								ezp.Warn();
-							}
-							event.setCancelled(true);
-						}
-					}
+					player.sendMessage(NO_PERM_BUCKET);
+					ezp.Warn();
 				}
+				event.setCancelled(true);
 			}
+
 		}
 		else if(event.getPlayer().getItemInHand().getTypeId() == EMPTY_BUCKET)
 		{
@@ -295,31 +270,27 @@ public class EpicZonesPlayerListener extends PlayerListener
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
 			Point blockPoint = new Point(event.getBlockClicked().getLocation().getBlockX(), event.getBlockClicked().getLocation().getBlockZ());
 			int blockHeight = event.getBlockClicked().getLocation().getBlockY();
+			boolean hasPerms = false;
 
-			for(String zoneTag: General.myZoneTags)
+			EpicZone currentZone = null;
+
+			currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint);
+			hasPerms = General.hasPermissions(player, currentZone, "destroy");
+
+			if(!hasPerms)
 			{
-				EpicZone z = General.myZones.get(zoneTag);
-				if(blockHeight >= z.getFloor() && blockHeight <= z.getCeiling())
+				if (ezp.getLastWarned().before(new Date()))
 				{
-					if(z.pointWithin(blockPoint))
-					{
-						if(!General.hasPermissions(player, z, "destroy"))
-						{
-							if (ezp.getLastWarned().before(new Date()))
-							{
-								player.sendMessage(NO_PERM_BUCKET);
-								ezp.Warn();
-							}
-							event.setCancelled(true);
-						}
-					}
+					player.sendMessage(NO_PERM_BUCKET);
+					ezp.Warn();
 				}
+				event.setCancelled(true);
 			}
 		}
 
 	}
 
-	private void buildWho(Player player, int pageNumber, boolean allZones)
+	private void buildWho(EpicZonePlayer ezp, Player player, int pageNumber, boolean allZones)
 	{
 
 		EpicZone currentZone = General.getPlayer(player.getName()).getCurrentZone();
@@ -335,7 +306,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 			{
 				if (players.size() > i)
 				{
-					player.sendMessage(buildWhoPlayerName(players, i, allZones));
+					player.sendMessage(buildWhoPlayerName(ezp, players, i, allZones));
 				}
 			}
 		}
@@ -346,30 +317,46 @@ public class EpicZonesPlayerListener extends PlayerListener
 			{
 				if (players.size() > i)
 				{
-					player.sendMessage(buildWhoPlayerName(players, i, allZones));
+					player.sendMessage(buildWhoPlayerName(ezp, players, i, allZones));
 				}
 			}
 		}
 	}
 
-	private String buildWhoPlayerName(ArrayList<EpicZonePlayer> players, int index, boolean allZones )
+	private String buildWhoPlayerName(EpicZonePlayer ezp, ArrayList<EpicZonePlayer> players, int index, boolean allZones )
 	{
 
 		if (allZones)
 		{
 			if(players.get(index).getCurrentZone() != null)
 			{
-				return players.get(index).getName() + " - " + players.get(index).getCurrentZone().getName();
+				return players.get(index).getName() + " - " + players.get(index).getCurrentZone().getName() + " - Distance: " + CalcDist(ezp, players.get(index));
 			}
 			else
 			{
-				return players.get(index).getName();
+				return players.get(index).getName() + " - Distance: " + CalcDist(ezp, players.get(index));
 			}
 		}
 		else
 		{
-			return players.get(index).getName();
+			return players.get(index).getName() + " - Distance: " + CalcDist(ezp, players.get(index));
 		}
+	}
+
+	private int	CalcDist(EpicZonePlayer player1, EpicZonePlayer player2)
+	{
+		int result = 0;
+
+		if(!player1.getName().equals(player2.getName()))
+		{
+			int aSquared = (int)(player1.getDistanceFromCenter() * player1.getDistanceFromCenter());
+			int bSquared = (int)(player2.getDistanceFromCenter() * player2.getDistanceFromCenter());
+			int cSquared = aSquared + bSquared;
+
+			result = (int)Math.sqrt(cSquared);
+		}
+
+		return result;
 	}
 
 	private ArrayList<EpicZonePlayer> getPlayers(EpicZone currentZone, boolean allZones)
@@ -395,15 +382,17 @@ public class EpicZonesPlayerListener extends PlayerListener
 	private boolean playerWithinBorder(Point point, Player player)
 	{
 
+		EpicZonePlayer ezp = General.getPlayer(player.getName());
+		double xsquared = point.x * point.x;
+		double ysquared = point.y * point.y;
+		double distanceFromCenter = Math.sqrt(xsquared + ysquared);
+
+		ezp.setDistanceFromCenter((int)distanceFromCenter);
+
 		if(General.config.enableRadius && !EpicZones.permissions.has(player, "epiczones.ignoremapradius"))
 		{
 
-			double xsquared = point.x * point.x;
-			double ysquared = point.y * point.y;
-			double distanceFromCenter = Math.sqrt(xsquared + ysquared);
-
-			//player.sendMessage("Distance From Center: " + distanceFromCenter);
-
+			//WarnPlayer(player, ezp, "Distance From Center: " + distanceFromCenter);
 			if(distanceFromCenter <= General.config.mapRadius)
 			{
 				return true;

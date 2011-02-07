@@ -88,34 +88,39 @@ public class General {
 	public static boolean hasPermissions(Player player, EpicZone zone, String flag)
 	{
 
-		if(zone != null)
-		{
-			//System.out.println("Zone Tag: " + zone.getTag());
-			//System.out.println("Has Parent: " + zone.hasParent());
-			//System.out.println("Permission Check: " + "epiczones." + zone.getTag() + "." + flag);
-			//System.out.println("Permission Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag));
-		}
+		//if(zone != null)
+		//{
+		//System.out.println("Zone Tag: " + zone.getTag());
+		//System.out.println("Has Parent: " + zone.hasParent());
+		//System.out.println("Permission Check: " + "epiczones." + zone.getTag() + "." + flag);
+		//System.out.println("Permission Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag));
+		//}
 
-		if(zone == null)
+		if(!EpicZones.permissions.has(player, "epiczones.ignorepermissions"))
 		{
-			return getDefaultPerm(flag);
-		}
-		else if(EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag))
-		{
-			return true;
-		}
-		else if(zone.hasParent())
-		{
-			//System.out.println("Checking [" + zone.getName() + "] Parent [" + zone.getParent().getName() + "] Permissions. Result: " + hasPermissions(player, zone.getParent(), flag));
-			return hasPermissions(player, zone.getParent(), flag);
+			if(zone == null)
+			{
+				return getDefaultPerm(flag);
+			}
+			else if(EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag) && !EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny"))
+			{
+				return true;
+			}
+			else if(zone.hasParent())
+			{
+				//System.out.println("Checking [" + zone.getName() + "] Parent [" + zone.getParent().getName() + "] Permissions. Result: " + hasPermissions(player, zone.getParent(), flag));
+				return hasPermissions(player, zone.getParent(), flag);
+			}
+			else
+			{
+				return getDefaultPerm(flag);	
+			}
 		}
 		else
 		{
-			return getDefaultPerm(flag);	
+			return true;
 		}
-
 	}
-
 
 	private static boolean getDefaultPerm(String flag)
 	{
@@ -128,47 +133,6 @@ public class General {
 
 		return false;
 	}
-
-	//	private static boolean testPerms(EpicZonePlayer player, EpicZone zone, String flag)
-	//	{
-	//
-	//		boolean result = getDefaultPerm(flag);
-	//		String group = EpicZones.permissions.getGroup(player.getName());
-	//		EpicZonePermission p;
-	//
-	//		p = zone.getPermission(group);
-	//
-	//		//System.out.println("Permissions: " + p.getPermissionObject());
-	//
-	//		if(p == null)
-	//		{
-	//			p = zone.getPermission(player.getName());
-	//		}
-	//
-	//		if(p != null)
-	//		{
-	//
-	//			//We know permissions are defined for the player, reset the result to false, so that if permissions are not granted, they can be denied.
-	//			result = false;
-	//
-	//			Map<String,String> flags = p.getPermissionFlags();
-	//
-	//			//System.out.println("Flags: " + flags.toString());
-	//			//System.out.println("Flag Checked: " + flag);
-	//			if(flags.containsKey(flag) &&
-	//					flags.get(flag).equalsIgnoreCase("allow"))
-	//			{
-	//				result = true;
-	//				//System.out.println("Allowed!");
-	//			}
-	////			else if(p.getPermissionObject().equalsIgnoreCase(player.getName()))
-	////			{
-	////				result = false;
-	////			}
-	//		}
-	//
-	//		return result;
-	//	}
 
 	public static void loadZones(File path) throws FileNotFoundException
 	{
@@ -209,11 +173,11 @@ public class General {
 			EpicZone zone = myZones.get(zoneTag);
 			if(zone.hasChildren())
 			{
-				System.out.println("Attaching Child Zones To " + zone.getName() + "[" + zone.getTag() + "].");
+				//System.out.println("Attaching Child Zones To " + zone.getName() + "[" + zone.getTag() + "].");
 				for(String child: zone.getChildrenTags())
 				{
 					EpicZone childZone = myZones.get(child);
-					System.out.println("\t" + childZone.getName() + "[" + childZone.getTag() + "] added as a child of " + zone.getName() + "[" + zone.getTag() + "].");
+					//System.out.println("\t" + childZone.getName() + "[" + childZone.getTag() + "] added as a child of " + zone.getName() + "[" + zone.getTag() + "].");
 
 					childZone.setParent(zone);
 					zone.addChild(childZone);
@@ -236,8 +200,8 @@ public class General {
 
 		for(String zoneTag: General.myZoneTags)
 		{
-			EpicZone z = General.myZones.get(zoneTag);
-			resultTag = General.isPointInZone(z, playerHeight, playerPoint);
+			EpicZone zone = General.myZones.get(zoneTag);
+			resultTag = General.isPointInZone(zone, playerHeight, playerPoint);
 			if(resultTag.length() > 0)
 			{
 				result = General.myZones.get(resultTag);
@@ -261,18 +225,16 @@ public class General {
 				result = isPointInZone(zone.getChildren().get(zoneTag), playerHeight, playerPoint);
 				if(result.length() > 0)
 				{
-					break;
+					return result;
 				}
 			}
 		}
-		else
+
+		if(playerHeight >= zone.getFloor() && playerHeight <= zone.getCeiling())
 		{
-			if(playerHeight >= zone.getFloor() && playerHeight <= zone.getCeiling())
+			if(zone.pointWithin(playerPoint))
 			{
-				if(zone.pointWithin(playerPoint))
-				{
-					result = zone.getTag();
-				}
+				result = zone.getTag();
 			}
 		}
 

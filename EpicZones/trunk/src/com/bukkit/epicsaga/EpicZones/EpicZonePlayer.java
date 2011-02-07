@@ -14,12 +14,14 @@ public class EpicZonePlayer {
 	private String name;
 	private Location currentLocation;
 	private Date lastWarned = new Date();
+	private int distanceFromCenter;
 	
 	public EpicZone getCurrentZone(){return currentZone;}
 	public int getEntityID(){return entityID;}
 	public String getName(){return name;}
 	public Location getCurrentLocation(){return currentLocation;}
 	public Date getLastWarned(){return lastWarned;}
+	public int getDistanceFromCenter(){return distanceFromCenter;}
 	
 	public EpicZonePlayer(int entityID, String name)
 	{
@@ -30,6 +32,11 @@ public class EpicZonePlayer {
 	public void setCurrentZone(EpicZone z)
 	{
 		this.currentZone = z;
+	}
+	
+	public void setDistanceFromCenter(int distance)
+	{
+		this.distanceFromCenter = distance;
 	}
 	
 	public void setCurrentLocation(Location l)
