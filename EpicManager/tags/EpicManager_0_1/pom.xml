@@ -15,26 +15,46 @@
   <!-- Properties -->
 
   <properties>
-  	<extern.folder>${project.basedir}/Releases</extern.folder>
+    <extern.folder>${project.basedir}/Releases</extern.folder>
     <pom.folder>${project.basedir}/src/poms</pom.folder>
 
-  	<bukkit.version>0.0.1-SNAPSHOT</bukkit.version>
-  	<bukkit.build>100</bukkit.build>
+    <!--
+      Change these to move to another build, remember to:
+
+      - match the craftbukkit build to the buklkit build:
+          http://bamboo.lukegb.com/browse/BUKKIT-CRAFTBUKKIT/history
+      - change the sha1 checksums below to the new files
+
+     -->
+    <bukkit.build>100</bukkit.build>
+    <craftbukkit.build>200</craftbukkit.build>
+
+    <!--
+       use an sha1 checksum utility to recalculate these
+
+       (try: http://www.google.com/search?q=sha1+checksum+utility)
+
+     -->
+    <bukkit.sha1>fd352f9bd0c8e933af9c20a579816d56446aaf0e</bukkit.sha1>
+    <craftbukkit.sha1>c166000d8aa656905d9277e5dcd61387abe738f2</craftbukkit.sha1>
+
+    <bukkit.version>0.0.1-SNAPSHOT</bukkit.version>
     <bukkit.pom>${pom.folder}/bukkit-${bukkit.version}.pom</bukkit.pom>
     <bukkit.url>
       http://bamboo.lukegb.com/browse/BUKKIT-BUKKITMAIN-JOB1-${bukkit.build}/artifact/Bukkit-JAR/bukkit-${bukkit.version}.jar
     </bukkit.url>
-    <bukkit.sha1>fd352f9bd0c8e933af9c20a579816d56446aaf0e</bukkit.sha1>
 
-  	<craftbukkit.version>0.0.1-SNAPSHOT</craftbukkit.version>
-  	<craftbukkit.build>200</craftbukkit.build>
+    <craftbukkit.version>0.0.1-SNAPSHOT</craftbukkit.version>
     <craftbukkit.pom>${pom.folder}/craftbukkit-${bukkit.version}.pom</craftbukkit.pom>
     <craftbukkit.url>
       http://bamboo.lukegb.com/browse/BUKKIT-CRAFTBUKKIT-JOB1-${craftbukkit.build}/artifact/CraftBukkit-JAR/craftbukkit-${craftbukkit.version}.jar
     </craftbukkit.url>
-    <craftbukkit.sha1>c166000d8aa656905d9277e5dcd61387abe738f2</craftbukkit.sha1>
 
-	<permissions.version>2.0</permissions.version>
+    <!--
+      Change this to use a different version of permissions, remember to change
+      the checksum.
+    -->
+    <permissions.version>2.0</permissions.version>
     <permissions.url>http://mirror.nexua.org/Permissions/JARS/${permissions.version}/Permissions.jar</permissions.url>
     <permissions.sha1>f78d01af5c4257b0bd91764d2dff80e51e69a0d7</permissions.sha1>
   </properties>
