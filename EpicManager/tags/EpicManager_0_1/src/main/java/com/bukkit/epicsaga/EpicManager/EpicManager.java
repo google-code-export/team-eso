@@ -113,7 +113,7 @@ public class EpicManager extends JavaPlugin {
 	        logInfo( " version " + pdfFile.getVersion() + " is enabled." );
     	}
         catch(EnableError e) {
-        	logSevere("Error intilizing plugin." + e.toString());
+        	logSevere("Error intilizing plugin, disabling." + e.toString());
 
         	this.getServer().getPluginManager().disablePlugin(this);
         }

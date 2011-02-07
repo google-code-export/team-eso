@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -192,8 +193,9 @@ public class HomeFeature implements PluginFeature {
 			int chunkx = dest.getBlockX() >> 4;
 			int chunkz = dest.getBlockZ() >> 4;
 
-			if (!world.isChunkLoaded(chunkx, chunkz)) {
-				world.loadChunk(chunkx, chunkz);
+			Chunk chunk = world.getChunkAt(chunkx, chunkz);
+			if (!world.isChunkLoaded(chunk)) {
+				world.loadChunk(chunk);
 			}
 
 			event.setTo(dest);

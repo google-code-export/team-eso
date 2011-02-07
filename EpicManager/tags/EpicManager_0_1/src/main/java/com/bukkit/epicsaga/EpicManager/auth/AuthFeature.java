@@ -49,6 +49,11 @@ import com.bukkit.epicsaga.EpicManager.EpicManager;
 import com.bukkit.epicsaga.EpicManager.PluginFeature;
 import com.bukkit.epicsaga.EpicManager.EpicManager.EnableError;
 
+/* TODO: make the permission work directly from the permissions file.
+ * Also support a banned reason to be included.
+ */
+
+
 /**
  * A PluginFeature that handles user login authorization.  Currently implemented
  *   as a flat-file whitelist.
