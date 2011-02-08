@@ -15,13 +15,22 @@ public class EpicZonePlayer {
 	private Location currentLocation;
 	private Date lastWarned = new Date();
 	private int distanceFromCenter;
+	private boolean teleporting = false;
+	private Date lastCheck = new Date();
 	
 	public EpicZone getCurrentZone(){return currentZone;}
 	public int getEntityID(){return entityID;}
 	public String getName(){return name;}
 	public Location getCurrentLocation(){return currentLocation;}
 	public Date getLastWarned(){return lastWarned;}
+	public Date getLastCheck(){return lastCheck;}
 	public int getDistanceFromCenter(){return distanceFromCenter;}
+	public boolean isTeleporting(){return teleporting;}
+	
+	public void setEntityID(int value)
+	{
+		this.entityID = value;
+	}
 	
 	public EpicZonePlayer(int entityID, String name)
 	{
@@ -49,5 +58,17 @@ public class EpicZonePlayer {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.SECOND, 2);
 		this.lastWarned = cal.getTime();
+	}
+	
+	public void Check()
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MILLISECOND, 500);
+		this.lastCheck = cal.getTime();
+	}
+	
+	public void setIsTeleporting(boolean value)
+	{
+		teleporting = value;
 	}
 }

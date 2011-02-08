@@ -23,6 +23,7 @@ import org.bukkit.plugin.Plugin;
 public class EpicZones extends JavaPlugin {
 	private final EpicZonesPlayerListener playerListener = new EpicZonesPlayerListener(this);
 	private final EpicZonesBlockListener blockListener = new EpicZonesBlockListener(this);
+	private final EpicZonesEntityListener entityListener = new EpicZonesEntityListener(this);
 	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 	private static final String CONFIG_FILE = "config.yml";
 
@@ -57,6 +58,9 @@ public class EpicZones extends JavaPlugin {
 			pm.registerEvent(Event.Type.BLOCK_DAMAGED, this.blockListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_PLACED, this.blockListener, Event.Priority.Normal, this);
 
+			pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, this.entityListener, Event.Priority.Normal, this);
+			pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_PROJECTILE, this.entityListener, Event.Priority.Normal, this);
+			
 			for(Player p:getServer().getOnlinePlayers())
 			{
 				General.addPlayer(p.getEntityId(), p.getName());

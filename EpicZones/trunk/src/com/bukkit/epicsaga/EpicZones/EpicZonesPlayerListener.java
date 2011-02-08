@@ -11,6 +11,7 @@ import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerItemEvent;
@@ -49,15 +50,25 @@ public class EpicZonesPlayerListener extends PlayerListener
 		int playerHeight = event.getTo().getBlockY();
 		Point playerPoint = new Point(event.getTo().getBlockX(), event.getTo().getBlockZ());
 
-		if(ezp.getCurrentLocation() == null){ezp.setCurrentLocation(event.getFrom());}
-		if(!PlayerWithinZoneLogic(player, ezp, playerHeight, playerPoint))
+		if(ShouldCheckPlayer(ezp))
 		{
-			event.setTo(ezp.getCurrentLocation());
-			event.setCancelled(true);
-		}
-		else
-		{
-			ezp.setCurrentLocation(event.getTo());
+			if(!ezp.isTeleporting())
+			{
+				if(ezp.getCurrentLocation() == null){ezp.setCurrentLocation(event.getFrom());}
+				if(!PlayerWithinZoneLogic(player, ezp, playerHeight, playerPoint))
+				{
+					ezp.setIsTeleporting(true);
+					player.teleportTo(ezp.getCurrentLocation());
+					ezp.setIsTeleporting(false);
+					event.setTo(ezp.getCurrentLocation());
+					event.setCancelled(true);
+				}
+				else
+				{
+					ezp.setCurrentLocation(event.getFrom());
+				}
+			}
+			ezp.Check();
 		}
 
 	}
@@ -70,18 +81,29 @@ public class EpicZonesPlayerListener extends PlayerListener
 		int playerHeight = event.getTo().getBlockY();
 		Point playerPoint = new Point(event.getTo().getBlockX(), event.getTo().getBlockZ());
 
-		if(ezp.getCurrentLocation() == null){ezp.setCurrentLocation(event.getFrom());}
-		if(!PlayerWithinZoneLogic(player, ezp, playerHeight, playerPoint))
+		if(ShouldCheckPlayer(ezp))
 		{
-			event.setTo(ezp.getCurrentLocation());
-			event.setCancelled(true);
-		}
-		{
-			ezp.setCurrentLocation(event.getTo());
+			if(!ezp.isTeleporting())
+			{
+				if(ezp.getEntityID() != player.getEntityId()){ezp.setEntityID(player.getEntityId());}
+				if(ezp.getCurrentLocation() == null){ezp.setCurrentLocation(event.getFrom());}
+				if(!PlayerWithinZoneLogic(player, ezp, playerHeight, playerPoint))
+				{
+					ezp.setIsTeleporting(true);
+					player.teleportTo(ezp.getCurrentLocation());
+					ezp.setIsTeleporting(false);
+					event.setTo(ezp.getCurrentLocation());
+					event.setCancelled(true);
+				}
+				{
+					ezp.setCurrentLocation(event.getTo());
+				}
+			}
+			ezp.Check();
 		}
 
 	}
-
+	
 	private boolean PlayerWithinZoneLogic(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint)
 	{
 
@@ -123,12 +145,11 @@ public class EpicZonesPlayerListener extends PlayerListener
 					if(General.hasPermissions(player, foundZone, "entry"))
 					{
 						ezp.setCurrentZone(foundZone);
-						player.sendMessage(foundZone.getEnterText());
+						if(foundZone.getEnterText().length() > 0){player.sendMessage(foundZone.getEnterText());}
 					}
 					else
 					{
 						WarnPlayer(player, ezp, NO_PERM_ENTER + foundZone.getName());
-						player.teleportTo(ezp.getCurrentLocation());
 						return false;
 					}
 				}
@@ -138,7 +159,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 			{
 				if (ezp.getCurrentZone() != null)
 				{
-					player.sendMessage(ezp.getCurrentZone().getExitText());
+					if(ezp.getCurrentZone().getExitText().length() > 0){player.sendMessage(ezp.getCurrentZone().getExitText());}
 					ezp.setCurrentZone(null);
 				}
 			}
@@ -146,7 +167,6 @@ public class EpicZonesPlayerListener extends PlayerListener
 		else
 		{
 			WarnPlayer(player, ezp, NO_PERM_BORDER);
-			player.teleportTo(ezp.getCurrentLocation());
 			return false;
 		}
 
@@ -160,6 +180,18 @@ public class EpicZonesPlayerListener extends PlayerListener
 		{
 			player.sendMessage(message);
 			ezp.Warn();
+		}
+	}
+
+	private boolean ShouldCheckPlayer(EpicZonePlayer ezp)
+	{
+		if (ezp.getLastCheck().before(new Date()))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 

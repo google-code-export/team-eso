@@ -16,7 +16,7 @@ public class EpicZone {
 
 	private String tag = "";
 	private String name = "";
-	private ArrayList<SimpleEntry<String, String>> flags = new ArrayList<SimpleEntry<String, String>>();
+	private Map<String, Boolean> flags = new  HashMap<String, Boolean>();
 	private int floor = 0;
 	private int ceiling = 0;
 	private ArrayList<Point> pointList = new ArrayList<Point>();
@@ -37,7 +37,7 @@ public class EpicZone {
 		{
 			this.tag = split[0].replaceAll("[^a-zA-Z0-9]", "");
 			this.name = split[1];
-			this.flags = buildFlags(split[2]);
+			buildFlags(split[2]);
 			this.enterText = split[3];
 			this.exitText = split[4];
 			this.floor = Integer.valueOf(split[5]);
@@ -55,7 +55,7 @@ public class EpicZone {
 
 	public String getTag(){return tag;}
 	public String getName(){return name;}
-	public ArrayList<SimpleEntry<String, String>> getFlags(){return flags;}
+	public Map<String, Boolean> getFlags(){return flags;}
 	public int getFloor(){return floor;}
 	public int getCeiling(){return ceiling;}
 	public ArrayList<Point> getPointList(){return pointList;}
@@ -209,10 +209,8 @@ public class EpicZone {
 		this.hasParentFlag = true;
 	}
 
-	private ArrayList<SimpleEntry<String, String>> buildFlags(String data)
+	private void buildFlags(String data)
 	{
-
-		ArrayList<SimpleEntry<String, String>> result = new ArrayList<SimpleEntry<String, String>>();
 
 		if(data.length() > 0)
 		{
@@ -221,10 +219,10 @@ public class EpicZone {
 			for(int i = 0;i < dataList.length; i++)
 			{
 				String[] split = dataList[i].split(":");
-				result.add(new SimpleEntry<String, String>(split[0], split[1]));
+				this.flags.put(split[0], split[1].equalsIgnoreCase("true"));
 			}
 		}
-		return result;
+		
 	}
 
 	private void buildChildren(String data)
