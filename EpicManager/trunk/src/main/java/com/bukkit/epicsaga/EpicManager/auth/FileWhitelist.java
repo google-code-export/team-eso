@@ -75,7 +75,9 @@ public class FileWhitelist implements UserAuthenticator {
 	public void deny(String name) {
 		checkFile();
 
-		if(!users.contains(name.toLowerCase()))
+		name = name.toLowerCase();
+
+		if(!users.contains(name))
 			return;
 
 		try {
@@ -86,14 +88,16 @@ public class FileWhitelist implements UserAuthenticator {
 					"Error removing from file: "+file.getPath(), e);
 		}
 
-		users.remove(name.toLowerCase());
+		users.remove(name);
 
 	}
 
 	public void accept(String name) {
 		checkFile();
 
-		if(users.contains(name.toLowerCase()))
+		name = name.toLowerCase();
+
+		if(users.contains(name))
 			return;
 
 		try{
@@ -112,7 +116,7 @@ public class FileWhitelist implements UserAuthenticator {
 		}
 		// add after writing to file to ensure in-memory will be the
 		//   same as in-file
-		users.add(name.toLowerCase());
+		users.add(name);
 
 	}
 
@@ -161,7 +165,7 @@ public class FileWhitelist implements UserAuthenticator {
 
 		try{
 			while(scanner.hasNextLine()) {
-				line = scanner.nextLine().trim();
+				line = scanner.nextLine().trim().toLowerCase();
 				if(!line.isEmpty())
 					names.add(line);
 			}
@@ -170,7 +174,7 @@ public class FileWhitelist implements UserAuthenticator {
 			scanner.close();
 		}
 
-		names.remove(name);
+		names.remove(name.toLowerCase());
 
 		FileOutputStream fs = new FileOutputStream(file);
 		fs.getChannel().truncate(0);
