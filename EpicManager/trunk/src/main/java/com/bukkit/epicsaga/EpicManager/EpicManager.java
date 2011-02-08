@@ -113,7 +113,7 @@ public class EpicManager extends JavaPlugin {
 	        logInfo( " version " + pdfFile.getVersion() + " is enabled." );
     	}
         catch(EnableError e) {
-        	logSevere("Error intilizing plugin." + e.toString());
+        	logSevere("Error intilizing plugin, disabling." + e.toString());
 
         	this.getServer().getPluginManager().disablePlugin(this);
         }
@@ -134,13 +134,9 @@ public class EpicManager extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd,
 			String commandLabel, String[] args) {
 
-    	System.out.println("**** Command: "+ commandLabel);
-
     	CommandHandler handler = handlers.get(commandLabel.toLowerCase());
     	if(handler == null)
     		return true;
-
-    	System.out.println("**** Handler: "+ handler);
 
 		return handler.onCommand(commandLabel, sender, args);
 	}

@@ -64,8 +64,8 @@ public class FileWhitelist implements UserAuthenticator {
 
 		fileTime = file.lastModified();
 
-		if(!file.exists())
-			file.createNewFile();
+		if(!file.exists() && file.createNewFile())
+			throw new IOException("Cannot create file: "+file.toString());
 
 		users = new HashSet<String>();
 

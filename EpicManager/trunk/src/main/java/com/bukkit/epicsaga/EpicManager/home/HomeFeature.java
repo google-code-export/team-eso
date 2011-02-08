@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -59,19 +60,20 @@ import com.bukkit.epicsaga.EpicManager.PluginFeature;
  *
  * Commands implemented:
  * <li> /sethome (epimanager.home.sethome) - set your home</li>
- * <li>{@literal /sethome <player>}  (epimanager.home.setplayerhome) -
+ * <li>{@literal /sethome <player>} (epimanager.homeother.sethome) -
  * 		set a player's home to your location</li>
  * <li> /rmhome (epimanager.home.rmhome) - set your home</li>
- * <li>{@literal /rmhome <player>} (epimanager.home.rmplayerhome) - set player's home</li>
+ * <li>{@literal /rmhome <player>} (epimanager.homeother.rmhome) - set player's home</li>
  * <li> /home (epicmanager.home.home) - teleport to your home</li>
- * <li>{@literal /home <player> } (epicmanager.home.playerhome) -
+ * <li>{@literal /home <player> } (epicmanager.homeother.home) -
  * 		teleport to a player's home</li>
- * <li>{@literal /setgrouphome <group> }(epimanager.home.setgrouphome) -
+ *
+ * <li>{@literal /setghome <group> }(epicmanager.ghomeother.setghome) -
  * 		set a group's home </li>
- * <li>{@literal /rmgrouphome <group> }(epimanager.home.rmgrouphome) -
+ * <li>{@literal /rmghome <group> }(epimanager.ghomeother.rmghome) -
  * 		remove a group home</li>
- * <li> /grouphome (epicmanager.home.grouphome) - teleport to your group home</li>
- * <li>{@literal /grouphome <player/group>} (epicmanager.home.playergrouphome) -
+ * <li> /ghome (epicmanager.ghome.ghome) - teleport to your group home</li>
+ * <li>{@literal /ghome <player/group>} (epicmanager.ghomeother.ghome) -
  * 				teleport to a group home by the player or group name</li>
  * <br>
  * NOTES:
@@ -85,12 +87,33 @@ public class HomeFeature implements PluginFeature {
 	private static final String HOME_FILE = "playerhomes.txt";
 	private static final String GROUPHOME_FILE = "grouphomes.txt";
 
+	private static final String PERM_BASE="epicmanager.";
+
+	private static final String PERM_H = PERM_BASE+"home.";
+	private static final String PERM_HO = PERM_BASE+"homeother.";
+
+	private static final String PERM_GH = PERM_BASE+"ghome.";
+	private static final String PERM_GHO = PERM_BASE+"ghomeother.";
+
+	private static final String PERM_H_HOME = PERM_H+"home";
+	private static final String PERM_HO_HOME = PERM_HO+"home";
+	private static final String PERM_H_RMHOME = PERM_H+"rmhome";
+	private static final String PERM_HO_RMHOME = PERM_HO+"rmhome";
+	private static final String PERM_H_SETHOME = PERM_H+"sethome";
+	private static final String PERM_HO_SETHOME = PERM_HO+"sethome";
+
+	private static final String PERM_GH_GHOME = PERM_GH+"ghome";
+	private static final String PERM_GHO_GHOME = PERM_GHO+"ghome";
+	private static final String PERM_GHO_RMGHOME = PERM_GHO+"rmghome";
+	private static final String PERM_GHO_SETGHOME = PERM_GHO+"segthome";
+
+
 	private EpicManager plugin;
 
 	private HomeStore homes;
 	private GroupHomeStore groupHomes;
-    private Set<String> deadPlayers = new HashSet<String>();
-    private Set<String> spawningPlayers = new HashSet<String>();
+    private Set<Integer> deadPlayers = new HashSet<Integer>();
+    private Set<Integer> spawningPlayers = new HashSet<Integer>();
 
 	public void onEnable(EpicManager em) throws EpicManager.EnableError {
 		plugin = em;
@@ -107,6 +130,9 @@ public class HomeFeature implements PluginFeature {
 		em.registerCommand("home", homeCommand);
 		em.registerCommand("sethome", setHomeCommand);
 		em.registerCommand("rmhome", rmHomeCommand);
+		em.registerCommand("ghome", gHomeCommand);
+		em.registerCommand("setghome", setGHomeCommand);
+		em.registerCommand("rmghome", rmGHomeCommand);
 
 		PluginManager pm = em.getServer().getPluginManager();
 
@@ -127,13 +153,11 @@ public class HomeFeature implements PluginFeature {
 				return;
 
 			Player player = (Player) event.getEntity();
-			deadPlayers.add(player.getName());
+			deadPlayers.add(player.getEntityId());
 		}
 
     };
 
-
-    //TODO cancel onPlayerMoved event to prevent a "player moved wrongly!" check.
 	private PlayerListener pListener = new PlayerListener() {
 
 
@@ -146,7 +170,8 @@ public class HomeFeature implements PluginFeature {
 		public void onPlayerTeleport (PlayerMoveEvent event) {
 
 			String playerName = event.getPlayer().getName();
-			if(!deadPlayers.contains(playerName))
+			int playerId = event.getPlayer().getEntityId();
+			if(!deadPlayers.contains(playerId))
 				return;
 
 			// if dead, teleport to their home if they have one
@@ -165,16 +190,18 @@ public class HomeFeature implements PluginFeature {
 
 			World world = event.getPlayer().getWorld();
 
+			// attempt to preload the chunk
 			int chunkx = dest.getBlockX() >> 4;
 			int chunkz = dest.getBlockZ() >> 4;
 
-			if (!world.isChunkLoaded(chunkx, chunkz)) {
-				world.loadChunk(chunkx, chunkz);
+			Chunk chunk = world.getChunkAt(chunkx, chunkz);
+			if (!world.isChunkLoaded(chunk)) {
+				world.loadChunk(chunk);
 			}
 
 			event.setTo(dest);
-			deadPlayers.remove(playerName);
-			spawningPlayers.add(playerName);
+			deadPlayers.remove(playerId);
+			spawningPlayers.add(playerId);
 
 			return;
 		}
@@ -188,11 +215,11 @@ public class HomeFeature implements PluginFeature {
 		@Override
 		public void onPlayerMove(PlayerMoveEvent event) {
 
-			String playerName = event.getPlayer().getName();
-			if(!spawningPlayers.contains(playerName))
+			int playerId = event.getPlayer().getEntityId();
+			if(!spawningPlayers.contains(playerId))
 				return;
 
-			spawningPlayers.remove(playerName);
+			spawningPlayers.remove(playerId);
 
 			event.setCancelled(true);
 		}
@@ -246,39 +273,6 @@ public class HomeFeature implements PluginFeature {
 
 	}
 
-	private final CommandHandler rmHomeCommand = new CommandHandler() {
-	    public boolean onCommand(String command, CommandSender op, String[] args) {
-	    	if(!(op instanceof Player))
-	    		return true;
-
-	    	PlayerInfo ret;
-			try {
-				ret = getPlayerInfo(op, args,
-						"epicmanager.home.rmhome", "epicmanager.home.rmplayerhome");
-			}
-			catch (PlayerNotFoundException e) {
-				op.sendMessage(ChatColor.YELLOW+"Player not found on server.");
-				return false;
-			}
-			catch (PermissionException e) { return true; }
-
-	    	homes.clearHome(ret.name);
-
-			String message = ChatColor.YELLOW+"Your home has been removed.";
-	    	if(ret.otherPlayer == null) {
-	    		op.sendMessage(message);
-	    	}
-	    	else {
-		    	/* if both an op and player exist, notify both of success */
-	    		op.sendMessage(ChatColor.YELLOW+"Home has been removed.");
-	    		ret.otherPlayer.sendMessage(message);
-	    	}
-
-	    	return true;
-	    }
-
-	};
-
 	private final CommandHandler setHomeCommand = new CommandHandler() {
 	    public boolean onCommand(String command, CommandSender op, String[] args) {
 	    	if(!(op instanceof Player))
@@ -287,7 +281,7 @@ public class HomeFeature implements PluginFeature {
 	    	PlayerInfo ret;
 			try {
 				ret = getPlayerInfo(op, args,
-						"epicmanager.home.sethome", "epicmanager.home.setplayerhome");
+						PERM_H_SETHOME, PERM_HO_SETHOME);
 			}
 			catch (PlayerNotFoundException e) {
 				op.sendMessage(ChatColor.YELLOW+"Player not found on server.");
@@ -313,6 +307,39 @@ public class HomeFeature implements PluginFeature {
 
 	};
 
+	private final CommandHandler rmHomeCommand = new CommandHandler() {
+	    public boolean onCommand(String command, CommandSender op, String[] args) {
+	    	if(!(op instanceof Player))
+	    		return true;
+
+	    	PlayerInfo ret;
+			try {
+				ret = getPlayerInfo(op, args,
+						PERM_H_RMHOME, PERM_HO_RMHOME);
+			}
+			catch (PlayerNotFoundException e) {
+				op.sendMessage(ChatColor.YELLOW+"Player not found on server.");
+				return false;
+			}
+			catch (PermissionException e) { return true; }
+
+	    	homes.clearHome(ret.name);
+
+			String message = ChatColor.YELLOW+"Your home has been removed.";
+	    	if(ret.otherPlayer == null) {
+	    		op.sendMessage(message);
+	    	}
+	    	else {
+		    	/* if both an op and player exist, notify both of success */
+	    		op.sendMessage(ChatColor.YELLOW+"Home has been removed.");
+	    		ret.otherPlayer.sendMessage(message);
+	    	}
+
+	    	return true;
+	    }
+
+	};
+
 	private final CommandHandler homeCommand = new CommandHandler() {
 	    public boolean onCommand(String command, CommandSender op, String[] args) {
 	    	if(!(op instanceof Player))
@@ -321,7 +348,7 @@ public class HomeFeature implements PluginFeature {
 	    	PlayerInfo ret;
 			try {
 				ret = getPlayerInfo(op, args,
-						"epicmanager.home.home", "epicmanager.home.playerhome");
+						PERM_H_HOME, PERM_HO_HOME);
 			}
 			catch (PlayerNotFoundException e) {
 				// not fatal, try with the specified name
@@ -329,11 +356,22 @@ public class HomeFeature implements PluginFeature {
 			}
 			catch (PermissionException e) { return true; }
 
+			String errMsg = ChatColor.YELLOW+"Home not set, please use " +
+				"/sethome, or contact admin.";
+
 			Location location = homes.getHome(ret.name);
 			if(location == null) {
-				op.sendMessage(ChatColor.YELLOW+"Home not set, please use " +
-						"/sethome, or contact admin.");
-				return true;
+				String group = EpicManager.permissions.getGroup(ret.name);
+				if (group == null) {
+					op.sendMessage(errMsg);
+					return true;
+				}
+
+				location = groupHomes.getGroupHome(group);
+				if (location == null) {
+					op.sendMessage(errMsg);
+					return true;
+				}
 			}
 
 	    	((Player)op).teleportTo(location);
@@ -341,6 +379,104 @@ public class HomeFeature implements PluginFeature {
 	    }
 	};
 
+
+
+	private final CommandHandler setGHomeCommand = new CommandHandler() {
+	    public boolean onCommand(String command, CommandSender op, String[] args) {
+	    	if(!(op instanceof Player))
+	    		return true;
+
+	    	if (!EpicManager.permissions.has((Player)op, PERM_GHO_SETGHOME))
+	    		return true;
+
+	    	if (args.length != 1)
+	    		return false;
+
+	    	String group = args[0];
+
+	    	Location dest = ((Player)op).getLocation();
+	    	groupHomes.setGroupHome(group, dest);
+
+    		op.sendMessage(ChatColor.YELLOW+"Group home has been set.");
+	    	return true;
+	    }
+
+	};
+
+	private final CommandHandler rmGHomeCommand = new CommandHandler() {
+	    public boolean onCommand(String command, CommandSender op, String[] args) {
+	    	if(!(op instanceof Player))
+	    		return true;
+
+	    	if (!EpicManager.permissions.has((Player)op, PERM_GHO_RMGHOME))
+	    		return true;
+
+	    	if (args.length != 1)
+	    		return false;
+
+	    	String group = args[0];
+
+	    	groupHomes.clearGroupHome(group);
+
+    		op.sendMessage(ChatColor.YELLOW+"Group home has been set.");
+	    	return true;
+	    }
+
+	};
+
+
+	private final CommandHandler gHomeCommand = new CommandHandler() {
+	    public boolean onCommand(String command, CommandSender op, String[] args) {
+	    	if(!(op instanceof Player))
+	    		return true;
+
+	    	Location location;
+	    	if (args.length == 0) {
+	    		if (!EpicManager.permissions.has((Player)op, PERM_GH_GHOME))
+	    			return true;
+
+	    		String group = EpicManager.permissions.getGroup(((Player)op).getName());
+	    		if (group == null) {
+	    			op.sendMessage(ChatColor.YELLOW+"Group not found.");
+	    			return true;
+	    		}
+
+	    		location = groupHomes.getGroupHome(group);
+	    	}
+	    	else {
+	    		if (!EpicManager.permissions.has((Player)op, PERM_GHO_GHOME))
+	    			return true;
+
+	    		location = groupHomes.getGroupHome(args[0]);
+
+	    		if (location == null) {
+	    			Player player = plugin.getPlayerByDisplayName(args[0]);
+	    			if(player == null) {
+		    			op.sendMessage(ChatColor.YELLOW+"Player not found.");
+		    			return true;
+	    			}
+
+	    			String group = EpicManager.permissions.getGroup(player.getName());
+
+	    			if(group == null) {
+		    			op.sendMessage(ChatColor.YELLOW+"Player's group not found.");
+		    			return true;
+	    			}
+
+	    			location = groupHomes.getGroupHome(group);
+	    		}
+
+	    	}
+
+			if(location == null) {
+				op.sendMessage("Grouphome must be set with /setghome");
+				return true;
+			}
+
+	    	((Player)op).teleportTo(location);
+	    	return true;
+	    }
+	};
 }
 
 
