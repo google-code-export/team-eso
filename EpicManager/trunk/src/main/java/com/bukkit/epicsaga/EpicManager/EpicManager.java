@@ -71,7 +71,7 @@ public class EpicManager extends JavaPlugin {
 
     public EMConfig config;
 
-	private String pluginName = "EpicManager";
+	private static String pluginName = "EpicManager";
     private Map<String, CommandHandler> handlers =
     			new HashMap<String, CommandHandler>();
 
@@ -80,7 +80,6 @@ public class EpicManager extends JavaPlugin {
     	features.add(new AuthFeature());
     	features.add(new HomeFeature());
     }
-
 
     public EpicManager(PluginLoader pluginLoader, Server instance,
     		PluginDescriptionFile desc, File folder, File plugin,
@@ -112,8 +111,9 @@ public class EpicManager extends JavaPlugin {
 	        PluginDescriptionFile pdfFile = this.getDescription();
 	        logInfo( " version " + pdfFile.getVersion() + " is enabled." );
     	}
-        catch(EnableError e) {
-        	logSevere("Error intilizing plugin, disabling." + e.toString());
+        catch(Throwable e) {
+        	e.printStackTrace();        	
+        	logSevere("Error intilizing plugin, disabling.");
 
         	this.getServer().getPluginManager().disablePlugin(this);
         }
@@ -251,15 +251,15 @@ public class EpicManager extends JavaPlugin {
     	return matchingPlayer;
     }
 
-    public void logSevere(String message) {
+    public static void logSevere(String message) {
     	log.severe("[" + pluginName + "] " + message);
     }
 
-    public void logWarning(String message) {
+    public static void logWarning(String message) {
     	log.warning("[" + pluginName + "] " + message);
     }
 
-    public void logInfo(String message) {
+    public static void logInfo(String message) {
     	log.info("[" + pluginName + "] " + message);
     }
 

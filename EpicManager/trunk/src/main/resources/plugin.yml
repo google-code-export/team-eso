@@ -1,11 +1,17 @@
 name: EpicManager
+description: General manager commands plugin 
+website: http://team-eso.googlecode.com
+author: Team ESO
 main: com.bukkit.epicsaga.EpicManager.EpicManager
 version: 0.1
+
 commands:
   ban:
+    aliases: disallow
     description: Ban player(s) from server
     usage: /<command> <playerlist> - ban player(s) from server
   unban:
+    aliases: allow, pardon 
     description: Unban player(s) from server
     usage: /<command> <playerlist> - unban player(s) from server
   kick:

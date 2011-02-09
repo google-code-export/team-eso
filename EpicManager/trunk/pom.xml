@@ -35,9 +35,9 @@
        (try: http://www.google.com/search?q=sha1+checksum+utility)
 
      -->
-    <bukkit.sha1>fd352f9bd0c8e933af9c20a579816d56446aaf0e</bukkit.sha1>
-    <craftbukkit.sha1>c166000d8aa656905d9277e5dcd61387abe738f2</craftbukkit.sha1>
-
+    <bukkit.sha1>0de3f39c69711e102fe5b4cfcaa31d68ee673944</bukkit.sha1>
+    <craftbukkit.sha1>85ab1759579a63241da53d5f4ee278fd193ccde3</craftbukkit.sha1>
+     
     <bukkit.version>0.0.1-SNAPSHOT</bukkit.version>
     <bukkit.pom>${pom.folder}/bukkit-${bukkit.version}.pom</bukkit.pom>
     <bukkit.url>

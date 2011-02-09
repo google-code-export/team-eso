@@ -54,7 +54,7 @@ import java.util.Vector;
  * @author _sir_maniac
  *
  */
-public class FileWhitelist implements UserAuthenticator {
+public class FileWhitelist implements PlayerAuthenticator {
 	private File file;
 	private long fileTime;
 	private Set<String> users;
@@ -70,6 +70,10 @@ public class FileWhitelist implements UserAuthenticator {
 		users = new HashSet<String>();
 
 		readFile();
+	}
+
+	public void deny(String name, String reason) {
+		deny(name);
 	}
 
 	public void deny(String name) {
@@ -90,6 +94,10 @@ public class FileWhitelist implements UserAuthenticator {
 
 		users.remove(name);
 
+	}
+
+	public String getBannedReason(String name) {
+		return null;
 	}
 
 	public void accept(String name) {

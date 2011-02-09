@@ -36,16 +36,27 @@ package com.bukkit.epicsaga.EpicManager.auth;
  *
  * @author _sir_maniac
  */
-public interface UserAuthenticator {
+public interface PlayerAuthenticator {
 	/**
-	 * @param name
+	 * @param player
 	 * @return true if name is allowed under criteria of object instance
 	 */
 	boolean isAllowed(String name);
 
 	/**
+	 * Returns the reason banned.  If no reason is available, returns null.
+	 * 
+	 *  WARNING: can return null when player is banned, so don't rely on this
+	 *    return to verify if the user is banned.
+	 * 
+	 * @param player
+	 * @return null, reason given
+	 */
+	String getBannedReason(String name);
+	
+	/**
 	 * change authenticator to guarantee this user is allowed.
-	 * @param name
+	 * @param player
 	 */
 	void accept(String name);
 
@@ -54,4 +65,13 @@ public interface UserAuthenticator {
 	 * @param name
 	 */
 	void deny(String name);
+
+	/**
+	 * change authenticator to guarantee the user is disallowed
+	 * @param player
+	 * @param reason the reason the player was banned, which is included
+	 *        in the kick message.  can be null.
+	 */
+	void deny(String name, String reason);
+
 }

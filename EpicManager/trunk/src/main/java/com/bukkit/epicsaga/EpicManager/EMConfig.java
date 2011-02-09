@@ -72,7 +72,7 @@ public class EMConfig extends Configuration {
 	public void setDefaults() {
 		kickMessage = "Kicked by admin";
 		banMessage = "You have been banned.";
-		authMessage = "You are not on the whitelist.";
+		authMessage = "You are not allowed on this server.";
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class EMConfig extends Configuration {
 	/**
 	 * Save settings to config file. File errors are ignored like load.
 	 */
-	public void save() {
+	public boolean save() {
 		FileOutputStream stream;
 		BufferedWriter writer;
 
@@ -139,8 +139,10 @@ public class EMConfig extends Configuration {
 
 		}
 		catch(IOException e) {
-
+			return false;
 		}
+		
+		return true;
 	}
 
 }

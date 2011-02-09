@@ -31,8 +31,7 @@
 
 package com.bukkit.epicsaga.EpicManager.auth;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.FileNotFoundException;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -61,30 +60,34 @@ import com.bukkit.epicsaga.EpicManager.EpicManager.EnableError;
  * @author _sir_maniac
  *
  */
-public class AuthFeature implements PluginFeature, CommandHandler {
-	private static final String WHITELIST_FILE = "whitelist.txt";
-
+public class AuthFeature implements PluginFeature{
+	private static final String[] BAN_COMMANDS = {"ban", "disallow"};
+	private static final String[] ALLOW_COMMANDS = {"unban", "allow", "pardon"};
+	
 	private final PListener pListener = new PListener();
 
 	private EpicManager plugin;
 
-	public UserAuthenticator userAuth = null;
+	public PlayerAuthenticator userAuth = null;
 
 	public void onEnable(EpicManager em) throws EnableError {
 		plugin = em;
-    	File file  = new File(em.getDataFolder() + File.separator +
-    			WHITELIST_FILE);
 
         try {
-        	userAuth = new FileWhitelist(file);
+        	userAuth = new PermissionLoginAuthenticator(em.getServer(), "Default");
 		}
-        catch (IOException e) {
-    		throw new EnableError(" Could not access or create " +
-    				file.getPath(), e);
+        catch (FileNotFoundException e) {
+    		throw new EnableError(" Could not access permissions.  " +
+    				"Is Permissions plugin installed?" , e);
 		}
 
-        em.registerCommand("ban", this);
-        em.registerCommand("unban", this);
+        for (String cmd : BAN_COMMANDS) {
+            em.registerCommand(cmd, banHandler);
+        }
+        
+        for (String cmd : ALLOW_COMMANDS) {
+            em.registerCommand(cmd, allowHandler);
+        }
 
         PluginManager pm = em.getServer().getPluginManager();
         pm.registerEvent(Event.Type.PLAYER_LOGIN, pListener, Priority.Highest, em);
@@ -94,75 +97,87 @@ public class AuthFeature implements PluginFeature, CommandHandler {
 
 	}
 
-	public boolean onCommand(String command, CommandSender sender, String[] args) {
-		if(command.equalsIgnoreCase("ban"))
-			return doBan(sender, args);
-		else if(command.equalsIgnoreCase("unban"))
-			return doUnban(sender, args);
-		return true;
-	}
 
-    private boolean doBan(CommandSender op, String[] playerNames) {
-    	if(op instanceof Player &&
-    	   !EpicManager.permissions.has((Player)op, "epicmanager.ban"))
-	    		return true;
-
-    	if(playerNames.length == 0)
-    		return false;
-
-		for(String playerName : playerNames) {
-			userAuth.deny(playerName);
-
+	private CommandHandler banHandler = new CommandHandler() {
+	    public boolean onCommand(String command, CommandSender op, String[] args) {
+	    	if(op instanceof Player &&
+	    	   !EpicManager.permissions.has((Player)op, "epicmanager.ban"))
+		    		return true;
+	
+	    	if(args.length == 0)
+	    		return false;
+	
+	    	String playerName = args[0];
+	    	String banReason = null;
+	    	if(args.length > 1) {
+	        	StringBuilder b = new StringBuilder();
+	    		for(int i = 1; i < args.length; i++) {
+	    			b.append(args[i]).append(" ");
+	    		}
+	    		banReason = b.toString().trim();
+	    	}
+	    	
+			userAuth.deny(playerName, banReason);
+	
+			// send message to person who gsve command 
 			op.sendMessage(
 					ChatColor.YELLOW+
 					"Player '"+playerName+"' no longer allowed.");
-
+	
+			// Write log message and kick player if on server.
+			String opName;
+			if(op instanceof Player)
+				opName = ((Player)op).getName();
+			else
+				opName = "console";
+	
+			String banMessage = plugin.config.banMessage;
+			String logMessage = opName + " banned player '"+playerName+"'";
+	
+			if (banReason != null) {
+				banMessage = banMessage + " Ban Reason: " + banReason;
+				logMessage = logMessage + " Ban Reason: " + banReason;
+			}
+			
+			EpicManager.logInfo(logMessage);
+	
 			Player player = plugin.getPlayerByDisplayName(playerName);
-
 			if(player != null) {
-				player.kickPlayer(plugin.config.banMessage);
+				player.kickPlayer(banMessage);
+			}
+	
+			return true;
+	    }
+	};
 
+	private CommandHandler allowHandler = new CommandHandler() {
+	    public boolean onCommand(String command, CommandSender op, String[] args) {
+	    	if(op instanceof Player &&
+	    	   !EpicManager.permissions.has((Player)op, "epicmanager.unban"))
+	    		return true;
+	
+	    	if(args.length == 0)
+	    		return false;
+	
+	    	for(String playerName : args) {
+	    		userAuth.accept(playerName);
+	
+		    	op.sendMessage(ChatColor.YELLOW+"Player '"+playerName+
+		    			"' is now allowed.");
+	
 	    		String opName;
 	    		if(op instanceof Player)
 	    			opName = ((Player)op).getName();
 	    		else
 	    			opName = "console";
-
-	    		plugin.logInfo("Player '" + playerName +
-						"' denied server access by '" +
+	
+	    		EpicManager.logInfo("Player '" + playerName + "' accepted on server by '" +
 						opName + "'.");
-			}
-		}
-
-		return true;
-    }
-
-    private boolean doUnban(CommandSender op, String[] playerNames) {
-    	if(op instanceof Player &&
-    	   !EpicManager.permissions.has((Player)op, "epicmanager.unban"))
-    		return true;
-
-    	if(playerNames.length == 0)
-    		return false;
-
-    	for(String playerName : playerNames) {
-    		userAuth.accept(playerName);
-
-	    	op.sendMessage(ChatColor.YELLOW+"Player '"+playerName+
-	    			"' is now allowed.");
-
-    		String opName;
-    		if(op instanceof Player)
-    			opName = ((Player)op).getName();
-    		else
-    			opName = "console";
-
-    		plugin.logInfo("Player '" + playerName + "' accepted on server by '" +
-					opName + "'.");
-    	}
-
-		return true;
-    }
+	    	}
+	
+			return true;
+	    }
+	};
 
 	private class PListener extends PlayerListener {
 
@@ -175,9 +190,20 @@ public class AuthFeature implements PluginFeature, CommandHandler {
 				return;
 			}
 			if (plugin.config == null) {
-				System.out.println("--------------------Null");
+				EpicManager.logWarning("AuthFeature: EpicManager.config is null");
 			}
-			event.disallow(Result.KICK_BANNED, plugin.config.authMessage);
+			String reason = userAuth.getBannedReason(name);
+			
+			String authMessage;
+			
+			if (reason != null) {
+				authMessage = plugin.config.authMessage + " Ban Reason: "+reason;
+			}
+			else {
+				authMessage = plugin.config.authMessage;
+			}
+			
+			event.disallow(Result.KICK_BANNED, authMessage);
 		}
 
 	}
