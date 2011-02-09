@@ -20,6 +20,11 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
+import com.bukkit.epicsaga.EpicZones.EpicZonePlayer.EpicZoneMode;
+import com.bukkit.epicsaga.EpicZones.CommandHandlers.ReloadCommandHandler;
+import com.bukkit.epicsaga.EpicZones.CommandHandlers.WhoCommandHandler;
+import com.bukkit.epicsaga.EpicZones.CommandHandlers.ZoneCommandHandler;
+
 //import sun.security.mscapi.KeyStore.MY;
 
 /**
@@ -213,58 +218,9 @@ public class EpicZonesPlayerListener extends PlayerListener
 		if(!event.isCancelled())
 		{
 			String[] split = event.getMessage().split("\\s");
-
-			if (split[0].equalsIgnoreCase("/who"))
-			{
-				int pageNumber = 1;
-
-				if (split.length > 1)
-				{
-					if (split[1].equalsIgnoreCase("all"))
-					{
-						if (split.length > 2)
-						{
-							try
-							{
-								pageNumber = Integer.parseInt(split[2]);
-							}
-							catch(NumberFormatException nfe)
-							{
-								pageNumber = 1;
-							}
-						}
-						buildWho(General.getPlayer(event.getPlayer().getName()), event.getPlayer(), pageNumber, true);
-						return;
-					}
-					else
-					{
-						try
-						{
-							pageNumber = Integer.parseInt(split[1]);
-						}
-						catch(NumberFormatException nfe)
-						{
-							pageNumber = 1;
-						}
-					}
-				}
-				buildWho(General.getPlayer(event.getPlayer().getName()), event.getPlayer(), pageNumber, false);
-				event.setCancelled(true);
-			}
-			else if(split[0].equalsIgnoreCase("/reloadez"))
-			{
-				General.config.load();
-				//General.config.save();
-				try {
-					General.loadZones(null);
-					event.getPlayer().sendMessage("EpicZones Reloaded.");
-					event.setCancelled(true);
-				}
-				catch (FileNotFoundException e) {
-					event.getPlayer().sendMessage("Error, zone file not found.");
-					event.setCancelled(true);
-				}
-			}
+			if (split[0].equalsIgnoreCase("/who")){WhoCommandHandler.Process(split, event);}
+			else if (split[0].equalsIgnoreCase("/reloadez")){ReloadCommandHandler.Process(split, event);}
+			else if (split[0].equalsIgnoreCase("/zone")){ZoneCommandHandler.Process(split, event);}
 		}
 	}
 
@@ -319,96 +275,16 @@ public class EpicZonesPlayerListener extends PlayerListener
 				event.setCancelled(true);
 			}
 		}
-
-	}
-
-	private void buildWho(EpicZonePlayer ezp, Player player, int pageNumber, boolean allZones)
-	{
-
-		EpicZone currentZone = General.getPlayer(player.getName()).getCurrentZone();
-		if(currentZone == null){allZones = true;}
-		ArrayList<EpicZonePlayer> players = getPlayers(currentZone, allZones);
-		int playersPerPage = 8;
-		int playerCount = players.size();
-
-		if (allZones)
+		else if(event.getPlayer().getItemInHand().getTypeId() == General.config.zoneTool)
 		{
-			player.sendMessage(playerCount + " Players Online [Page " + pageNumber + " of " + ((int)Math.ceil((double)playerCount / (double)playersPerPage) + 1) + "]");
-			for(int i = (pageNumber - 1) * playersPerPage; i < (pageNumber * playersPerPage); i++)
+			if(General.getPlayer(event.getPlayer().getEntityId()).getMode() == EpicZoneMode.ZoneDraw)
 			{
-				if (players.size() > i)
-				{
-					player.sendMessage(buildWhoPlayerName(ezp, players, i, allZones));
-				}
+				Point point = new Point(event.getBlockClicked().getLocation().getBlockX(), event.getBlockClicked().getLocation().getBlockZ());
+				General.getPlayer(event.getPlayer().getEntityId()).getEditZone().addPoint(point);
+				event.getPlayer().sendMessage("Point " + point.x + ":" + point.y + " added to zone.");
 			}
 		}
-		else
-		{
-			player.sendMessage(playerCount + " Players Online in " + currentZone.getName() + " [Page " + pageNumber + " of " + ((int)Math.ceil((double)playerCount / playersPerPage) + 1) + "]");
-			for(int i = (pageNumber - 1) * playersPerPage; i < pageNumber * playersPerPage; i++)
-			{
-				if (players.size() > i)
-				{
-					player.sendMessage(buildWhoPlayerName(ezp, players, i, allZones));
-				}
-			}
-		}
-	}
 
-	private String buildWhoPlayerName(EpicZonePlayer ezp, ArrayList<EpicZonePlayer> players, int index, boolean allZones )
-	{
-
-		if (allZones)
-		{
-			if(players.get(index).getCurrentZone() != null)
-			{
-				return players.get(index).getName() + " - " + players.get(index).getCurrentZone().getName() + " - Distance: " + CalcDist(ezp, players.get(index));
-			}
-			else
-			{
-				return players.get(index).getName() + " - Distance: " + CalcDist(ezp, players.get(index));
-			}
-		}
-		else
-		{
-			return players.get(index).getName() + " - Distance: " + CalcDist(ezp, players.get(index));
-		}
-	}
-
-	private int	CalcDist(EpicZonePlayer player1, EpicZonePlayer player2)
-	{
-		int result = 0;
-
-		if(!player1.getName().equals(player2.getName()))
-		{
-			int aSquared = (int)(player1.getDistanceFromCenter() * player1.getDistanceFromCenter());
-			int bSquared = (int)(player2.getDistanceFromCenter() * player2.getDistanceFromCenter());
-			int cSquared = aSquared + bSquared;
-
-			result = (int)Math.sqrt(cSquared);
-		}
-
-		return result;
-	}
-
-	private ArrayList<EpicZonePlayer> getPlayers(EpicZone currentZone, boolean allZones)
-	{
-		if (allZones)
-		{
-			return General.myPlayers;
-		}
-		else
-		{
-			ArrayList<EpicZonePlayer> result = new ArrayList<EpicZonePlayer>();
-			for (EpicZonePlayer ezp: General.myPlayers)
-			{
-				if (!result.contains(ezp) && ezp.getCurrentZone().equals(currentZone))
-				{
-					result.add(ezp);
-				}
-			}
-			return result;
-		}
 	}
 
 	private boolean playerWithinBorder(Point point, Player player)

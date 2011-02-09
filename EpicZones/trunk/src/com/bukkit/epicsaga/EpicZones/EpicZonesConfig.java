@@ -28,6 +28,7 @@ public class EpicZonesConfig extends Configuration {
 	public boolean defaultBuild;
 	public boolean defaultDestroy;
 	public boolean enableRadius;
+	public int zoneTool = 280; //Default Tool Is String
 
 
 	public EpicZonesConfig(File file)
@@ -47,6 +48,7 @@ public class EpicZonesConfig extends Configuration {
 		defaultBuild = true;
 		defaultDestroy = true;
 		enableRadius = true;
+		zoneTool = 280;
 	}
 
 	@Override
@@ -77,6 +79,7 @@ public class EpicZonesConfig extends Configuration {
 			defaultBuild = getBoolean("defaultBuild", true);
 			defaultDestroy = getBoolean("defaultDestroy", true);
 			enableRadius = getBoolean("enableRadius", true);
+			zoneTool = getInt("zoneTool", zoneTool);
 		}
 	}
 
@@ -92,7 +95,8 @@ public class EpicZonesConfig extends Configuration {
 		root.put("defaultEnter", defaultEnter);
 		root.put("defaultBuild", defaultBuild);
 		root.put("defaultDestroy", defaultDestroy);
-		root.put("enableRadius",enableRadius);
+		root.put("enableRadius", enableRadius);
+		root.put("zoneTool", zoneTool);
 
 		try {
 			stream = new FileOutputStream(file);

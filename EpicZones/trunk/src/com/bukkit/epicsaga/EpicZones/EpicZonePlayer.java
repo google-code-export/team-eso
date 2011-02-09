@@ -17,6 +17,8 @@ public class EpicZonePlayer {
 	private int distanceFromCenter;
 	private boolean teleporting = false;
 	private Date lastCheck = new Date();
+	private EpicZoneMode mode = EpicZoneMode.None; 
+	private EpicZone editZone = null;
 	
 	public EpicZone getCurrentZone(){return currentZone;}
 	public int getEntityID(){return entityID;}
@@ -26,10 +28,24 @@ public class EpicZonePlayer {
 	public Date getLastCheck(){return lastCheck;}
 	public int getDistanceFromCenter(){return distanceFromCenter;}
 	public boolean isTeleporting(){return teleporting;}
+	public EpicZoneMode getMode(){return mode;}
+	public EpicZone getEditZone(){return editZone;}
+	
+	public enum EpicZoneMode{None, ZoneDraw, ZoneEdit, ZoneDrawConfirm}
 	
 	public void setEntityID(int value)
 	{
 		this.entityID = value;
+	}
+	
+	public void setMode(EpicZoneMode value)
+	{
+		this.mode = value;
+	}
+	
+	public void setEditZone(EpicZone value)
+	{
+		this.editZone = value;
 	}
 	
 	public EpicZonePlayer(int entityID, String name)

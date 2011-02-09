@@ -18,7 +18,7 @@ public class EpicZone {
 	private String name = "";
 	private Map<String, Boolean> flags = new  HashMap<String, Boolean>();
 	private int floor = 0;
-	private int ceiling = 0;
+	private int ceiling = 128;
 	private ArrayList<Point> pointList = new ArrayList<Point>();
 	private String enterText = "";
 	private String exitText = "";
@@ -27,6 +27,8 @@ public class EpicZone {
 	private Set<String> childrenNames = new HashSet<String>();
 	private boolean hasChildrenFlag = false;
 	private boolean hasParentFlag = false;
+
+	public EpicZone(){}
 
 	public EpicZone(String zoneData)
 	{
@@ -37,17 +39,17 @@ public class EpicZone {
 		{
 			this.tag = split[0].replaceAll("[^a-zA-Z0-9]", "");
 			this.name = split[1];
-			buildFlags(split[2]);
 			this.enterText = split[3];
 			this.exitText = split[4];
 			this.floor = Integer.valueOf(split[5]);
 			this.ceiling = Integer.valueOf(split[6]);
 			this.parent = null;
 			this.children = null;
-			this.pointList = buildPointList(split[8]);
-
+			
+			buildFlags(split[2]);
 			buildChildren(split[7]);
-
+			buildPointList(split[8]);
+			
 			System.out.println("Created Zone [" + this.name + "]");
 		}
 
@@ -71,6 +73,44 @@ public class EpicZone {
 	{
 		if(this.children == null){this.children = new HashMap<String, EpicZone>();}
 		this.children.put(childZone.getTag(), childZone);
+	}
+	
+	public void removeChild(String tag)
+	{
+		if(this.children != null)
+		{
+			this.children.remove(tag);
+		}
+	}
+
+	public void setTag(String value)
+	{
+		this.tag=value;
+	}
+
+	public void setName(String value)
+	{
+		this.name=value;
+	}
+
+	public void setFloor(int value)
+	{
+		this.floor=value;
+	}
+
+	public void setCeiling(int value)
+	{
+		this.ceiling=value;
+	}
+
+	public void setEnterText(String value)
+	{
+		this.enterText=value;
+	}
+
+	public void setExitText(String value)
+	{
+		this.exitText=value;
 	}
 
 	/**
@@ -222,7 +262,7 @@ public class EpicZone {
 				this.flags.put(split[0], split[1].equalsIgnoreCase("true"));
 			}
 		}
-		
+
 	}
 
 	private void buildChildren(String data)
@@ -241,19 +281,23 @@ public class EpicZone {
 
 	}
 
-	private ArrayList<Point> buildPointList(String data)
+	private void buildPointList(String data)
 	{
-		ArrayList<Point> result = new ArrayList<Point>();
+		
 		String[] dataList = data.split("\\s");
-
 		for(int i = 0;i < dataList.length; i++)
 		{
 			String[] split = dataList[i].split(":");
-			result.add(new Point(Integer.valueOf(split[0]), Integer.valueOf(split[1])));
+			addPoint(new Point(Integer.valueOf(split[0]), Integer.valueOf(split[1])));
 			//System.out.println("Added Point " + split[0] + "," + split[1] + " to " + this.tag );
 		}
 
-		return result;
+	}
+	
+	public void addPoint(Point point)
+	{
+		if(this.pointList == null){this.pointList = new ArrayList<Point>();}
+		this.pointList.add(point);
 	}
 
 }

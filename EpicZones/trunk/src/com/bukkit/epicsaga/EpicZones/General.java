@@ -1,9 +1,12 @@
 package com.bukkit.epicsaga.EpicZones;
 
 import java.awt.Point;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,9 +43,9 @@ public class General {
 		}
 
 		return null;
-		
+
 	}
-	
+
 	public static EpicZonePlayer getPlayer(int entityID)
 	{
 		for(EpicZonePlayer ezp: myPlayers)
@@ -52,7 +55,7 @@ public class General {
 		}
 
 		return null;
-		
+
 	}
 
 	public static void addPlayer(int entityID, String name)
@@ -80,17 +83,17 @@ public class General {
 	public static boolean hasPermissions(Player player, EpicZone zone, String flag)
 	{
 
-//		if(zone != null)
-//		{
-//		System.out.println("Zone Tag: " + zone.getTag());
-//		System.out.println("Has Parent: " + zone.hasParent());
-//		System.out.println("Permission Allow Check: " + "epiczones." + zone.getTag() + "." + flag);
-//		System.out.println("Permission Deny Check: " + "epiczones." + zone.getTag() + "." + flag + ".deny");
-//		System.out.println("Permission Allow Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag));
-//		System.out.println("Permission Deny Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny"));
-//		System.out.println("Permission Composite Result: " + (EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag) && !EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny")));
-//		System.out.println("Player Can Ignore Permissions: " + EpicZones.permissions.has(player, "epiczones.ignorepermissions"));
-//		}
+		//		if(zone != null)
+		//		{
+		//		System.out.println("Zone Tag: " + zone.getTag());
+		//		System.out.println("Has Parent: " + zone.hasParent());
+		//		System.out.println("Permission Allow Check: " + "epiczones." + zone.getTag() + "." + flag);
+		//		System.out.println("Permission Deny Check: " + "epiczones." + zone.getTag() + "." + flag + ".deny");
+		//		System.out.println("Permission Allow Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag));
+		//		System.out.println("Permission Deny Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny"));
+		//		System.out.println("Permission Composite Result: " + (EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag) && !EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny")));
+		//		System.out.println("Player Can Ignore Permissions: " + EpicZones.permissions.has(player, "epiczones.ignorepermissions"));
+		//		}
 
 		if(!EpicZones.permissions.has(player, "epiczones.ignorepermissions"))
 		{
@@ -139,7 +142,7 @@ public class General {
 		return false;
 	}
 
-	public static void loadZones(File path) throws FileNotFoundException
+	public static void loadZones(File path)
 	{
 		String line;
 		if (path != null){
@@ -147,23 +150,30 @@ public class General {
 			myFile = file;
 		}
 
-		Scanner scanner = new Scanner(myFile);
-		myZones.clear();
-		myZoneTags.clear();
-		try {
-			while(scanner.hasNext())
-			{
-				EpicZone newZone;
-				line = scanner.nextLine().trim();
-				if(line.startsWith("#") || line.isEmpty()){continue;}
-				newZone = new EpicZone(line);;
-				General.myZones.put(newZone.getTag(), newZone);
-				General.myZoneTags.add(newZone.getTag());
-			}
+		try
+		{
+			Scanner scanner = new Scanner(myFile);
+			myZones.clear();
+			myZoneTags.clear();
+			try {
+				while(scanner.hasNext())
+				{
+					EpicZone newZone;
+					line = scanner.nextLine().trim();
+					if(line.startsWith("#") || line.isEmpty()){continue;}
+					newZone = new EpicZone(line);;
+					General.myZones.put(newZone.getTag(), newZone);
+					General.myZoneTags.add(newZone.getTag());
+				}
 
+			}
+			finally {
+				scanner.close();
+			}
 		}
-		finally {
-			scanner.close();
+		catch(Exception e)
+		{
+			System.out.println(e.getMessage());
 		}
 
 		reconcileChildren();
@@ -195,6 +205,85 @@ public class General {
 			myZones.put(zoneTag, zone);
 		}
 
+	}
+
+	public static void SaveZones()
+	{
+		try 
+		{
+			String data = BuildZoneData();
+			Writer output = new BufferedWriter(new FileWriter(myFile, false));
+			try 
+			{
+				output.write(data);
+			}
+			finally {
+				output.close();
+			}
+		}
+		catch(Exception e)
+		{
+			System.out.println(e.getMessage());
+		}
+	}
+
+	private static String BuildZoneData()
+	{
+		String result = "";
+		String line = "";
+
+		for(String tag: myZoneTags)
+		{
+			EpicZone z = myZones.get(tag);
+			line = z.getTag() + "|";
+			line = line + z.getName() + "|";
+			line = line + BuildFlags(z) + "|";
+			line = line + z.getEnterText() + "|";
+			line = line + z.getExitText() + "|";
+			line = line + z.getFloor() + "|";
+			line = line + z.getCeiling() + "|";
+			line = line + BuildChildren(z) + "|";
+			line = line + BuildPointList(z) + "\n";
+			result = result + line;
+		}
+
+		return result;
+	}
+
+	private static String BuildFlags(EpicZone z)
+	{
+		String result = "";
+
+		if(z.getFlags().get("pvp") != null){result = result + "pvp:" + z.getFlags().get("pvp").toString() + " ";}
+		if(z.getFlags().get("nomobs") != null){result = result + "nomobs:" + z.getFlags().get("nomobs").toString() + " ";}
+		if(z.getFlags().get("regen") != null){result = result + "regen:" + z.getFlags().get("regen").toString() + " ";}
+		if(z.getFlags().get("noanimals") != null){result = result + "noanimals:" + z.getFlags().get("noanimals").toString() + " ";}
+
+		return result;
+	}
+
+	private static String BuildChildren(EpicZone z)
+	{
+		String result = "";
+
+		for(String tag: z.getChildrenTags())
+		{
+			result = result + tag + " ";
+		}
+
+		return result;
+	}
+
+	private static String BuildPointList(EpicZone z)
+	{
+		String result = "";
+
+		for(Point point: z.getPointList())
+		{
+			result = result + point.x + ":" + point.y + " ";
+		}
+
+		return result;
 	}
 
 	public static EpicZone getZoneForPoint(Player player,	EpicZonePlayer ezp, int playerHeight, Point playerPoint)
