@@ -1,0 +1,46 @@
+name: EpicManager
+description: General manager commands plugin 
+website: http://team-eso.googlecode.com
+author: Team ESO
+main: com.bukkit.epicsaga.EpicManager.EpicManager
+version: 0.1
+
+commands:
+  ban:
+    aliases: disallow
+    description: Ban player(s) from server
+    usage: /<command> <playerlist> - ban player(s) from server
+  unban:
+    aliases: allow, pardon 
+    description: Unban player(s) from server
+    usage: /<command> <playerlist> - unban player(s) from server
+  kick:
+    description: Kick player(s) from server
+    usage: /<command> <playerlist> - kick player(s) from server
+  sethome:
+    description: Set player's home spawn point
+    usage: |
+      - /<command> - set your home
+      - /<command> <player> - set another player's home to your location
+  rmhome:
+    description: Remove player's home spawn point
+    usage: |
+      - /<command> - remove your home
+      - /<command> <player> - remove another player's home
+  home:
+    description: Teleport to player's home
+    usage: |
+      - /<command> - teleport to your home
+      - /<command> <player> - teleport to another player's home
+  setghome:
+    description: Set a group home location(and spawn point).
+    usage: /<command> <group> - set a group home
+  rmghome:
+    description: Set a group home location.
+    usage: /<command> <group> - remove a group home
+  ghome:
+    description: Teleport to a group home.
+    usage: |
+      - /<command> - Teleport to your group home.
+      - /<command> <group> - Teleport to specified group
+
