@@ -31,7 +31,7 @@ public class EpicZonePlayer {
 	public EpicZoneMode getMode(){return mode;}
 	public EpicZone getEditZone(){return editZone;}
 	
-	public enum EpicZoneMode{None, ZoneDraw, ZoneEdit, ZoneDrawConfirm}
+	public enum EpicZoneMode{None, ZoneDraw, ZoneEdit, ZoneDrawConfirm, ZoneDeleteConfirm}
 	
 	public void setEntityID(int value)
 	{

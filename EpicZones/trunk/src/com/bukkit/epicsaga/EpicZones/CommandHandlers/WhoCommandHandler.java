@@ -7,50 +7,53 @@ import org.bukkit.event.player.PlayerChatEvent;
 
 import com.bukkit.epicsaga.EpicZones.EpicZone;
 import com.bukkit.epicsaga.EpicZones.EpicZonePlayer;
+import com.bukkit.epicsaga.EpicZones.EpicZones;
 import com.bukkit.epicsaga.EpicZones.General;
 
 public class WhoCommandHandler {
 
 	public static void Process(String[] data, PlayerChatEvent event)
 	{
-		
+
 		int pageNumber = 1;
 
-		if (data.length > 1)
+		if(EpicZones.permissions.has(event.getPlayer(), "epiczones.who"))
 		{
-			if (data[1].equalsIgnoreCase("all"))
+			if (data.length > 1)
 			{
-				if (data.length > 2)
+				if (data[1].equalsIgnoreCase("all"))
+				{
+					if (data.length > 2)
+					{
+						try
+						{
+							pageNumber = Integer.parseInt(data[2]);
+						}
+						catch(NumberFormatException nfe)
+						{
+							pageNumber = 1;
+						}
+					}
+					buildWho(General.getPlayer(event.getPlayer().getName()), event.getPlayer(), pageNumber, true);
+					return;
+				}
+				else
 				{
 					try
 					{
-						pageNumber = Integer.parseInt(data[2]);
+						pageNumber = Integer.parseInt(data[1]);
 					}
 					catch(NumberFormatException nfe)
 					{
 						pageNumber = 1;
 					}
 				}
-				buildWho(General.getPlayer(event.getPlayer().getName()), event.getPlayer(), pageNumber, true);
-				return;
 			}
-			else
-			{
-				try
-				{
-					pageNumber = Integer.parseInt(data[1]);
-				}
-				catch(NumberFormatException nfe)
-				{
-					pageNumber = 1;
-				}
-			}
+			buildWho(General.getPlayer(event.getPlayer().getName()), event.getPlayer(), pageNumber, false);
+			event.setCancelled(true);
 		}
-		buildWho(General.getPlayer(event.getPlayer().getName()), event.getPlayer(), pageNumber, false);
-		event.setCancelled(true);
-		
 	}
-	
+
 	private static void buildWho(EpicZonePlayer ezp, Player player, int pageNumber, boolean allZones)
 	{
 
@@ -119,7 +122,7 @@ public class WhoCommandHandler {
 
 		return result;
 	}
-	
+
 	private static ArrayList<EpicZonePlayer> getPlayers(EpicZone currentZone, boolean allZones)
 	{
 		if (allZones)

@@ -34,11 +34,12 @@ public class EpicZonesBlockListener extends BlockListener {
 		Player player = event.getPlayer();
 		EpicZonePlayer ezp = General.getPlayer(player.getName());
 		Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
+		String worldName = player.getWorld().getName();
 		int blockHeight = event.getBlock().getLocation().getBlockY();
 		boolean hasPerms = false;
 		EpicZone currentZone = null;
 
-		currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint);
+		currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint, worldName);
 		hasPerms = General.hasPermissions(player, currentZone, "destroy");
 
 		if(!hasPerms)
@@ -57,12 +58,13 @@ public class EpicZonesBlockListener extends BlockListener {
 		Player player = event.getPlayer();
 		EpicZonePlayer ezp = General.getPlayer(player.getName());
 		Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
+		String worldName = player.getWorld().getName();
 		int blockHeight = event.getBlock().getLocation().getBlockY();
 		boolean hasPerms = false;
 
 		EpicZone currentZone = null;
 
-		currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint);
+		currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint, worldName);
 		hasPerms = General.hasPermissions(player, currentZone, "build");
 
 		if(!hasPerms)

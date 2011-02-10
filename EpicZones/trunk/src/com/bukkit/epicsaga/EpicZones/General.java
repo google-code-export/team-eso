@@ -1,6 +1,7 @@
 package com.bukkit.epicsaga.EpicZones;
 
 import java.awt.Point;
+import java.awt.Polygon;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -229,13 +230,14 @@ public class General {
 
 	private static String BuildZoneData()
 	{
-		String result = "";
+		String result = "#Zone Tag|World|Zone Name|Flags|Enter Message|Exit Message|Floor|Ceiling|Child Zones|PointList\n";
 		String line = "";
 
 		for(String tag: myZoneTags)
 		{
 			EpicZone z = myZones.get(tag);
 			line = z.getTag() + "|";
+			line = line + z.getWorld() + "|";
 			line = line + z.getName() + "|";
 			line = line + BuildFlags(z) + "|";
 			line = line + z.getEnterText() + "|";
@@ -276,17 +278,19 @@ public class General {
 
 	private static String BuildPointList(EpicZone z)
 	{
-		String result = "";
 
-		for(Point point: z.getPointList())
+		String result = "";
+		Polygon poly = z.getPolygon();
+
+		for(int i = 0; i < poly.npoints; i++)
 		{
-			result = result + point.x + ":" + point.y + " ";
+			result = result + poly.xpoints[i] + ":" + poly.ypoints[i] + " ";
 		}
 
 		return result;
 	}
 
-	public static EpicZone getZoneForPoint(Player player,	EpicZonePlayer ezp, int playerHeight, Point playerPoint)
+	public static EpicZone getZoneForPoint(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint, String worldName)
 	{
 
 		EpicZone result = null;
@@ -295,7 +299,7 @@ public class General {
 		for(String zoneTag: General.myZoneTags)
 		{
 			EpicZone zone = General.myZones.get(zoneTag);
-			resultTag = General.isPointInZone(zone, playerHeight, playerPoint);
+			resultTag = General.isPointInZone(zone, playerHeight, playerPoint, worldName);
 			if(resultTag.length() > 0)
 			{
 				result = General.myZones.get(resultTag);
@@ -307,7 +311,7 @@ public class General {
 
 	}
 
-	public static String isPointInZone(EpicZone zone, int playerHeight, Point playerPoint)
+	public static String isPointInZone(EpicZone zone, int playerHeight, Point playerPoint, String worldName)
 	{
 
 		String result = "";
@@ -316,7 +320,7 @@ public class General {
 		{
 			for(String zoneTag: zone.getChildrenTags())
 			{
-				result = isPointInZone(zone.getChildren().get(zoneTag), playerHeight, playerPoint);
+				result = isPointInZone(zone.getChildren().get(zoneTag), playerHeight, playerPoint, worldName);
 				if(result.length() > 0)
 				{
 					return result;
@@ -324,11 +328,14 @@ public class General {
 			}
 		}
 
-		if(playerHeight >= zone.getFloor() && playerHeight <= zone.getCeiling())
+		if(worldName.equalsIgnoreCase(zone.getWorld()))
 		{
-			if(zone.pointWithin(playerPoint))
+			if(playerHeight >= zone.getFloor() && playerHeight <= zone.getCeiling())
 			{
-				result = zone.getTag();
+				if(zone.pointWithin(playerPoint))
+				{
+					result = zone.getTag();
+				}
 			}
 		}
 

@@ -113,6 +113,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 	{
 
 		EpicZone foundZone = null;
+		String worldName = player.getWorld().getName();
 
 		if(playerWithinBorder(playerPoint, player))
 		{
@@ -122,7 +123,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 
 				String resultTag;
 				foundZone = ezp.getCurrentZone();
-				resultTag = General.isPointInZone(foundZone, playerHeight, playerPoint);
+				resultTag = General.isPointInZone(foundZone, playerHeight, playerPoint, worldName);
 				if(resultTag.length() > 0)
 				{
 					if(!resultTag.equals(ezp.getCurrentZone().getTag()))
@@ -138,7 +139,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 			}
 			else
 			{
-				foundZone = General.getZoneForPoint(player, ezp, playerHeight, playerPoint);
+				foundZone = General.getZoneForPoint(player, ezp, playerHeight, playerPoint, worldName);
 			}
 
 
@@ -233,12 +234,13 @@ public class EpicZonesPlayerListener extends PlayerListener
 			Player player = event.getPlayer();
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
 			Point blockPoint = new Point(event.getBlockClicked().getLocation().getBlockX(), event.getBlockClicked().getLocation().getBlockZ());
+			String worldName = player.getWorld().getName();
 			int blockHeight = event.getBlockClicked().getLocation().getBlockY();
 			boolean hasPerms = false;
 
 			EpicZone currentZone = null;
 
-			currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint);
+			currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint, worldName);
 			hasPerms = General.hasPermissions(player, currentZone, "build");
 
 			if(!hasPerms)
@@ -257,12 +259,13 @@ public class EpicZonesPlayerListener extends PlayerListener
 			Player player = event.getPlayer();
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
 			Point blockPoint = new Point(event.getBlockClicked().getLocation().getBlockX(), event.getBlockClicked().getLocation().getBlockZ());
+			String worldName = player.getWorld().getName();
 			int blockHeight = event.getBlockClicked().getLocation().getBlockY();
 			boolean hasPerms = false;
 
 			EpicZone currentZone = null;
 
-			currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint);
+			currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint, worldName);
 			hasPerms = General.hasPermissions(player, currentZone, "destroy");
 
 			if(!hasPerms)
