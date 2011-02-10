@@ -119,7 +119,7 @@ public class AuthFeature implements PluginFeature{
 	    	
 			userAuth.deny(playerName, banReason);
 	
-			// send message to person who gsve command 
+			// send message to person who gave command 
 			op.sendMessage(
 					ChatColor.YELLOW+
 					"Player '"+playerName+"' no longer allowed.");
