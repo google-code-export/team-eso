@@ -90,7 +90,7 @@ public class EpicZones extends JavaPlugin {
 		debugees.put(player, value);
 	}
 
-	private void setupPermissions() throws Exception {
+	public void setupPermissions() throws Exception {
 		Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
 		if(test != null) {
 			// make sure Permissions gets enabled first

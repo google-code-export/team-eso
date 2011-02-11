@@ -118,30 +118,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 		if(playerWithinBorder(playerPoint, player))
 		{
 
-			if(ezp.getCurrentZone() != null)
-			{
-
-				String resultTag;
-				foundZone = ezp.getCurrentZone();
-				resultTag = General.isPointInZone(foundZone, playerHeight, playerPoint, worldName);
-				if(resultTag.length() > 0)
-				{
-					if(!resultTag.equals(ezp.getCurrentZone().getTag()))
-					{
-						foundZone = General.myZones.get(resultTag);
-					}
-				}
-				else
-				{
-					foundZone = null;
-				}
-
-			}
-			else
-			{
-				foundZone = General.getZoneForPoint(player, ezp, playerHeight, playerPoint, worldName);
-			}
-
+			foundZone = FindZone(player, ezp, playerHeight, playerPoint, worldName);
 
 			if(foundZone != null)
 			{
@@ -180,6 +157,39 @@ public class EpicZonesPlayerListener extends PlayerListener
 
 	}
 
+	private EpicZone FindZone(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint, String worldName)
+	{
+		
+		EpicZone result = null;
+		
+		if(ezp.getCurrentZone() != null)
+		{
+
+			String resultTag;
+			result = ezp.getCurrentZone();
+			resultTag = General.isPointInZone(result, playerHeight, playerPoint, worldName);
+			if(resultTag.length() > 0)
+			{
+				if(!resultTag.equalsIgnoreCase(ezp.getCurrentZone().getTag()))
+				{
+					result = General.myZones.get(resultTag);
+				}
+			}
+			else
+			{
+				result = null;
+			}
+
+		}
+		else
+		{
+			result = General.getZoneForPoint(player, ezp, playerHeight, playerPoint, worldName);
+		}
+		
+		return result;
+		
+	}
+	
 	private void WarnPlayer(Player player, EpicZonePlayer ezp, String message)
 	{
 		if (ezp.getLastWarned().before(new Date()))
@@ -220,7 +230,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 		{
 			String[] split = event.getMessage().split("\\s");
 			if (split[0].equalsIgnoreCase("/who")){WhoCommandHandler.Process(split, event);}
-			else if (split[0].equalsIgnoreCase("/reloadez")){ReloadCommandHandler.Process(split, event);}
+			else if (split[0].equalsIgnoreCase("/reloadez")){ReloadCommandHandler.Process(split, event, plugin);}
 			else if (split[0].equalsIgnoreCase("/zone")){ZoneCommandHandler.Process(split, event);}
 		}
 	}

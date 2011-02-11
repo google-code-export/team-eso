@@ -84,17 +84,17 @@ public class General {
 	public static boolean hasPermissions(Player player, EpicZone zone, String flag)
 	{
 
-		//		if(zone != null)
-		//		{
-		//		System.out.println("Zone Tag: " + zone.getTag());
-		//		System.out.println("Has Parent: " + zone.hasParent());
-		//		System.out.println("Permission Allow Check: " + "epiczones." + zone.getTag() + "." + flag);
-		//		System.out.println("Permission Deny Check: " + "epiczones." + zone.getTag() + "." + flag + ".deny");
-		//		System.out.println("Permission Allow Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag));
-		//		System.out.println("Permission Deny Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny"));
-		//		System.out.println("Permission Composite Result: " + (EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag) && !EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny")));
-		//		System.out.println("Player Can Ignore Permissions: " + EpicZones.permissions.has(player, "epiczones.ignorepermissions"));
-		//		}
+//				if(zone != null)
+//				{
+//				System.out.println("Zone Tag: " + zone.getTag());
+//				System.out.println("Has Parent: " + zone.hasParent());
+//				System.out.println("Permission Allow Check: " + "epiczones." + zone.getTag() + "." + flag);
+//				System.out.println("Permission Deny Check: " + "epiczones." + zone.getTag() + "." + flag + ".deny");
+//				System.out.println("Permission Allow Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag));
+//				System.out.println("Permission Deny Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny"));
+//				System.out.println("Permission Composite Result: " + (EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag) && !EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny")));
+//				System.out.println("Player Can Ignore Permissions: " + EpicZones.permissions.has(player, "epiczones.ignorepermissions"));
+//				}
 
 		if(!EpicZones.permissions.has(player, "epiczones.ignorepermissions"))
 		{
@@ -103,7 +103,12 @@ public class General {
 				//System.out.println("1");
 				return getDefaultPerm(flag);
 			}
-			else if(EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag) && !EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny"))
+			else if(EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny"))
+			{
+				//System.out.println("1.5");
+				return false;
+			}
+			else if(EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag))
 			{
 				//System.out.println("2");
 				return true;
@@ -113,15 +118,10 @@ public class General {
 				//System.out.println("3");
 				return hasPermissions(player, zone.getParent(), flag);
 			}
-			else if(!EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny"))
+			else
 			{
 				//System.out.println("4");
 				return getDefaultPerm(flag);	
-			}
-			else
-			{
-				//System.out.println("5");	
-				return false;
 			}
 		}
 		else
