@@ -68,7 +68,7 @@ To allow a player to ignore the map radius add this to their permissions
 == Permissions Explained ==
 EpicZones is fully integrated with Permissions, to define who can do what within zones. This allows permissions to properly inherit from groups and also allow for specific permissions for players.
 
-To give a player permissions to do things in a zone, you add a permission to that player's group or the player specifically in the form of epiczones.<zonetag>.<flag>
+To give a player permissions to do things in a zone, you add a permission to that player's group or the player specifically in the form of epiczones.zonetag.flag
 
 So, if you wanted joebob to have build access in test1, listed above. You would add the following permission to joebob's permissions.
 {{{epiczones.test1.build}}}
