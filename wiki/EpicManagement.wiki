@@ -1,4 +1,4 @@
-#Provide basic server management. /kick, /ban and a permissions driven whitelist, to name some of the key points. 
+Provide basic server management. /kick, /ban and a permissions driven whitelist, to name some of the key points. 
 
 = Introduction =
 
