@@ -1,8 +1,0 @@
-#Provide leveling and skilling up for players, limiting the use of items to specific levels. Making the game more of a curve, than a flat landscape 
-
-= Introduction =
-Provide leveling and skilling up for players, limiting the use of items to specific levels. Making the game more of a curve, than a flat landscape 
-
-
-= Details =
-Provide leveling and skilling up for players, limiting the use of items to specific levels. Making the game more of a curve, than a flat landscape 
