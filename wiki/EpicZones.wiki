@@ -1,19 +1,19 @@
-#summary Details for EpicZones plugin.
+#summary Polygon based area protection, with child zones, permissions inheritance, and map border protection.
 
 == Introduction ==
-Polygon based Area Protection.
+Polygon based area protection, with child zones, permissions inheritance, and map border protection. 
+
+*Lead Developer* jblaske
 
 
 == Features ==
-    * Polygonal area creation (Not just cuboids!)
-    * Provide a Circular border to your map
+    * Polygonal area creation. (Not just cuboids!)
+    * In-game zone creation.
+    * Provide a Circular border to your map.
     * Hierarchical Permissions with Child and Parent Zones.
-    * Toggle Permissions by zone for (Build, Destroy, Entry)
-    * Display Entering and Exiting messages in chat
-    * Utilizes Groups from Permissions Plugin for defining Zone level Permissions.
+    * Utilizes Permissions for zone rights.
+    * Display Entering and Exiting messages in chat.
     * Enhanced /who
-     * /who - only tells you who is in the zone you are in, and child zones to that zone.
-     * /who all - tells you where everybody on the server is
 
 
 == Default Config.yml ==
@@ -22,32 +22,82 @@ defaultEnter: true
 defaultDestroy: true
 defaultBuild: true
 mapRadius: 1000
+enableRadius: true
 }}}
  * Default permissions are used, when nothing is specified for any given user/group.
 
 
 == Example Zones.txt ==
 {{{
-#ZoneName|Flags|Enter Message|Exit Message|Permissions|Floor|Ceiling|ParentZone|ChildZone|PointList
-test|pvp:false regen:false nomobs:false|Entering Test Zone...|Leaving Test Zone...|Admins[build:allow destroy:allow entry:allow],Member[build:allow destroy:allow entry:allow]|0|128||test2|-20:20 20:20 20:-20 -20:-20
-test2|pvp:false regen:false nomobs:false|Entering Test Zone 2...|Leaving Test Zone 2...|Admins[build:deny destroy:deny entry:deny],Member[build:allow destroy:allow entry:allow]|0|128|test||-10:20 10:10 10:-10 -10:-10
+#Zone Tag|World|Zone Name|Flags|Enter Message|Exit Message|Floor|Ceiling|Child Zones|PointList
+test1|world1|Test Zone 1|pvp:false regen:false nomobs:false|Entering Test Zone 1...|Leaving Test Zone 1...|0|128|test2 |-20:20 20:20 20:-20 -20:-20
+test2|world1|Test Zone 2|pvp:false regen:false nomobs:false|Entering Test Zone 2...|Leaving Test Zone 2...|0|128||-10:10 10:10 10:-10 -10:-10
 }}}
- * PVP, Regen and NoMobs have no effect currently, and do not need to be specified.
- * ZoneName must be unique.
+ * Regen and NoMobs have no effect currently, and do not need to be specified.
+ * ZoneTag must be unique.
 
+
+== Creating Zones In Game ==
+Use the /zone command at any time for in game help.
+
+Example for creating a zone in game.
+{{{/zone create arena}}}
+You are then put into draw mode, use the zoneTool in your config (Default is Stick) to right click and set points. When you are done.
+
+When a zone is created, its Name is defaulted to the tag, and its world is defaulted to the world you are in. Both can be changed after drawing your polygon.
+{{{/zone save
+/zone name PvP Arena
+/zone flag pvp true
+/zone enter PVP is enabled, beware!
+/zone exit You are no longer in a pvp zone, you can relax now
+/zone save}}}
+And your zone is done!
+
+Be sure to set your new zone as a child on any zones it is within like this:
+{{{/zone edit parentzone
+/zone addchildren arena
+/zone save}}}
+Currently, you cannot add permissions from within game, you must modify your permissions config.yml manually.
+
+== Map Radius ==
+Map radius, when enabled will prevent players from travling outside of the fixed range from 0,0 on the map.
+
+To allow a player to ignore the map radius add this to their permissions
+{{{epiczones.ignoremapradius}}}
 
 == Permissions Explained ==
-    * Build
-     * Allows or Denies the ability to place blocks within the zone. (uses block location, not player location)
-     * Allows or Denies the ability to pour buckets of Water or Lava within the zone. (uses block location, not player location)
-    * Destroy
-     * Allows or Denies the ability to break blocks within the zone. (uses block location, not player location)
-     * Allows or Denies the ability to scoup buckets of Water or Lava within the zone. (uses block location, not player location)
-    * Entry
-     * Allows or Denies the player the ability to enter a zone.
+EpicZones is fully integrated with Permissions, to define who can do what within zones. This allows permissions to properly inherit from groups and also allow for specific permissions for players.
+
+To give a player permissions to do things in a zone, you add a permission to that player's group or the player specifically in the form of epiczones.<zonetag>.<flag>
+
+So, if you wanted joebob to have build access in test1, listed above. You would add the following permission to joebob's permissions.
+{{{epiczones.test1.build}}}
+It's that simple!
+
+Now you wonder, how do i specifically deny somebody from doing things now? Easy just add .deny to the end! This would deny build permissions in test1.
+{{{epiczones.test1.build.deny}}}
+NOTE: Deny permissions take precedence over allow permissions. Child permissions take precedence over parent permissions.
+
+If you would like a member to be able to ignore all zone permissions add this to their permissions
+{{{epiczones.ignorepermissions}}}
+
+
+== Possible Permission Flags ==
+    * build
+      * The placement of blocks and pouring of buckets
+    * destroy
+      * The destruction of blocks and the scooping of buckets
+    * entry
+      * Player walk or teleport within a zone.
+
+== Flags ==
+    * PVP
+      * You must have PVP enabled in your server.properties file
+      * Setting pvp:true in a zone, will allow players to damage each other.
+      * When checking for pvp allowance, it checks the zone of the player being damaged, not the player dealing the damage.
 
 
 == Commands ==
-    * /who (no security yet)
-     * /who all (no security yet)
-    * /reloadez (no security yet)
+    * /who (epiczones.who)
+    * /reloadez (epiczones.admin)
+    * /zone (epiczones.admin)
