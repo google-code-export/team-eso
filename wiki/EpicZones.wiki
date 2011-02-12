@@ -41,22 +41,28 @@ test2|world1|Test Zone 2|pvp:false regen:false nomobs:false|Entering Test Zone 2
 Use the /zone command at any time for in game help.
 
 Example for creating a zone in game.
-{{{/zone create arena}}}
+{{{
+/zone create arena
+}}}
 You are then put into draw mode, use the zoneTool in your config (Default is Stick) to right click and set points. When you are done.
 
 When a zone is created, its Name is defaulted to the tag, and its world is defaulted to the world you are in. Both can be changed after drawing your polygon.
-{{{/zone save
+{{{
+/zone save
 /zone name PvP Arena
 /zone flag pvp true
 /zone enter PVP is enabled, beware!
 /zone exit You are no longer in a pvp zone, you can relax now
-/zone save}}}
+/zone save
+}}}
 And your zone is done!
 
 Be sure to set your new zone as a child on any zones it is within like this:
-{{{/zone edit parentzone
+{{{
+/zone edit parentzone
 /zone addchildren arena
-/zone save}}}
+/zone save
+}}}
 Currently, you cannot add permissions from within game, you must modify your permissions config.yml manually.
 
 == Map Radius ==
