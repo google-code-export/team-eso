@@ -1,9 +1,8 @@
-Provide a framework for players to create their own quests and jobs they need completed. As well as built in quests for NPCs. 
+Provide a party system for hunting monsters and exploring in the toughest of dungeons. 
 
 = Introduction =
-Provide a framework for players to create their own quests and jobs they need completed. As well as built in quests for NPCs. 
+Provide a party system for hunting monsters and exploring in the toughest of dungeons. 
 
 
 = Details =
-
-Provide a framework for players to create their own quests and jobs they need completed. As well as built in quests for NPCs. 
+Provide a party system for hunting monsters and exploring in the toughest of dungeons. 
