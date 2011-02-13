@@ -1,7 +1,5 @@
 package com.bukkit.epicsaga.EpicZones.CommandHandlers;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerChatEvent;
 import com.bukkit.epicsaga.EpicZones.EpicZones;
 import com.bukkit.epicsaga.EpicZones.General;

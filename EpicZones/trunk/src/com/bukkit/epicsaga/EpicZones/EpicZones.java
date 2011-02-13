@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.HashMap;
 import org.bukkit.entity.Player;
 import org.bukkit.Server;
-import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
@@ -24,8 +23,12 @@ public class EpicZones extends JavaPlugin {
 	private final EpicZonesPlayerListener playerListener = new EpicZonesPlayerListener(this);
 	private final EpicZonesBlockListener blockListener = new EpicZonesBlockListener(this);
 	private final EpicZonesEntityListener entityListener = new EpicZonesEntityListener(this);
+	private final EpicZonesVehicleListener vehicleListener = new EpicZonesVehicleListener(this);
+	private final EpicZonesRegen regen = new EpicZonesRegen(this);
+	
 	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 	private static final String CONFIG_FILE = "config.yml";
+	
 
 	public static PermissionHandler permissions;
 
@@ -47,6 +50,7 @@ public class EpicZones extends JavaPlugin {
 			General.config.load();
 			General.config.save();
 			General.loadZones(this.getDataFolder());
+			
 
 			pm.registerEvent(Event.Type.PLAYER_MOVE, this.playerListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_TELEPORT, this.playerListener, Event.Priority.Normal, this);
@@ -60,7 +64,11 @@ public class EpicZones extends JavaPlugin {
 
 			pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, this.entityListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_PROJECTILE, this.entityListener, Event.Priority.Normal, this);
-			
+
+			pm.registerEvent(Event.Type.VEHICLE_MOVE, this.vehicleListener, Event.Priority.Normal, this);
+
+			getServer().getScheduler().scheduleAsyncRepeatingTask(this, regen, 10, 10);
+
 			for(Player p:getServer().getOnlinePlayers())
 			{
 				General.addPlayer(p.getEntityId(), p.getName());

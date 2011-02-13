@@ -53,10 +53,10 @@ public class ZoneCommandHandler {
 	{
 		if(propertyName.equals("editzone")){General.getPlayer(playerID).setEditZone((EpicZone)value);}
 		else if(propertyName.equals("mode")){General.getPlayer(playerID).setMode((EpicZoneMode)value);}
-		else if(propertyName.equals("flag:pvp")){General.getPlayer(playerID).getEditZone().getFlags().put("pvp", (Boolean)value);}
-		else if(propertyName.equals("flag:nomobs")){General.getPlayer(playerID).getEditZone().getFlags().put("nomobs", (Boolean)value);}
-		else if(propertyName.equals("flag:regen")){General.getPlayer(playerID).getEditZone().getFlags().put("regen", (Boolean)value);}
-		else if(propertyName.equals("flag:noanimals")){General.getPlayer(playerID).getEditZone().getFlags().put("noanimals", (Boolean)value);}
+		else if(propertyName.equals("flag:pvp")){General.getPlayer(playerID).getEditZone().setPVP(Boolean.valueOf((String)value));}
+		//else if(propertyName.equals("flag:nomobs")){General.getPlayer(playerID).getEditZone().getFlags().put("nomobs", Boolean.valueOf((String)value));}
+		else if(propertyName.equals("flag:regen")){General.getPlayer(playerID).getEditZone().setRegen((String)value);}
+		//else if(propertyName.equals("flag:noanimals")){General.getPlayer(playerID).getEditZone().getFlags().put("noanimals", Boolean.valueOf((String)value));}
 		else if(propertyName.equals("floor")){General.getPlayer(playerID).getEditZone().setFloor((Integer)value);}
 		else if(propertyName.equals("ceiling")){General.getPlayer(playerID).getEditZone().setCeiling((Integer)value);}
 		else if(propertyName.equals("entermessage")){General.getPlayer(playerID).getEditZone().setEnterText((String)value);}
@@ -155,7 +155,11 @@ public class ZoneCommandHandler {
 			if(data.length > 3 && data[2].length() > 0 && data[3].length() > 0)
 			{
 				String flag = data[2];
-				String value = data[3];
+				String value = "";
+				for(int i = 3; i < data.length; i++)
+				{
+					value = value + data[i] + " ";
+				}			
 				if(ValidFlag(flag))
 				{
 					Set(playerID, "flag:" + flag.toLowerCase(), value);
@@ -417,7 +421,7 @@ public class ZoneCommandHandler {
 					if(General.myZones.get(data[2]) != null)
 					{
 						String tag = data[2].replaceAll("[^a-zA-Z0-9]", "");
-						Set(playerID, "editzone", General.myZones.get(tag));
+						Set(playerID, "editzone", new EpicZone(General.myZones.get(tag)));
 						Set(playerID, "mode", EpicZoneMode.ZoneEdit);
 						SendMessage(event, "Editing Zone: " + tag);
 					}
@@ -513,7 +517,7 @@ public class ZoneCommandHandler {
 	{
 		if(flag.equals("pvp")){return true;}
 		//else if(flag.equals("nomobs")){return true;}
-		//else if(flag.equals("regen")){return true;}
+		else if(flag.equals("regen")){return true;}
 		//else if(flag.equals("noanimals")){return true;}
 		else {return false;}
 	}

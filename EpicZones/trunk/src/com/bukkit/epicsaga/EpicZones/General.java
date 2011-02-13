@@ -4,24 +4,15 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Scanner;
-import java.util.Set;
-
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
 import com.bukkit.epicsaga.EpicZones.EpicZone;
-import com.bukkit.epicsaga.EpicZones.EpicZonePermission;
 import com.bukkit.epicsaga.EpicZones.EpicZonePlayer;
 import com.bukkit.epicsaga.EpicZones.EpicZones;
 import com.bukkit.epicsaga.EpicZones.General;
@@ -34,7 +25,9 @@ public class General {
 	private static final String ZONE_FILE = "zones.txt";
 	private static File myFile;
 	public static EpicZonesConfig config;
-
+	public static final String NO_PERM_ENTER = "You do not have permission to enter ";
+	public static final String NO_PERM_BORDER = "You have reached the border of the map.";
+	
 	public static EpicZonePlayer getPlayer(String name)
 	{
 		for(EpicZonePlayer ezp: myPlayers)
@@ -256,10 +249,26 @@ public class General {
 	{
 		String result = "";
 
-		if(z.getFlags().get("pvp") != null){result = result + "pvp:" + z.getFlags().get("pvp").toString() + " ";}
-		if(z.getFlags().get("nomobs") != null){result = result + "nomobs:" + z.getFlags().get("nomobs").toString() + " ";}
-		if(z.getFlags().get("regen") != null){result = result + "regen:" + z.getFlags().get("regen").toString() + " ";}
-		if(z.getFlags().get("noanimals") != null){result = result + "noanimals:" + z.getFlags().get("noanimals").toString() + " ";}
+		if(z.hasPVP())
+			{result = result + "pvp:true ";}
+		else
+			{result = result + "pvp:false ";}
+		
+		//if(z.getFlags().get("nomobs") != null){result = result + "nomobs:" + z.getFlags().get("nomobs").toString() + " ";}
+		
+		if(z.hasRegen())
+		{
+			if(z.getRegenDelay() > 0)
+			{
+				result = result + "regen:" + z.getRegenInterval() + ":" + z.getRegenAmount() + ":" + z.getRegenDelay() + " ";
+			}
+			else
+			{
+				result = result + "regen:" + z.getRegenInterval() + ":" + z.getRegenAmount() + " ";	
+			}
+		}
+		
+		//if(z.getFlags().get("noanimals") != null){result = result + "noanimals:" + z.getFlags().get("noanimals").toString() + " ";}
 
 		return result;
 	}
@@ -341,4 +350,77 @@ public class General {
 
 		return result;
 	}
+	
+	public static boolean pointWithinBorder(Point point, Player player)
+	{
+
+		if(General.config.enableRadius)
+		{
+
+			EpicZonePlayer ezp = General.getPlayer(player.getName());
+			double xsquared = point.x * point.x;
+			double ysquared = point.y * point.y;
+			double distanceFromCenter = Math.sqrt(xsquared + ysquared);
+
+			ezp.setDistanceFromCenter((int)distanceFromCenter);
+
+			if(distanceFromCenter <= General.config.mapRadius)
+			{
+				if(ezp.getPastBorder())
+				{
+					WarnPlayer(player, ezp, "You are inside the map radius border.");
+					ezp.setPastBorder(false);
+				}
+				return true;
+			}
+			else
+			{
+				if(EpicZones.permissions.has(player, "epiczones.ignoremapradius"))
+				{
+					if(!ezp.getPastBorder())
+					{
+						WarnPlayer(player, ezp, "You are outside the map radius border.");
+						ezp.setPastBorder(true);
+					}
+					return true;
+				}
+				else
+				{
+					return false;	
+				}
+			}
+
+		}
+		else
+		{
+			return true;
+		}
+	}
+	
+	public static void WarnPlayer(Player player, EpicZonePlayer ezp, String message)
+	{
+		if (ezp.getLastWarned().before(new Date()))
+		{
+			player.sendMessage(message);
+			ezp.Warn();
+		}
+	}
+	
+	public static boolean ShouldCheckPlayer(EpicZonePlayer ezp)
+	{
+		if (ezp.getLastCheck().before(new Date()))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	public static void Regen()
+	{
+		
+	}
+	
 }

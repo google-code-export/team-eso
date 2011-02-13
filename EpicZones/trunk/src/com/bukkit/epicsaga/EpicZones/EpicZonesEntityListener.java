@@ -1,17 +1,6 @@
 package com.bukkit.epicsaga.EpicZones;
 
-import java.awt.Point;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.bukkit.Location;
-import org.bukkit.command.Command;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -20,11 +9,11 @@ import org.bukkit.event.entity.EntityListener;
 public class EpicZonesEntityListener extends EntityListener 
 {
 
-	private final EpicZones plugin;
+	//private final EpicZones plugin;
 
 	public EpicZonesEntityListener(EpicZones instance)
 	{
-		plugin = instance;
+		//plugin = instance;
 	}
 
 	public @Override void onEntityDamageByEntity(EntityDamageByEntityEvent event)
@@ -37,18 +26,15 @@ public class EpicZonesEntityListener extends EntityListener
 				EpicZone zone = ezp.getCurrentZone();
 				if(zone != null)
 				{
-					if(zone.getFlags().get("pvp") != null)
+					if(!zone.hasPVP())
 					{
-						if(!zone.getFlags().get("pvp"))
-						{
-							event.setCancelled(true);
-						}
+						event.setCancelled(true);
 					}
 				}
 			}
 		}
 	}
-	
+
 	public @Override void onEntityDamageByProjectile(EntityDamageByProjectileEvent event)
 	{
 		if(event.getCause() == DamageCause.ENTITY_ATTACK)
@@ -59,12 +45,9 @@ public class EpicZonesEntityListener extends EntityListener
 				EpicZone zone = ezp.getCurrentZone();
 				if(zone != null)
 				{
-					if(zone.getFlags().get("pvp") != null)
+					if(!zone.hasPVP())
 					{
-						if(!zone.getFlags().get("pvp"))
-						{
-							event.setCancelled(true);
-						}
+						event.setCancelled(true);
 					}
 				}
 			}

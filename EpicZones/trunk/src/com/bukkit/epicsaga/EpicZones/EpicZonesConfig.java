@@ -5,9 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.util.config.Configuration;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -28,8 +25,7 @@ public class EpicZonesConfig extends Configuration {
 	public boolean defaultBuild;
 	public boolean defaultDestroy;
 	public boolean enableRadius;
-	public int zoneTool = 280; //Default Tool Is String
-
+	public int zoneTool = 280; //Default Tool Is Stick
 
 	public EpicZonesConfig(File file)
 	{
@@ -85,8 +81,9 @@ public class EpicZonesConfig extends Configuration {
 
 	/**
 	 * Save settings to config file. File errors are ignored like load.
+	 * @return 
 	 */
-	public void save()
+	public boolean save()
 	{
 		FileOutputStream stream;
 		BufferedWriter writer;
@@ -98,22 +95,27 @@ public class EpicZonesConfig extends Configuration {
 		root.put("enableRadius", enableRadius);
 		root.put("zoneTool", zoneTool);
 
-		try {
+		try 
+		{
 			stream = new FileOutputStream(file);
 			stream.getChannel().truncate(0);
 			writer = new BufferedWriter(new OutputStreamWriter(stream));
 
-			try{
+			try
+			{
 				writer.write(yaml.dump(root));
 			}
-			finally {
+			finally 
+			{
 				writer.close();
 			}
 
 		}
-		catch(IOException e) {
-
+		catch(IOException e)
+		{
+			return false;
 		}
+		return true;
 	}
 
 }

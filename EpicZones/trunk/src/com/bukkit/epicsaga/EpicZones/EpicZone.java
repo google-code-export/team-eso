@@ -2,23 +2,18 @@ package com.bukkit.epicsaga.EpicZones;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.Location;
-
-import com.bukkit.epicsaga.EpicZones.EpicZonePermission;
-import com.bukkit.epicsaga.EpicZones.General;
-
 public class EpicZone {
 
 	private String tag = "";
 	private String name = "";
-	private Map<String, Boolean> flags = new  HashMap<String, Boolean>();
+	//private Map<String, Boolean> flags = new  HashMap<String, Boolean>();
 	private int floor = 0;
 	private int ceiling = 128;
 	private String world = "";
@@ -31,8 +26,38 @@ public class EpicZone {
 	private Set<String> childrenNames = new HashSet<String>();
 	private boolean hasChildrenFlag = false;
 	private boolean hasParentFlag = false;
+	private boolean hasPVP = false;
+	private boolean hasRegen = false;
+	private Date lastRegen = new Date();
+	private int regenAmount = 0;
+	private int regenDelay = 0;
+	private int regenInterval = 500;
 
 	public EpicZone(){}
+	
+	public EpicZone(EpicZone prime)
+	{
+		this.tag = prime.tag;
+		this.name = prime.name;
+		this.floor = prime.floor;
+		this.ceiling = prime.ceiling;
+		this.world = prime.world;
+		this.polygon = prime.polygon;
+		this.boundingBox = prime.boundingBox;
+		this.enterText = prime.enterText;
+		this.exitText = prime.exitText;
+		this.parent = prime.parent;
+		this.children = prime.children;
+		this.childrenNames = prime.childrenNames;
+		this.hasChildrenFlag = prime.hasChildrenFlag;
+		this.hasParentFlag = prime.hasParentFlag;
+		this.hasPVP = prime.hasPVP;
+		this.hasRegen = prime.hasRegen;
+		this.lastRegen = prime.lastRegen;
+		this.regenAmount = prime.regenAmount;
+		this.regenDelay = prime.regenDelay;
+		this.regenInterval = prime.regenInterval;
+	}
 
 	public EpicZone(String zoneData)
 	{
@@ -50,7 +75,7 @@ public class EpicZone {
 			this.ceiling = Integer.valueOf(split[7]);
 			this.parent = null;
 			this.children = null;
-			
+
 			buildFlags(split[3]);
 			buildChildren(split[8]);
 			buildPolygon(split[9]);
@@ -64,7 +89,7 @@ public class EpicZone {
 
 	public String getTag(){return tag;}
 	public String getName(){return name;}
-	public Map<String, Boolean> getFlags(){return flags;}
+	//public Map<String, Boolean> getFlags(){return flags;}
 	public int getFloor(){return floor;}
 	public int getCeiling(){return ceiling;}
 	public Polygon getPolygon(){return polygon;}
@@ -76,6 +101,7 @@ public class EpicZone {
 	public Set<String> getChildrenTags(){return childrenNames;}
 	public boolean hasChildren(){return hasChildrenFlag;}
 	public boolean hasParent(){return hasParentFlag;}
+	public boolean hasRegen(){return hasRegen;}
 
 	public void addChild(EpicZone childZone)
 	{
@@ -95,7 +121,7 @@ public class EpicZone {
 	{
 		this.world = value;
 	}
-	
+
 	public void setTag(String value)
 	{
 		this.tag=value;
@@ -155,10 +181,76 @@ public class EpicZone {
 			for(int i = 0;i < dataList.length; i++)
 			{
 				String[] split = dataList[i].split(":");
-				this.flags.put(split[0], split[1].equalsIgnoreCase("true"));
+				String flag = split[0].toLowerCase();
+
+				if(flag.equals("pvp"))
+				{
+					this.hasPVP = split[1].equalsIgnoreCase("true");
+				}
+				else if(flag.equals("regen"))
+				{
+					if (split.length > 2)
+					{
+						if(split.length > 3)
+						{
+							setRegen(split[1] + " " + split[2] + " " + split[3]);
+						}
+						else
+						{
+							setRegen(split[1] + " " + split[2] + " 0");
+						}
+					}
+					else
+					{
+						setRegen(split[1] + " 1");
+					}
+				}
+				else if(flag.equals("mobs"))
+				{
+					//ToDo
+				}
 			}
 		}
 
+	}
+
+	public void setPVP(boolean value)
+	{
+		this.hasPVP = value;
+	}
+
+	public void setRegen(String value)
+	{
+		
+		String[] split = value.split("\\s");
+		int interval = 0;
+		int amount = 0;
+		int delay = 0;
+		
+		if(split.length > 1)
+		{
+			interval = Integer.valueOf(split[0]);
+			amount = Integer.valueOf(split[1]);
+			if(split.length > 2)
+			{
+				delay = Integer.valueOf(split[2]);
+			}
+		}
+		
+		if(amount != 0)
+		{ 
+			this.hasRegen = true;
+			this.regenInterval = interval;
+			this.regenAmount = amount;
+			this.regenDelay = delay;
+		}
+		else
+		{
+			this.hasRegen = false;
+			this.regenInterval = 0;
+			this.regenDelay = 0;
+			this.regenAmount = 0;
+		}
 	}
 
 	private void buildChildren(String data)
@@ -198,9 +290,55 @@ public class EpicZone {
 	{
 		this.polygon = new Polygon();
 	}
-	
+
 	public void rebuildBoundingBox()
 	{
 		this.boundingBox = this.polygon.getBounds();
+	}
+
+	public boolean hasPVP() 
+	{
+		return this.hasPVP;
+	}
+
+	public int getRegenAmount() 
+	{
+		return regenAmount;
+	}
+	
+	public int getRegenDelay() 
+	{
+		return regenDelay;
+	}
+	
+	public int getRegenInterval() 
+	{
+		return regenInterval;
+	}
+
+	public void Regen()
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MILLISECOND, this.regenInterval);
+		this.lastRegen = cal.getTime();
+	}
+
+	public Date getAdjustedRegenDelay()
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MILLISECOND, -this.regenDelay);
+		return cal.getTime();
+	}
+	
+	public boolean timeToRegen()
+	{
+		if (this.hasRegen)
+		{
+			if(this.lastRegen.before(new Date()))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -1,11 +1,8 @@
 package com.bukkit.epicsaga.EpicZones;
 
 import org.bukkit.Location;
-
 import java.util.Calendar;
 import java.util.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 public class EpicZonePlayer {
 
@@ -19,6 +16,9 @@ public class EpicZonePlayer {
 	private Date lastCheck = new Date();
 	private EpicZoneMode mode = EpicZoneMode.None; 
 	private EpicZone editZone = null;
+	private boolean pastBorder = false;
+	private Date enteredZone = new Date();
+	
 	
 	public EpicZone getCurrentZone(){return currentZone;}
 	public int getEntityID(){return entityID;}
@@ -30,8 +30,16 @@ public class EpicZonePlayer {
 	public boolean isTeleporting(){return teleporting;}
 	public EpicZoneMode getMode(){return mode;}
 	public EpicZone getEditZone(){return editZone;}
+	public boolean getPastBorder(){return pastBorder;}
+	public Date getEnteredZone(){return enteredZone;}
 	
 	public enum EpicZoneMode{None, ZoneDraw, ZoneEdit, ZoneDrawConfirm, ZoneDeleteConfirm}
+	
+	
+	public void setPastBorder(boolean value)
+	{
+		this.pastBorder = value;
+	}
 	
 	public void setEntityID(int value)
 	{
@@ -57,6 +65,7 @@ public class EpicZonePlayer {
 	public void setCurrentZone(EpicZone z)
 	{
 		this.currentZone = z;
+		this.enteredZone = new Date();
 	}
 	
 	public void setDistanceFromCenter(int distance)
