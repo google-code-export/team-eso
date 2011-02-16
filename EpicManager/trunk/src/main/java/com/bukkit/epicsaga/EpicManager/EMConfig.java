@@ -31,48 +31,25 @@
 
 package com.bukkit.epicsaga.EpicManager;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.bukkit.util.config.Configuration;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
+import com.bukkit.epicsaga.WritableConfiguration;
 
-public class EMConfig extends Configuration {
-	private static final Yaml yaml;
-
-	static {
-		DumperOptions options = new DumperOptions();
-		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-		yaml = new Yaml(options);
-	}
-
-	private File file;
-
+public class EMConfig extends WritableConfiguration {
+	public String allowGroup = null;
 	public String kickMessage = null;
 	public String banMessage = null;
-	public String authMessage = null;
-
+	public String noLoginMessage = null;
 
 	public EMConfig(File file) {
 		super(file);
-
-
-		this.file = file;
-
-		if(file == null)
-			throw new IllegalArgumentException("file cannot be null");
 	}
 
 	public void setDefaults() {
+		allowGroup = "Default";
 		kickMessage = "Kicked by admin";
 		banMessage = "You have been banned.";
-		authMessage = "You are not allowed on this server.";
+		noLoginMessage = "You are not allowed on this server.";
 	}
 
 	@Override
@@ -80,34 +57,49 @@ public class EMConfig extends Configuration {
 		// make sure there is always known values in case absent in config file
 		setDefaults();
 
-		if(file == null)
-			throw new IllegalArgumentException("file cannot be null");
+		super.load();
 
-		if(!file.exists()) {
-			try {
-				file.createNewFile();
-				save();
-			}
-			catch(IOException e) {
+		boolean hasEmpty = false;
+		String ret;
 
-			}
+		ret = getString("messages.ban");
+		if(ret != null) {
+			banMessage = ret;
+		}
+		else 
+			hasEmpty = true;
+
+		ret = getString("messages.kick");
+		if(ret != null) {
+			kickMessage = ret;
+		}
+		else 
+			hasEmpty = true;
+
+		ret = getString("messages.nologin");
+		if(ret != null) {
+			noLoginMessage = ret;
 		}
 		else {
-			super.load();
-
-			String ret;
-
+			// check for ond value
 			ret = getString("messages.auth");
-			if(ret != null)
-				authMessage = ret;
-
-			ret = getString("messages.ban");
-			if(ret != null)
-				banMessage = ret;
-
-			ret = getString("messages.auth");
-			if(ret != null)
-				authMessage = ret;
+			if (ret != null) {
+				noLoginMessage = ret;
+				removeProperty("messages.auth");
+			}
+			else 
+				hasEmpty = true;
+		}
+		
+		ret = getString("auth.allow-group");
+		if(ret != null) {
+			allowGroup = ret;
+		}
+		else 
+			hasEmpty = true;
+		
+		if (hasEmpty) {
+			save();
 		}
 	}
 
@@ -115,34 +107,12 @@ public class EMConfig extends Configuration {
 	 * Save settings to config file. File errors are ignored like load.
 	 */
 	public boolean save() {
-		FileOutputStream stream;
-		BufferedWriter writer;
-
-		Map<String, Object> messages = new HashMap<String,Object>();
-		messages.put("auth", authMessage);
-		messages.put("ban", banMessage);
-		messages.put("kick", kickMessage);
-
-		root.put("messages", messages);
-
-		try {
-			stream = new FileOutputStream(file);
-			stream.getChannel().truncate(0);
-			writer = new BufferedWriter(new OutputStreamWriter(stream));
-
-			try{
-				writer.write(yaml.dump(root));
-			}
-			finally {
-				writer.close();
-			}
-
-		}
-		catch(IOException e) {
-			return false;
-		}
+		setProperty("messages.nologin", noLoginMessage);
+		setProperty("messages.ban", banMessage);
+		setProperty("messages.kick", kickMessage);
+		setProperty("auth.allow-group", allowGroup);
 		
-		return true;
+		return super.save();
 	}
-
+	
 }

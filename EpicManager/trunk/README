@@ -5,10 +5,173 @@ This plugin implements multiple simple commands:
 
 
 
-INSTALATION
+1. INSTALATION
  This project is most easily built with maven.
 
  You can run:
    mvn clean install
 
    To build the package, which is found in the target/ folder.
+
+===================   
+2. USING
+
+===================
+2.1 Configuration file:
+
+Example:
+
+auth:
+	# the Permisisons plugin group group to add new players to
+	allow-group: Default
+messages:
+	#message to player when they are kicked
+	kick: 'Kicked by admin'
+	
+	# message to player when they are banned 
+	# if they have a reason, " Reason: <banned-reason>" is added
+	ban: 'You have been banned.'
+	
+	# message to player when thay aren't allowed(when not in permission or banned) 
+	# if they have a reason, " Reason: <banned-reason>" is added
+	nologin: 'You are not allowed on this server.'
+
+
+===================   
+2.2 Home and GroupHome feature
+
+===================
+2.2.1 Setting the home or group home
+
+Home and Group Homes features are alternate spawn points that can be set for 
+users or a permissions plugin group. 
+ 
+For the user to set their own spawn point, they would do the following:
+
+> /sethome  (using the permission "epicsaga.home.set")
+
+If you would rather not have the player able to set their home, admins can use:
+> /sethome <user> (using the permission "epicsaga.homeother.set")
+At the location the user's home should be set.
+
+Use of setting group homes is similar:
+> /setghome <group name> (permission: "epicsaga.ghomeother.set")
+
+Currently the setghome doesn't verify if the permissions group exists, which 
+allows the group home to be used as a named teleport. 
+
+===================
+2.2.2 Teleporting to the home or group home
+
+Teleport to your home:
+> /home     		# permission: "epicsaga.home.home"  
+
+Teleport to a players home:
+> /home <player>    # permission: "epicsaga.homeother.home"
+
+Teleport to a group's home:
+> /ghome <group name> # permisison: "epicsaga.ghomeother.ghome"
+ 
+2.1.3 Removing a home or grouphome
+Remove your home:
+> /rmhome     		# permission: "epicsaga.home.rm"  
+
+Remove a players home:
+> /rmhome <player>    # permission: "epicsaga.homeother.rm"
+
+Remove to a group's home:
+> /rmghome <group name> # permisison: "epicsaga.ghomeother.rm"
+
+
+===================
+2.2.4 Permission for home an grouphome
+
+The permissions for managing a player's own home is separate from managing other 
+players, for easy separation of authority:
+
+Example:
+
+users:
+	regularplayer:
+		group: Default
+		info:
+		permissions:
+		- 'epicsaga.home.*'  # allows player to manage their own home
+							 # (and teleport to it)
+		- 'epicsaga.ghome.*'  # allows player to teleport to their group home
+	adminplayer:
+		group: Admin
+		info:
+		permissions:
+		- 'epicsaga.home.*'  # allows player to manage their own home
+							 # (and teleport to it)
+		- 'epicsaga.homeother.*'  # can also manage/teleport other player's homes
+		- 'epicsaga.ghome.*'  # allows player to teleport to their group home
+		- 'epicsaga.ghomeother.*'  # allows player to manage group homes
+
+===================
+2.3 Auth feature
+
+===================
+2.3.1 Kicking player
+
+* Kick a list of players from the server
+> /kick <playername> [<playername> ...]
+
+Example:
+> /kick jim bill bob 
+
+===================
+2.3.1 Banning/unbanning
+
+* Ban a player with an optional reason, the reason is reported to the player when
+they are kicked, or when they attempt to log-in:
+
+> /{ban|disallow} <playername> [reason]
+
+Example:
+> /ban BillTheConquerer Conquered too much
+
+* Unban / allow the player on thei server.  If the player doesn't exist in 
+permissions file, a user is created, adding it to the group named in 
+"auth.allow-group" configuration option.
+
+> /{unban|pardon|allow} <playername> [<playername> ...]
+		
+Example:
+> /unban jim samwise notch
+
+
+====================
+2.3.1 Ban/unban and the Permissions plugin
+
+With this plugin, the Permissions/config.yml becomes the whitelist for the server,
+if the user isn't in the permissions, they are denied access.
+
+When a player didn't already exist, it is added to the Permissions/config.yml 
+automatically, using the group in this plugin's config.yml ("auth.allow-group")
+
+When a player is banned, instead of removing them from the file, an additional 
+option is added:
+
+users:
+	jim:
+		group: Default
+		info:
+			banned: true
+		permissions:
+
+
+As long as banned is true, the user cannot log in.
+
+Two additional config entries are used:
+
+users:
+	jim:
+		group: Default
+		info:
+			banned: true
+			banned-reason: 'he is a griefer'
+			banned-times: 1
+		permissions:
+

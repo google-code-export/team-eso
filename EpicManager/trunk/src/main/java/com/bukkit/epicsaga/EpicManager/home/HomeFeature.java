@@ -59,18 +59,18 @@ import com.bukkit.epicsaga.EpicManager.PluginFeature;
  *
  *
  * Commands implemented:
- * <li> /sethome (epimanager.home.sethome) - set your home</li>
- * <li>{@literal /sethome <player>} (epimanager.homeother.sethome) -
+ * <li> /sethome (epimanager.home.set) - set your home</li>
+ * <li>{@literal /sethome <player>} (epimanager.homeother.set) -
  * 		set a player's home to your location</li>
- * <li> /rmhome (epimanager.home.rmhome) - set your home</li>
- * <li>{@literal /rmhome <player>} (epimanager.homeother.rmhome) - set player's home</li>
+ * <li> /rmhome (epimanager.home.rm) - set your home</li>
+ * <li>{@literal /rmhome <player>} (epimanager.homeother.rm) - set player's home</li>
  * <li> /home (epicmanager.home.home) - teleport to your home</li>
  * <li>{@literal /home <player> } (epicmanager.homeother.home) -
  * 		teleport to a player's home</li>
  *
- * <li>{@literal /setghome <group> }(epicmanager.ghomeother.setghome) -
+ * <li>{@literal /setghome <group> }(epicmanager.ghomeother.set) -
  * 		set a group's home </li>
- * <li>{@literal /rmghome <group> }(epimanager.ghomeother.rmghome) -
+ * <li>{@literal /rmghome <group> }(epimanager.ghomeother.rm) -
  * 		remove a group home</li>
  * <li> /ghome (epicmanager.ghome.ghome) - teleport to your group home</li>
  * <li>{@literal /ghome <player/group>} (epicmanager.ghomeother.ghome) -
@@ -97,15 +97,15 @@ public class HomeFeature implements PluginFeature {
 
 	private static final String PERM_H_HOME = PERM_H+"home";
 	private static final String PERM_HO_HOME = PERM_HO+"home";
-	private static final String PERM_H_RMHOME = PERM_H+"rmhome";
-	private static final String PERM_HO_RMHOME = PERM_HO+"rmhome";
-	private static final String PERM_H_SETHOME = PERM_H+"sethome";
-	private static final String PERM_HO_SETHOME = PERM_HO+"sethome";
+	private static final String PERM_H_RMHOME = PERM_H+"rm";
+	private static final String PERM_HO_RMHOME = PERM_HO+"rm";
+	private static final String PERM_H_SETHOME = PERM_H+"set";
+	private static final String PERM_HO_SETHOME = PERM_HO+"set";
 
 	private static final String PERM_GH_GHOME = PERM_GH+"ghome";
 	private static final String PERM_GHO_GHOME = PERM_GHO+"ghome";
-	private static final String PERM_GHO_RMGHOME = PERM_GHO+"rmghome";
-	private static final String PERM_GHO_SETGHOME = PERM_GHO+"segthome";
+	private static final String PERM_GHO_RMGHOME = PERM_GHO+"rm";
+	private static final String PERM_GHO_SETGHOME = PERM_GHO+"set";
 
 
 	private EpicManager plugin;

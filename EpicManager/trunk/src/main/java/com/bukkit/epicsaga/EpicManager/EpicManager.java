@@ -53,11 +53,10 @@ import com.nijiko.permissions.PermissionHandler;
 
 import com.bukkit.epicsaga.EpicManager.auth.AuthFeature;
 import com.bukkit.epicsaga.EpicManager.home.HomeFeature;
-import com.bukkit.epicsaga.EpicManager.misc.MiscFeature;
 
 /**
  * Core plugin handler.
- *
+ * 
  * @author _sir_maniac
  */
 public class EpicManager extends JavaPlugin {
@@ -76,7 +75,6 @@ public class EpicManager extends JavaPlugin {
     			new HashMap<String, CommandHandler>();
 
     static {
-    	features.add(new MiscFeature());
     	features.add(new AuthFeature());
     	features.add(new HomeFeature());
     }

@@ -1,25 +1,43 @@
+/*
+
+	This file is part of EpicManager
+
+	Copyright (C) 2011 by Team ESO
+
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	THE SOFTWARE.
+
+ */
+
+/**
+ * @author sir.manic@gmail.com
+ * @license MIT License
+ */
+
 package com.bukkit.epicsaga;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.List;
 
-import org.bukkit.Location;
 import org.bukkit.Server;
-import org.bukkit.World;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Egg;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
-import org.bukkit.entity.Vehicle;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Type;
-import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
 
 import com.nijiko.permissions.PermissionHandler;
@@ -28,9 +46,11 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 public class WritablePermissionHandler extends PermissionHandler {
 	private static final String FILENAME="config.yml";
 	
-	private Server server;
+	private Permissions perms;
 	private PermissionHandler handler;
 	private WritableConfiguration source;
+	private File sourceFile;
+	private long sourceModDate;
 	
 	/**
 	 * 
@@ -40,11 +60,7 @@ public class WritablePermissionHandler extends PermissionHandler {
 	 */
 	public WritablePermissionHandler(Server server) 
 			throws FileNotFoundException {
-		this.server = server;
-		
 		PluginManager pm = server.getPluginManager();
-
-		Permissions perms;		
 		
 		try {
 			perms = (Permissions)pm.getPlugin("Permissions");
@@ -63,10 +79,11 @@ public class WritablePermissionHandler extends PermissionHandler {
 		}
 		
 		handler = perms.getHandler();
-		source = new WritableConfiguration(new File(perms.getDataFolder(), 
-				FILENAME));
+		sourceFile = new File(perms.getDataFolder(), FILENAME);
+		sourceModDate = 0;
+		source = new WritableConfiguration(sourceFile);
 		
-		reloadSource();
+		refreshSource();
 	}
 	
 	/**
@@ -74,19 +91,21 @@ public class WritablePermissionHandler extends PermissionHandler {
 	 * 
 	 * @param server
 	 */
-	public static void reloadPermissions(Server server) {
-		Event event = new PlayerChatEvent(Type.PLAYER_COMMAND, new FakePlayer(), 
-				"/rp");
-		server.getPluginManager().callEvent(event);
+	public void reload() {
+		perms.getConfiguration().load();
+		perms.setupPermissions();
 	}
 	
-	private void reloadSource() {
-		source.load();
+	private void refreshSource() {
+		if (sourceFile.lastModified() > sourceModDate) {
+			source.load();
+			sourceModDate = sourceFile.lastModified();
+		}
 	}
 	
 	private void saveSource() {
 		source.save();
-		reloadPermissions(server);
+		reload();
 	}
 
 	
@@ -98,7 +117,7 @@ public class WritablePermissionHandler extends PermissionHandler {
 					"a permissions variable");
 		}
 		
-		reloadSource();
+		refreshSource();
 		String path = "groups."+name;
 		
 		if (source.getProperty(path) == null)
@@ -116,15 +135,13 @@ public class WritablePermissionHandler extends PermissionHandler {
 					"permissions");
 		}
 		
-		String val = value.toString();
-		
-		reloadSource();
+		refreshSource();
 		String path = "users."+name;
 		
 		if (source.getProperty(path) == null)
 			throw new NotFound("Cannot find user: "+name);
 		
-		source.setProperty(path+".info."+variable, val);
+		source.setProperty(path+".info."+variable, value);
 		saveSource();
 	}
 
@@ -149,7 +166,7 @@ public class WritablePermissionHandler extends PermissionHandler {
 	 */
 	public void addPlayer(String name, String group, List<String> permissions) 
 			throws NotFound {
-		reloadSource();
+		refreshSource();
 		name = name.toLowerCase();
 		
 		if(source.getProperty("groups."+group) == null)
@@ -289,164 +306,6 @@ public class WritablePermissionHandler extends PermissionHandler {
 	@Override
 	public boolean permission(Player paramPlayer, String paramString) {
 		return handler.permission(paramPlayer, paramString);
-	}
-
-
-	
-	/**
-	 * A fake player to use when triggering the PLAYER_COMMAND event
-	 * 
-	 * @author _sir_maniac
-	 *
-	 */
-	private static class FakePlayer implements Player {
-		private static final String NAME="console";
-
-		@Override
-		public InetSocketAddress getAddress() {
-			return null;
-		}
-
-		@Override
-		public String getDisplayName() {
-			return NAME;
-		}
-
-		@Override
-		public boolean isOnline() {
-			return true;
-		}
-
-		@Override
-		public void kickPlayer(String message) {
-		}
-
-		@Override
-		public boolean performCommand(String command) {
-			throw new IllegalStateException("not implemented in FakePlayer");
-		}
-
-		@Override
-		public void setCompassTarget(Location loc) {
-		}
-
-		@Override
-		public void setDisplayName(String name) {
-		}
-
-		@Override
-		public int getHealth() {
-			return 20;
-		}
-
-		@Override
-		public int getMaximumAir() {
-			return 1000;
-		}
-
-		@Override
-		public int getRemainingAir() {
-			return 1000;
-		}
-
-		@Override
-		public Vehicle getVehicle() {
-			return null;
-		}
-
-		@Override
-		public boolean isInsideVehicle() {
-			return false;
-		}
-
-		@Override
-		public boolean leaveVehicle() {
-			return false;
-		}
-
-		@Override
-		public void setHealth(int health) {
-		}
-
-		@Override
-		public void setMaximumAir(int ticks) {
-		}
-
-		@Override
-		public void setRemainingAir(int ticks) {
-		}
-
-		@Override
-		public Arrow shootArrow() {
-			throw new IllegalStateException("not implemented in FakePlayer");
-		}
-
-		@Override
-		public Egg throwEgg() {
-			throw new IllegalStateException("not implemented in FakePlayer");
-		}
-
-		@Override
-		public Snowball throwSnowball() {
-			throw new IllegalStateException("not implemented in FakePlayer");
-		}
-
-		@Override
-		public boolean isOp() {
-			return true;
-		}
-
-		@Override
-		public boolean isPlayer() {
-			return true;
-		}
-
-		@Override
-		public void sendMessage(String message) {
-		}
-
-		@Override
-		public PlayerInventory getInventory() {
-			throw new IllegalStateException("not implemented in FakePlayer");
-		}
-
-		@Override
-		public ItemStack getItemInHand() {
-			return null;
-		}
-
-		@Override
-		public String getName() {
-			return NAME;
-		}
-
-		@Override
-		public void setItemInHand(ItemStack item) {
-		}
-
-		@Override
-		public int getEntityId() {
-			return Integer.MAX_VALUE;
-		}
-
-		@Override
-		public Location getLocation() {
-			throw new IllegalStateException("not implemented in FakePlayer");
-		}
-
-		@Override
-		public World getWorld() {
-			throw new IllegalStateException("not implemented in FakePlayer");
-		}
-
-		@Override
-		public void teleportTo(Entity destination) {
-		}
-
-		@Override
-		public void teleportTo(Location location) {
-		}
-
 	}
 	
 	/**

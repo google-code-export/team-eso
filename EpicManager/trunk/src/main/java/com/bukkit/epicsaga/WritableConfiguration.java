@@ -1,3 +1,34 @@
+/*
+
+	This file is part of EpicManager
+
+	Copyright (C) 2011 by Team ESO
+
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	THE SOFTWARE.
+
+ */
+
+/**
+ * @author sir.manic@gmail.com
+ * @license MIT License
+ */
+
 package com.bukkit.epicsaga;
 
 import java.io.BufferedWriter;
@@ -24,22 +55,24 @@ import org.yaml.snakeyaml.representer.Representer;
  *
  */
 public class WritableConfiguration extends Configuration {
-	private static final Yaml yaml;
+	protected Yaml yaml;
 	
 	private File file;
 
-	// these make the config file look nicer
-	static {
-		DumperOptions options = new DumperOptions();
-		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-		yaml = new Yaml(new NullRepresenter(), options);
+	public WritableConfiguration(File file) {
+		this(file, new NullRepresenter());
 	}
 
-	public WritableConfiguration(File file) {
+	protected WritableConfiguration(File file, Representer rep) {
 		super(file);
 		this.file = file;
+
+		// make config files look nicer
+		DumperOptions options = new DumperOptions();
+		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+		yaml = new Yaml(rep, options);
+
 	}
-	
 	/**
 	 * Saves the configuration to disk.
 	 * 
@@ -133,13 +166,26 @@ public class WritableConfiguration extends Configuration {
 		}
 	}
 
+	public void removeProperty(String path) {
+		int index = path.lastIndexOf(".");
+		if(index != -1) {
+			String mapPath = path.substring(0, index);
+			String key = path.substring(index+1);
+			
+			Map<String, Object> map = getPath(mapPath);
+			map.remove(key);
+		}
+		else {
+			root.remove(path);
+		}
+	}
 	
 	/*
 	 * borrowed from:
 	 * http://code.google.com/p/snakeyaml/source/browse/src/test/java/org/yaml/snakeyaml/types/NullTagTest.java
 	 * 
 	 */
-	 private static class NullRepresenter extends Representer {
+	 protected static class NullRepresenter extends Representer {
 	        public NullRepresenter() {
 	            super();
 	            // null representer is exceptional and it is stored as an instance

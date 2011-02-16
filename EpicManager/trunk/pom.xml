@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.bukkit.epicsaga</groupId>
-  <version>0.1</version>
+  <version>0.1-SNAPSHOT</version>
   <artifactId>EpicManager</artifactId>
   <packaging>jar</packaging>
   <name>EpicManager</name>
@@ -75,6 +75,16 @@
 			<target>1.5</target>
 		</configuration>
 	</plugin>
+
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-surefire-plugin</artifactId>
+      <configuration>
+        <systemPropertyVariables>
+          <testFileDir>${project.build.dir}</testFileDir>
+        </systemPropertyVariables>
+      </configuration>
+    </plugin>
 
      <plugin>
         <groupId>com.savage7.maven.plugins</groupId>
@@ -166,6 +176,11 @@
 	  <groupId>org.yaml</groupId>
 	  <artifactId>snakeyaml</artifactId>
 	  <version>1.7</version>
+	</dependency>
+	<dependency>
+		<groupId>junit</groupId>
+		<artifactId>junit</artifactId>
+		<version>4.8.2</version>
 	</dependency>
   </dependencies>
 </project>

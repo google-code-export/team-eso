@@ -57,12 +57,22 @@ import com.bukkit.epicsaga.EpicManager.EpicManager.EnableError;
  * A PluginFeature that handles user login authorization.  Currently implemented
  *   as a flat-file whitelist.
  *
+ * Commands implemented:
+ * <li> /ban &lt; player > [reason] (epimanager.ban) - prevent player from logging in</li>
+ * <li> /unban &lt; playerlist > (epicmanager.unban) - allow the player to log in</li>
+ * <li> /kick &lt; playerlist > (epicmanager.unban) - allow the player to log in</li>
+ *
  * @author _sir_maniac
  *
  */
 public class AuthFeature implements PluginFeature{
+	private static final String PERM_BAN = "epicmanager.ban";
+	private static final String PERM_UNBAN = "epicmanager.unban";
+	private static final String PERM_KICK = "epicmanager.kick";
+	
 	private static final String[] BAN_COMMANDS = {"ban", "disallow"};
 	private static final String[] ALLOW_COMMANDS = {"unban", "allow", "pardon"};
+	private static final String[] KICK_COMMANDS = {"kick"};
 	
 	private final PListener pListener = new PListener();
 
@@ -74,7 +84,8 @@ public class AuthFeature implements PluginFeature{
 		plugin = em;
 
         try {
-        	userAuth = new PermissionLoginAuthenticator(em.getServer(), "Default");
+        	userAuth = new PermissionLoginAuthenticator(em.getServer(), 
+        					plugin.config.allowGroup);
 		}
         catch (FileNotFoundException e) {
     		throw new EnableError(" Could not access permissions.  " +
@@ -89,6 +100,10 @@ public class AuthFeature implements PluginFeature{
             em.registerCommand(cmd, allowHandler);
         }
 
+        for (String cmd : KICK_COMMANDS) {
+            em.registerCommand(cmd, kickHandler);
+        }
+        
         PluginManager pm = em.getServer().getPluginManager();
         pm.registerEvent(Event.Type.PLAYER_LOGIN, pListener, Priority.Highest, em);
 	}
@@ -101,7 +116,7 @@ public class AuthFeature implements PluginFeature{
 	private CommandHandler banHandler = new CommandHandler() {
 	    public boolean onCommand(String command, CommandSender op, String[] args) {
 	    	if(op instanceof Player &&
-	    	   !EpicManager.permissions.has((Player)op, "epicmanager.ban"))
+	    	   !EpicManager.permissions.has((Player)op, PERM_BAN))
 		    		return true;
 	
 	    	if(args.length == 0)
@@ -153,7 +168,7 @@ public class AuthFeature implements PluginFeature{
 	private CommandHandler allowHandler = new CommandHandler() {
 	    public boolean onCommand(String command, CommandSender op, String[] args) {
 	    	if(op instanceof Player &&
-	    	   !EpicManager.permissions.has((Player)op, "epicmanager.unban"))
+	    	   !EpicManager.permissions.has((Player)op, PERM_UNBAN))
 	    		return true;
 	
 	    	if(args.length == 0)
@@ -179,6 +194,41 @@ public class AuthFeature implements PluginFeature{
 	    }
 	};
 
+	private CommandHandler kickHandler = new CommandHandler() {
+	    public boolean onCommand(String command, CommandSender op,
+	    		String[] playerNames) {
+	    	if(op instanceof Player &&
+	    	   !EpicManager.permissions.has((Player)op, PERM_KICK))
+	    		return true;
+
+	    	if(playerNames.length == 0)
+	    		return false;
+
+	    	for(String playerName : playerNames) {
+		    	Player player = plugin.getPlayerByDisplayName(playerName);
+
+		    	if(player != null) {
+		    		String opName;
+
+		    		player.kickPlayer(plugin.config.kickMessage);
+		    		op.sendMessage(ChatColor.YELLOW+"Player kicked from server.");
+
+		    		if(op instanceof Player)
+		    			opName = ((Player)op).getName();
+		    		else
+		    			opName = "console";
+
+		    		EpicManager.logInfo("Player '" + player + "' kicked from server by '" +
+		    				opName + "'.");
+		    	}
+		    	else {
+		    		op.sendMessage(ChatColor.YELLOW+"Player not found: "+playerName);
+		    	}
+	    	}
+	    	return true;
+	    }
+	};
+
 	private class PListener extends PlayerListener {
 
 		@Override
@@ -197,10 +247,10 @@ public class AuthFeature implements PluginFeature{
 			String authMessage;
 			
 			if (reason != null) {
-				authMessage = plugin.config.authMessage + " Ban Reason: "+reason;
+				authMessage = plugin.config.noLoginMessage + " Ban Reason: "+reason;
 			}
 			else {
-				authMessage = plugin.config.authMessage;
+				authMessage = plugin.config.noLoginMessage;
 			}
 			
 			event.disallow(Result.KICK_BANNED, authMessage);
