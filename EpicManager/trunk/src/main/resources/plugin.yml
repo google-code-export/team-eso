@@ -3,7 +3,7 @@ description: General manager commands plugin
 website: http://team-eso.googlecode.com
 author: Team ESO
 main: com.bukkit.epicsaga.EpicManager.EpicManager
-version: 0.1
+version: 0.2
 
 commands:
   #
