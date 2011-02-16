@@ -85,7 +85,7 @@ public class AuthFeature implements PluginFeature{
 
         try {
         	userAuth = new PermissionLoginAuthenticator(em.getServer(), 
-        					plugin.config.allowGroup);
+        					plugin.config.addGroup);
 		}
         catch (FileNotFoundException e) {
     		throw new EnableError(" Could not access permissions.  " +

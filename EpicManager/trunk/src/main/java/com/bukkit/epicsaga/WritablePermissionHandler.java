@@ -34,7 +34,9 @@ package com.bukkit.epicsaga;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
@@ -51,6 +53,9 @@ public class WritablePermissionHandler extends PermissionHandler {
 	private WritableConfiguration source;
 	private File sourceFile;
 	private long sourceModDate;
+	
+	private Map<String, String> userCaseMap = new HashMap<String, String>();
+	private Map<String, String> groupCaseMap = new HashMap<String, String>();
 	
 	/**
 	 * 
@@ -96,11 +101,26 @@ public class WritablePermissionHandler extends PermissionHandler {
 		perms.setupPermissions();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void refreshSource() {
-		if (sourceFile.lastModified() > sourceModDate) {
-			source.load();
-			sourceModDate = sourceFile.lastModified();
+		if (sourceFile.lastModified() <= sourceModDate) 
+			return;
+		
+		source.load();
+		sourceModDate = sourceFile.lastModified();
+		
+		Map<String, ?> users = (Map<String, ?>)source.getProperty("users");
+		userCaseMap.clear();
+		for (String user : users.keySet()) {
+			userCaseMap.put(user.toLowerCase(), user);
 		}
+
+		Map<String, ?> groups = (Map<String, ?>)source.getProperty("groups");
+		groupCaseMap.clear();
+		for (String group : groups.keySet()) {
+			groupCaseMap.put(group.toLowerCase(), group);
+		}
+
 	}
 	
 	private void saveSource() {
@@ -108,6 +128,16 @@ public class WritablePermissionHandler extends PermissionHandler {
 		reload();
 	}
 
+	
+	String groupPath(String group) {
+		return "groups."+groupCaseMap.get(group.toLowerCase());
+	}
+
+	String userPath(String user) {
+		String ret = "users."+userCaseMap.get(user.toLowerCase()); 
+		return ret;
+	}
+	
 	
 	@SuppressWarnings("unchecked")
 	public void setGroupPermissionVariable(String name, String variable, Object value) 
@@ -118,12 +148,12 @@ public class WritablePermissionHandler extends PermissionHandler {
 		}
 		
 		refreshSource();
-		String path = "groups."+name;
+		String path = userPath(name);
 		
 		if (source.getProperty(path) == null)
 			throw new NotFound("Cannot find group: "+name);
 		
-		source.setProperty(path+".info."+name, value);
+		source.setProperty(path+".info."+variable, value);
 		saveSource();
 	}
 	
@@ -136,7 +166,7 @@ public class WritablePermissionHandler extends PermissionHandler {
 		}
 		
 		refreshSource();
-		String path = "users."+name;
+		String path = userPath(name);
 		
 		if (source.getProperty(path) == null)
 			throw new NotFound("Cannot find user: "+name);
@@ -150,8 +180,7 @@ public class WritablePermissionHandler extends PermissionHandler {
 	 * @param player
 	 */
 	public boolean hasUser(String name) {
-		return source.getProperty(
-				"users."+name.toLowerCase()) == null ? false : true;
+		return source.getProperty(userPath(name)) == null ? false : true;
 	}
 	
 	/**
@@ -169,14 +198,14 @@ public class WritablePermissionHandler extends PermissionHandler {
 		refreshSource();
 		name = name.toLowerCase();
 		
-		if(source.getProperty("groups."+group) == null)
+		if(source.getProperty(groupPath(group)) == null)
 			throw new NotFound("Group "+group+" not found in permissions");
 		
 		if(permissions != null && permissions.isEmpty())
 			permissions = null;
 		
-		source.setProperty("users."+name+".group", group);
-		source.setProperty("users."+name+".permissions", permissions);
+		source.setProperty(userPath(name)+".group", group);
+		source.setProperty(userPath(name)+".permissions", permissions);
 		
 		saveSource();
 	}
@@ -333,5 +362,6 @@ public class WritablePermissionHandler extends PermissionHandler {
 		}
 		
 	}
+	
 	
 }

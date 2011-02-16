@@ -23,7 +23,7 @@ Example:
 
 auth:
 	# the Permisisons plugin group group to add new players to
-	allow-group: Default
+	assign-group-on-add: Default
 messages:
 	#message to player when they are kicked
 	kick: 'Kicked by admin'
