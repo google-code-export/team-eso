@@ -1,0 +1,83 @@
+name: EpicManager
+description: General manager commands plugin 
+website: http://team-eso.googlecode.com
+author: Team ESO
+main: com.bukkit.epicsaga.EpicManager.EpicManager
+version: 0.2
+
+commands:
+  #
+  # permission: 
+  #   - epicmanager.ban		# ban a player
+  #   - epicmanager.unban   # unban a player
+  #   - epicmanager.kick    # kick a player
+  # 
+  ban:
+    aliases: disallow
+    description: Ban player(s) from server
+    usage: /<command> <player> [reason] - ban player(s) from server
+  unban:
+    aliases: allow, pardon 
+    description: Unban player(s) from server
+    usage: /<command> <playerlist> - unban player(s) from server
+  kick:
+    description: Kick player(s) from server
+    usage: /<command> <playerlist> - kick player(s) from server
+
+  ####################################
+  #  PLAYER HOMES
+  ####################################
+
+  #   
+  # permissions: 
+  #  - epicmanager.home.set        # set own home
+  #  - epicmanager.homeother.set   # set other's home
+  #  - epicmanager.home.rm        # remove own home
+  #  - epicmanager.homeother.rm   # remove other's home
+  #  - epicmanager.home.home        # teleport to own home
+  #  - epicmanager.homeother.home   # teleport to other's home
+  #
+  sethome:
+    description: Set player's home spawn point
+    usage: |
+      - /<command> - set your home
+      - /<command> <player> - set another player's home to your location
+  rmhome:
+    description: Remove player's home spawn point
+    usage: |
+      - /<command> - remove your home
+      - /<command> <player> - remove another player's home
+  home:
+    description: Teleport to player's home
+    usage: |
+      - /<command> - teleport to your home
+      - /<command> <player> - teleport to another player's home
+
+
+  ####################################
+  #  GROUP HOME 
+  ####################################
+
+
+  #   
+  # permissions: 
+  #  - epicmanager.ghome.set         # teleport to own home
+  #  - epicmanager.ghomeother.set    # teleport to other's home
+  #  - epicmanager.ghome.rm          # teleport to own home
+  #  - epicmanager.ghomeother.rm     # teleport to other's home
+  #  - epicmanager.ghome.ghome       # teleport to own home
+  #  - epicmanager.ghomeother.ghome  # teleport to other's home
+  #
+
+  setghome:
+    description: Set a group home location(and spawn point).
+    usage: /<command> <group> - set a group home
+  rmghome:
+    description: Set a group home location.
+    usage: /<command> <group> - remove a group home
+  ghome:
+    description: Teleport to a group home.
+    usage: |
+      - /<command> - Teleport to your group home.
+      - /<command> <group> - Teleport to specified group
+
