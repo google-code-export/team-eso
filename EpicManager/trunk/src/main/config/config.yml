@@ -1,0 +1,14 @@
+auth:
+	# the Permisisons plugin group group to add new players to
+	assign-group-on-add: Default
+messages:
+	#message to player when they are kicked
+	kick: 'Kicked by admin'
+	
+	# message to player when they are banned 
+	# if they have a reason, " Reason: <banned-reason>" is added
+	ban: 'You have been banned.'
+	
+	# message to player when thay aren't allowed(when not in permission or banned) 
+	# if they have a reason, " Reason: <banned-reason>" is added
+	nologin: 'You are not allowed on this server.'
