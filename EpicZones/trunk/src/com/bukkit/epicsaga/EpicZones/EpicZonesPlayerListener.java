@@ -119,7 +119,9 @@ public class EpicZonesPlayerListener extends PlayerListener
 				{
 					if(General.hasPermissions(player, foundZone, "entry"))
 					{
+						if(ezp.getCurrentZone() != null){ezp.setPreviousZoneTag(ezp.getCurrentZone().getTag());}
 						ezp.setCurrentZone(foundZone);
+						EpicZonesHeroChat.joinChat(foundZone.getTag(), ezp, player);
 						if(foundZone.getEnterText().length() > 0){player.sendMessage(foundZone.getEnterText());}
 					}
 					else
@@ -135,6 +137,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 				if (ezp.getCurrentZone() != null)
 				{
 					if(ezp.getCurrentZone().getExitText().length() > 0){player.sendMessage(ezp.getCurrentZone().getExitText());}
+					EpicZonesHeroChat.leaveChat(ezp.getCurrentZone().getTag(), player);
 					ezp.setCurrentZone(null);
 				}
 			}

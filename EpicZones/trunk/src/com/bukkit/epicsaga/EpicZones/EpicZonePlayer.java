@@ -18,7 +18,7 @@ public class EpicZonePlayer {
 	private EpicZone editZone = null;
 	private boolean pastBorder = false;
 	private Date enteredZone = new Date();
-	
+	private String previousZoneTag = "";
 	
 	public EpicZone getCurrentZone(){return currentZone;}
 	public int getEntityID(){return entityID;}
@@ -32,9 +32,14 @@ public class EpicZonePlayer {
 	public EpicZone getEditZone(){return editZone;}
 	public boolean getPastBorder(){return pastBorder;}
 	public Date getEnteredZone(){return enteredZone;}
+	public String getPreviousZoneTag(){return previousZoneTag;}
 	
 	public enum EpicZoneMode{None, ZoneDraw, ZoneEdit, ZoneDrawConfirm, ZoneDeleteConfirm}
 	
+	public void setPreviousZoneTag(String value)
+	{
+		previousZoneTag = value;
+	}
 	
 	public void setPastBorder(boolean value)
 	{

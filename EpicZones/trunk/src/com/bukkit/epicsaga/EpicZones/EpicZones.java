@@ -9,6 +9,8 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
+
+import com.bukkit.dthielke.herochat.HeroChatPlugin;
 import com.bukkit.epicsaga.EpicZones.General;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.permissions.PermissionHandler;
@@ -25,11 +27,11 @@ public class EpicZones extends JavaPlugin {
 	private final EpicZonesEntityListener entityListener = new EpicZonesEntityListener(this);
 	private final EpicZonesVehicleListener vehicleListener = new EpicZonesVehicleListener(this);
 	private final EpicZonesRegen regen = new EpicZonesRegen(this);
-	
+
 	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 	private static final String CONFIG_FILE = "config.yml";
-	
 
+	public static HeroChatPlugin heroChat = null;
 	public static PermissionHandler permissions;
 
 	public EpicZones(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
@@ -46,11 +48,12 @@ public class EpicZones extends JavaPlugin {
 			PluginManager pm = getServer().getPluginManager();
 
 			setupPermissions();
+			setupHeroChat();
 			checkConfigDir();
 			General.config.load();
 			General.config.save();
 			General.loadZones(this.getDataFolder());
-			
+
 
 			pm.registerEvent(Event.Type.PLAYER_MOVE, this.playerListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_TELEPORT, this.playerListener, Event.Priority.Normal, this);
@@ -107,6 +110,16 @@ public class EpicZones extends JavaPlugin {
 		}
 		else {
 			throw new Exception("Permission plugin not available.");
+		}
+	}
+	
+	public void setupHeroChat()
+	{
+		Plugin test = this.getServer().getPluginManager().getPlugin("HeroChat");
+
+		if (test != null)
+		{
+		    heroChat = (com.bukkit.dthielke.herochat.HeroChatPlugin)test;
 		}
 	}
 

@@ -25,6 +25,7 @@ public class EpicZonesConfig extends Configuration {
 	public boolean defaultBuild;
 	public boolean defaultDestroy;
 	public boolean enableRadius;
+	public boolean enableHeroChat;
 	public int zoneTool = 280; //Default Tool Is Stick
 
 	public EpicZonesConfig(File file)
@@ -44,6 +45,7 @@ public class EpicZonesConfig extends Configuration {
 		defaultBuild = true;
 		defaultDestroy = true;
 		enableRadius = true;
+		enableHeroChat = false;
 		zoneTool = 280;
 	}
 
@@ -75,6 +77,7 @@ public class EpicZonesConfig extends Configuration {
 			defaultBuild = getBoolean("defaultBuild", true);
 			defaultDestroy = getBoolean("defaultDestroy", true);
 			enableRadius = getBoolean("enableRadius", true);
+			enableHeroChat = getBoolean("enableHeroChat", false);
 			zoneTool = getInt("zoneTool", zoneTool);
 		}
 	}
@@ -93,6 +96,7 @@ public class EpicZonesConfig extends Configuration {
 		root.put("defaultBuild", defaultBuild);
 		root.put("defaultDestroy", defaultDestroy);
 		root.put("enableRadius", enableRadius);
+		root.put("enableHeroChat", enableHeroChat);
 		root.put("zoneTool", zoneTool);
 
 		try 

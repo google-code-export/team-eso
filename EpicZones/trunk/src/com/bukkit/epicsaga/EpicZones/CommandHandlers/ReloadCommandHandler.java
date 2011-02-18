@@ -13,6 +13,7 @@ public class ReloadCommandHandler {
 			try 
 			{
 				plugin.setupPermissions();
+				plugin.setupHeroChat();
 				General.config.load();
 				General.config.save();
 				General.loadZones(null);
