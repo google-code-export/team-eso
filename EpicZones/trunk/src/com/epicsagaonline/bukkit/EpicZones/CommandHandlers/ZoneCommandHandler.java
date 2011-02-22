@@ -24,6 +24,7 @@ public class ZoneCommandHandler {
 				if(data[1].equalsIgnoreCase("create")){Create(data, event, ezp, playerID);}
 				else if(data[1].equalsIgnoreCase("save")){Save(data, event, ezp, playerID);}
 				else if(data[1].equalsIgnoreCase("flag")){Flag(data, event, ezp, playerID);}
+				else if(data[1].equalsIgnoreCase("radius")){Radius(data, event, ezp, playerID);}
 				else if(data[1].equalsIgnoreCase("floor")){Floor(data, event, ezp, playerID);}
 				else if(data[1].equalsIgnoreCase("ceiling")){Ceiling(data, event, ezp, playerID);}
 				else if(data[1].equalsIgnoreCase("addchildren")){AddChildren(data, event, ezp, playerID);}
@@ -58,6 +59,7 @@ public class ZoneCommandHandler {
 		else if(propertyName.equals("flag:regen")){General.getPlayer(playerID).getEditZone().setRegen((String)value);}
 		//else if(propertyName.equals("flag:noanimals")){General.getPlayer(playerID).getEditZone().getFlags().put("noanimals", Boolean.valueOf((String)value));}
 		else if(propertyName.equals("floor")){General.getPlayer(playerID).getEditZone().setFloor((Integer)value);}
+		else if(propertyName.equals("radius")){General.getPlayer(playerID).getEditZone().setRadius((Integer)value);}
 		else if(propertyName.equals("ceiling")){General.getPlayer(playerID).getEditZone().setCeiling((Integer)value);}
 		else if(propertyName.equals("entermessage")){General.getPlayer(playerID).getEditZone().setEnterText((String)value);}
 		else if(propertyName.equals("exitmessage")){General.getPlayer(playerID).getEditZone().setExitText((String)value);}
@@ -119,14 +121,20 @@ public class ZoneCommandHandler {
 				Set(playerID, "boundingbox", "");
 				SendMessage(event, "Drawing Complete. It's reccomended you set the name of your zone now with /zone name [value], or type /zone for more options.");
 			}
+			else if(ezp.getEditZone().getPolygon().npoints == 1 && ezp.getEditZone().getRadius() > 0)
+			{
+				Set(playerID, "mode", EpicZoneMode.ZoneEdit);
+				Set(playerID, "boundingbox", "");
+				SendMessage(event, "Drawing Complete. It's reccomended you set the name of your zone now with /zone name [value], or type /zone for more options.");
+			}
 			else
 			{
-				SendMessage(event, "You must draw at least 3 points before you can move on.");
+				SendMessage(event, "You must draw at least 3 points or 1 point and set a radius, before you can move on.");
 			}
 		}
 		else if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 		{
-			
+
 			if(General.myZones.get(ezp.getEditZone().getTag()) == null)
 			{
 				General.myZones.put(ezp.getEditZone().getTag(), ezp.getEditZone());
@@ -170,6 +178,34 @@ public class ZoneCommandHandler {
 					SendMessage(event, "The flag [" + flag + "] is not a valid flag.");
 					SendMessage(event, "Valid flags are: pvp");
 				}
+			}
+		}
+		else
+		{
+			Help(event, ezp, playerID);
+		}
+	}
+
+	private static void Radius(String[] data, PlayerChatEvent event, EpicZonePlayer ezp, int playerID)
+	{
+		if(ezp.getMode() == EpicZoneMode.ZoneDraw || ezp.getMode() == EpicZoneMode.ZoneEdit)
+		{
+			if (ezp.getEditZone().getPolygon().npoints == 1)
+			{
+				if(data.length > 2 && IsNumeric(data[2]))
+				{
+					Integer value = Integer.parseInt(data[2]);
+					Set(playerID, "radius", value);
+					SendMessage(event, "Zone Updated. Radius set to: " + value);
+				}
+				else
+				{
+					SendMessage(event, "[" + data[2] + "] is not a valid value for radius.");
+				}
+			}
+			else
+			{
+				SendMessage(event, "You must specify a single center point, before setting the radius.");
 			}
 		}
 		else

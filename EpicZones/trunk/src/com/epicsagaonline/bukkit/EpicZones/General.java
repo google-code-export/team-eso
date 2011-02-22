@@ -291,11 +291,18 @@ public class General {
 		String result = "";
 		Polygon poly = z.getPolygon();
 
-		for(int i = 0; i < poly.npoints; i++)
+		if(poly.npoints <= 1)
 		{
-			result = result + poly.xpoints[i] + ":" + poly.ypoints[i] + " ";
+			result = z.getCenter().x + ":" + z.getCenter().y + " " + z.getRadius();
 		}
-
+		else
+		{
+			for(int i = 0; i < poly.npoints; i++)
+			{
+				result = result + poly.xpoints[i] + ":" + poly.ypoints[i] + " ";
+			}
+		}
+		
 		return result;
 	}
 

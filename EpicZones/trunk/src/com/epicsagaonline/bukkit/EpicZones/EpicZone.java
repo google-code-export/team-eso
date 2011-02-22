@@ -84,7 +84,7 @@ public class EpicZone {
 			buildChildren(split[8]);
 			buildPolygon(split[9]);
 
-			this.boundingBox = this.polygon.getBounds();
+			rebuildBoundingBox();
 
 			System.out.println("Created Zone [" + this.name + "]");
 		}
@@ -161,29 +161,39 @@ public class EpicZone {
 	public void setRadius(int value)
 	{
 		this.radius = value;
+		if(this.polygon.npoints == 1)
+		{
+			this.center.x = this.polygon.xpoints[0];
+			this.center.y = this.polygon.ypoints[0];
+		}
 	}
 
 	public boolean pointWithin(Point point)
 	{
 		boolean result = false;
-		if(this.boundingBox.contains(point))
+
+		if(this.boundingBox != null)
 		{
-			if(this.polygon != null)
+			if(this.boundingBox.contains(point))
 			{
-				if(this.polygon.contains(point))
+				if(this.polygon != null)
 				{
-					result = true;
+					if(this.polygon.contains(point))
+					{
+						result = true;
+					}
 				}
 			}
-			else if(this.center != null)
+		}
+		else if(this.center != null)
+		{
+			if(this.pointWithinCircle(point))
 			{
-				if(this.pointWithinCircle(point))
-				{
-					result = true;
-				}
+				result = true;
 			}
-		}	
+		}
 		return result;
+
 	}
 
 	public void setCenter(Point value)
@@ -298,7 +308,7 @@ public class EpicZone {
 	private void buildPolygon(String data)
 	{
 		String[] dataList = data.split("\\s");
-
+		//System.out.println("Data: " + data);
 		if (dataList.length > 2)
 		{
 			this.polygon = new Polygon();
@@ -309,12 +319,14 @@ public class EpicZone {
 				this.polygon.addPoint(Integer.valueOf(split[0]), Integer.valueOf(split[1]));
 			}
 		}
-		else if(dataList.length > 1)
+		else if(dataList.length >= 1)
 		{
 			String[] split = dataList[0].split(":");
 			this.polygon = null;
 			this.center = new Point(Integer.valueOf(split[0]), Integer.valueOf(split[1]));
+			//System.out.println("Center: " + this.center.x + " " + this.center.y);
 			this.radius = Integer.valueOf(dataList[1]);
+			//System.out.println("Radius: " + this.radius);
 		}
 	}
 
@@ -335,10 +347,7 @@ public class EpicZone {
 		{
 			this.boundingBox = this.polygon.getBounds();
 		}
-		else if(this.center != null)
-		{
-			this.boundingBox = new Rectangle(this.center.x - this.radius, this.center.y - this.radius, this.radius * 2, this.radius * 2);
-		}
+		this.boundingBox = null;
 	}
 
 	public boolean hasPVP() 
@@ -386,7 +395,7 @@ public class EpicZone {
 		}
 		return false;
 	}
-	
+
 	public boolean pointWithinCircle(Point test)
 	{
 		double x = test.x - this.center.x;
@@ -394,7 +403,8 @@ public class EpicZone {
 		double xsquared = x * x;
 		double ysquared = y * y;
 		double distanceFromCenter = Math.sqrt(xsquared + ysquared);
-		
+		//System.out.println(this.center);
+		//System.out.println(x + " " + y);
 		return distanceFromCenter <= this.radius;
 
 	}
