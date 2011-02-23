@@ -19,8 +19,6 @@ import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.ReloadCommandHandler;
 import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.WhoCommandHandler;
 import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.ZoneCommandHandler;
 
-//import sun.security.mscapi.KeyStore.MY;
-
 /**
  * Handle events for all Player related events
  * @author jblaske
@@ -67,7 +65,6 @@ public class EpicZonesPlayerListener extends PlayerListener
 			}
 			ezp.Check();
 		}
-
 	}
 
 	public @Override void onPlayerTeleport(PlayerMoveEvent event)
@@ -98,99 +95,14 @@ public class EpicZonesPlayerListener extends PlayerListener
 			}
 			ezp.Check();
 		}
-
-	}
-
-	private boolean PlayerWithinZoneLogic(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint)
-	{
-
-		EpicZone foundZone = null;
-		String worldName = player.getWorld().getName();
-
-		if(General.pointWithinBorder(playerPoint, player))
-		{
-
-			foundZone = FindZone(player, ezp, playerHeight, playerPoint, worldName);
-
-			if(foundZone != null)
-			{
-
-				if (ezp.getCurrentZone() == null || foundZone != ezp.getCurrentZone())
-				{
-					if(General.hasPermissions(player, foundZone, "entry"))
-					{
-						if(ezp.getCurrentZone() != null){ezp.setPreviousZoneTag(ezp.getCurrentZone().getTag());}
-						ezp.setCurrentZone(foundZone);
-						EpicZonesHeroChat.joinChat(foundZone.getTag(), ezp, player);
-						if(foundZone.getEnterText().length() > 0){player.sendMessage(foundZone.getEnterText());}
-					}
-					else
-					{
-						General.WarnPlayer(player, ezp, General.NO_PERM_ENTER + foundZone.getName());
-						return false;
-					}
-				}
-
-			}
-			else
-			{
-				if (ezp.getCurrentZone() != null)
-				{
-					if(ezp.getCurrentZone().getExitText().length() > 0){player.sendMessage(ezp.getCurrentZone().getExitText());}
-					EpicZonesHeroChat.leaveChat(ezp.getCurrentZone().getTag(), player);
-					ezp.setCurrentZone(null);
-				}
-			}
-		}
-		else
-		{
-			General.WarnPlayer(player, ezp, General.NO_PERM_BORDER);
-			return false;
-		}
-
-		return true;
-
-	}
-
-	private EpicZone FindZone(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint, String worldName)
-	{
-
-		EpicZone result = null;
-
-		if(ezp.getCurrentZone() != null)
-		{
-
-			String resultTag;
-			result = ezp.getCurrentZone();
-			resultTag = General.isPointInZone(result, playerHeight, playerPoint, worldName);
-			if(resultTag.length() > 0)
-			{
-				if(!resultTag.equalsIgnoreCase(ezp.getCurrentZone().getTag()))
-				{
-					result = General.myZones.get(resultTag);
-				}
-			}
-			else
-			{
-				result = null;
-			}
-
-		}
-		else
-		{
-			result = General.getZoneForPoint(player, ezp, playerHeight, playerPoint, worldName);
-		}
-
-		return result;
-
 	}
 
 	public @Override void onPlayerLogin(PlayerLoginEvent event)
 	{
 		if(event.getResult() != Result.ALLOWED)
-			return;
-
-		General.addPlayer(event.getPlayer().getEntityId(), event.getPlayer().getName());
+		{
+			General.addPlayer(event.getPlayer().getEntityId(), event.getPlayer().getName());
+		}
 	}
 
 	public @Override void onPlayerQuit(PlayerEvent event)
@@ -274,6 +186,85 @@ public class EpicZonesPlayerListener extends PlayerListener
 				event.getPlayer().sendMessage("Point " + point.x + ":" + point.y + " added to zone.");
 			}
 		}
+	}
+	
+	private boolean PlayerWithinZoneLogic(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint)
+	{
+
+		EpicZone foundZone = null;
+		String worldName = player.getWorld().getName();
+		if(General.pointWithinBorder(playerPoint, player))
+		{
+			foundZone = FindZone(player, ezp, playerHeight, playerPoint, worldName);
+			
+			if(foundZone != null)
+			{
+				if (ezp.getCurrentZone() == null || foundZone != ezp.getCurrentZone())
+				{
+					if(General.hasPermissions(player, foundZone, "entry"))
+					{
+						if(ezp.getCurrentZone() != null){ezp.setPreviousZoneTag(ezp.getCurrentZone().getTag());}
+						ezp.setCurrentZone(foundZone);
+						EpicZonesHeroChat.joinChat(foundZone.getTag(), ezp, player);
+						if(foundZone.getEnterText().length() > 0){player.sendMessage(foundZone.getEnterText());}
+					}
+					else
+					{
+						General.WarnPlayer(player, ezp, General.NO_PERM_ENTER + foundZone.getName());
+						return false;
+					}
+				}
+
+			}
+			else
+			{
+				if (ezp.getCurrentZone() != null)
+				{
+					if(ezp.getCurrentZone().getExitText().length() > 0){player.sendMessage(ezp.getCurrentZone().getExitText());}
+					EpicZonesHeroChat.leaveChat(ezp.getCurrentZone().getTag(), player);
+					ezp.setCurrentZone(null);
+				}
+			}
+		}
+		else
+		{
+			General.WarnPlayer(player, ezp, General.NO_PERM_BORDER);
+			return false;
+		}
+
+		return true;
+
+	}
+
+	private EpicZone FindZone(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint, String worldName)
+	{
+
+		EpicZone result = null;
+
+		if(ezp.getCurrentZone() != null)
+		{
+
+			String resultTag;
+			result = ezp.getCurrentZone();
+			resultTag = General.isPointInZone(result, playerHeight, playerPoint, worldName);
+			if(resultTag.length() > 0)
+			{
+				if(!resultTag.equalsIgnoreCase(ezp.getCurrentZone().getTag()))
+				{
+					result = General.myZones.get(resultTag);
+				}
+			}
+			else
+			{
+				result = null;
+			}
+		}
+		else
+		{
+			result = General.getZoneForPoint(player, ezp, playerHeight, playerPoint, worldName);
+		}
+
+		return result;
 
 	}
 }

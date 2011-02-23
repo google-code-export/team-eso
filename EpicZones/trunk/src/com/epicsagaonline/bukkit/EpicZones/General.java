@@ -311,7 +311,6 @@ public class General {
 
 		EpicZone result = null;
 		String resultTag = "";
-
 		for(String zoneTag: General.myZoneTags)
 		{
 			EpicZone zone = General.myZones.get(zoneTag);
@@ -343,7 +342,6 @@ public class General {
 				}
 			}
 		}
-
 		if(worldName.equalsIgnoreCase(zone.getWorld()))
 		{
 			if(playerHeight >= zone.getFloor() && playerHeight <= zone.getCeiling())

@@ -171,7 +171,6 @@ public class EpicZone {
 	public boolean pointWithin(Point point)
 	{
 		boolean result = false;
-
 		if(this.boundingBox != null)
 		{
 			if(this.boundingBox.contains(point))
@@ -193,7 +192,6 @@ public class EpicZone {
 			}
 		}
 		return result;
-
 	}
 
 	public void setCenter(Point value)
@@ -347,7 +345,10 @@ public class EpicZone {
 		{
 			this.boundingBox = this.polygon.getBounds();
 		}
-		this.boundingBox = null;
+		else	
+		{
+			this.boundingBox = null;
+		}
 	}
 
 	public boolean hasPVP() 
