@@ -2,6 +2,7 @@ package com.epicsagaonline.bukkit.EpicZones;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class EpicZone {
 	private String exitText = "";
 	private EpicZone parent = null;
 	private Map<String, EpicZone> children = new HashMap<String, EpicZone>();
-	private Set<String> childrenNames = new HashSet<String>();
+	private Set<String> childrenTags = new HashSet<String>();
 	private boolean hasChildrenFlag = false;
 	private boolean hasParentFlag = false;
 	private boolean hasPVP = false;
@@ -34,6 +35,10 @@ public class EpicZone {
 	private int regenDelay = 0;
 	private int regenInterval = 500;
 	private int radius = 0;
+	private ArrayList<String> allowedMobs = new ArrayList<String>();
+	private boolean allowFire = false;
+	private boolean allowExplode = false;
+
 
 	public EpicZone(){}
 
@@ -51,7 +56,7 @@ public class EpicZone {
 		this.exitText = prime.exitText;
 		this.parent = prime.parent;
 		this.children = prime.children;
-		this.childrenNames = prime.childrenNames;
+		this.childrenTags = prime.childrenTags;
 		this.hasChildrenFlag = prime.hasChildrenFlag;
 		this.hasParentFlag = prime.hasParentFlag;
 		this.hasPVP = prime.hasPVP;
@@ -61,6 +66,9 @@ public class EpicZone {
 		this.regenDelay = prime.regenDelay;
 		this.regenInterval = prime.regenInterval;
 		this.radius = prime.radius;
+		this.allowedMobs = prime.allowedMobs;
+		this.allowFire = prime.allowFire;
+		this.allowExplode = prime.allowExplode;
 	}
 
 	public EpicZone(String zoneData)
@@ -102,21 +110,39 @@ public class EpicZone {
 	public String getWorld(){return world;}
 	public EpicZone getParent(){return parent;}
 	public Map<String, EpicZone> getChildren(){return children;}
-	public Set<String> getChildrenTags(){return childrenNames;}
+	public Set<String> getChildrenTags(){return childrenTags;}
 	public boolean hasChildren(){return hasChildrenFlag;}
 	public boolean hasParent(){return hasParentFlag;}
 	public boolean hasRegen(){return hasRegen;}
 	public int getRadius(){return radius;}
 	public Point getCenter(){return center;}
-
+	public ArrayList<String> getAllowedMobs(){return allowedMobs;}
+	public boolean getAllowFire(){return allowFire;}
+	public boolean getAllowExplode(){return allowExplode;}
 	public void addChild(EpicZone childZone)
 	{
 		if(this.children == null){this.children = new HashMap<String, EpicZone>();}
 		this.children.put(childZone.getTag(), childZone);
 	}
 
+	public void setAllowFire(Boolean value)
+	{
+		this.allowFire = value;
+	}
+	
+	public void setAllowExplode(Boolean value)
+	{
+		this.allowExplode = value;
+	}
+			
+	
 	public void removeChild(String tag)
 	{
+		if(this.childrenTags != null)
+		{
+			this.childrenTags.remove(tag);
+		}
+
 		if(this.children != null)
 		{
 			this.children.remove(tag);
@@ -208,6 +234,8 @@ public class EpicZone {
 	private void buildFlags(String data)
 	{
 
+		allowedMobs.add("all");
+
 		if(data.length() > 0)
 		{
 			String[] dataList = data.split("\\s");
@@ -241,11 +269,207 @@ public class EpicZone {
 				}
 				else if(flag.equals("mobs"))
 				{
-					//ToDo
+					BuildMobsFlag(split);
+				}
+				else if(flag.equals("fire"))
+				{
+					this.allowFire = split[1].equalsIgnoreCase("true");
+				}
+				else if(flag.equals("explode"))
+				{
+					this.allowExplode = split[1].equalsIgnoreCase("true");
+				}
+					
+			}
+		}
+	}
+
+	public void SetMobs(String data)
+	{
+		if (data.length() > 0)
+		{
+			String[] split;
+			split = (data + ":").split(":");
+			if(split.length == 0)
+			{
+				split = (data + ",").split(",");
+			}
+			if(split.length == 0)
+			{
+				split = (data + " ").split(" ");
+			}
+			if(split.length > 0)
+			{
+				BuildMobsFlag(split);
+			}
+		}
+	}
+
+	private void BuildMobsFlag(String[] split)
+	{
+		if(split.length > 0)
+		{
+			allowedMobs = new ArrayList<String>();
+			for(String mobType: split)
+			{
+				mobType = mobType.trim();
+				if(mobType.equalsIgnoreCase("none"))
+				{
+					allowedMobs.add("none");
+					return;
+				}
+				if(mobType.equalsIgnoreCase("animal"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftSquid"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftSquid");
+					}
+
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftChicken"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftChicken");
+					}
+
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftCow"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftCow");
+					}
+
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftSheep"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftSheep");
+					}
+
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftPig"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftPig");
+					}
+				}	
+				else if(mobType.equalsIgnoreCase("monster"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftCreeper"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftCreeper");
+					}
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftZombie"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftZombie");
+					}
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftGhast"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftGhast");
+					}
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftGiant"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftGiant");
+					}
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftSkeleton"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftSkeleton");
+					}
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftSlime"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftSlime");
+					}
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftSpider"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftSpider");
+					}
+				}
+				else if(mobType.equalsIgnoreCase("all"))
+				{
+					allowedMobs.add("all");
+				}
+				else if(mobType.equalsIgnoreCase("creeper"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftCreeper"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftCreeper");
+					}
+				}
+				else if(mobType.equalsIgnoreCase("zombie"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftZombie"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftZombie");
+					}
+				}
+				else if(mobType.equalsIgnoreCase("ghast"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftGhast"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftGhast");
+					}
+				}
+				else if(mobType.equalsIgnoreCase("giant"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftGiant"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftGiant");
+					}
+				}
+				else if(mobType.equalsIgnoreCase("skeleton"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftSkeleton"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftSkeleton");
+					}
+				}
+				else if(mobType.equalsIgnoreCase("slime"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftSlime"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftSlime");
+					}
+				}
+				else if(mobType.equalsIgnoreCase("spider"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftSpider"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftSpider");
+					}
+				}
+				else if(mobType.equalsIgnoreCase("squid"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftSquid"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftSquid");
+					}
+				}
+				else if(mobType.equalsIgnoreCase("chicken"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftChicken"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftChicken");
+					}
+				}
+				else if(mobType.equalsIgnoreCase("cow"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftCow"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftCow");
+					}
+				}
+				else if(mobType.equalsIgnoreCase("sheep"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftSheep"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftSheep");
+					}
+				}
+				else if(mobType.equalsIgnoreCase("pig"))
+				{
+					if(!allowedMobs.contains("org.bukkit.craftbukkit.entity.CraftPig"))
+					{
+						allowedMobs.add("org.bukkit.craftbukkit.entity.CraftPig");
+					}
 				}
 			}
 		}
-
+		else
+		{
+			allowedMobs.add("all");	
+		}
 	}
 
 	public void setPVP(boolean value)
@@ -296,7 +520,7 @@ public class EpicZone {
 
 			for(int i = 0;i < dataList.length; i++)
 			{
-				this.childrenNames.add(dataList[i]);
+				this.childrenTags.add(dataList[i]);
 				this.hasChildrenFlag = true;
 			}
 		}

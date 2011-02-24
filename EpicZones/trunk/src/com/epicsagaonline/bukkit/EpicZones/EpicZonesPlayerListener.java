@@ -28,13 +28,14 @@ public class EpicZonesPlayerListener extends PlayerListener
 	private final EpicZones plugin;
 	private static final String NO_PERM_BUCKET = "You do not have permissions to do that in this zone.";
 	private static final int EMPTY_BUCKET = 325;
-	private Set<Integer> bucketTypes = new HashSet<Integer>();
+	private Set<Integer> itemsOfDestruction = new HashSet<Integer>();
 
 	public EpicZonesPlayerListener(EpicZones instance)
 	{
 		plugin = instance;
-		bucketTypes.add(326);
-		bucketTypes.add(327);
+		itemsOfDestruction.add(259);
+		itemsOfDestruction.add(326);
+		itemsOfDestruction.add(327);
 	}
 
 	public @Override void onPlayerMove(PlayerMoveEvent event)
@@ -89,6 +90,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 					event.setTo(ezp.getCurrentLocation());
 					event.setCancelled(true);
 				}
+				else
 				{
 					ezp.setCurrentLocation(event.getTo());
 				}
@@ -99,7 +101,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 
 	public @Override void onPlayerLogin(PlayerLoginEvent event)
 	{
-		if(event.getResult() != Result.ALLOWED)
+		if(event.getResult() == Result.ALLOWED)
 		{
 			General.addPlayer(event.getPlayer().getEntityId(), event.getPlayer().getName());
 		}
@@ -117,14 +119,14 @@ public class EpicZonesPlayerListener extends PlayerListener
 			String[] split = event.getMessage().split("\\s");
 			if (split[0].equalsIgnoreCase("/who")){WhoCommandHandler.Process(split, event);}
 			else if (split[0].equalsIgnoreCase("/reloadez")){ReloadCommandHandler.Process(split, event, plugin);}
-			else if (split[0].equalsIgnoreCase("/zone")){ZoneCommandHandler.Process(split, event);}
+			else if (split[0].equalsIgnoreCase("/zone")){ZoneCommandHandler.Process(split, event, plugin);}
 		}
 	}
 
 	public @Override void onPlayerItem(PlayerItemEvent event)
 	{
 
-		if (bucketTypes.contains((event.getPlayer().getItemInHand().getTypeId())))
+		if (itemsOfDestruction.contains((event.getPlayer().getItemInHand().getTypeId())))
 		{
 
 			Player player = event.getPlayer();
@@ -137,7 +139,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 			EpicZone currentZone = null;
 			if(General.pointWithinBorder(blockPoint, player))
 			{
-				currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint, worldName);
+				currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
 				hasPerms = General.hasPermissions(player, currentZone, "build");
 
 				if(!hasPerms)
@@ -163,7 +165,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 			EpicZone currentZone = null;
 			if(General.pointWithinBorder(blockPoint, player))
 			{
-				currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint, worldName);
+				currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
 				hasPerms = General.hasPermissions(player, currentZone, "destroy");
 
 				if(!hasPerms)
@@ -261,7 +263,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 		}
 		else
 		{
-			result = General.getZoneForPoint(player, ezp, playerHeight, playerPoint, worldName);
+			result = General.getZoneForPoint(playerHeight, playerPoint, worldName);
 		}
 
 		return result;

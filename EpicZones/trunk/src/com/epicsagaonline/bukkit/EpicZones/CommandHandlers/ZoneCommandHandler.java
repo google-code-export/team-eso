@@ -1,5 +1,6 @@
 package com.epicsagaonline.bukkit.EpicZones.CommandHandlers;
 
+import org.bukkit.ChatColor;
 import org.bukkit.event.player.PlayerChatEvent;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZone;
@@ -10,9 +11,13 @@ import com.epicsagaonline.bukkit.EpicZones.EpicZonePlayer.EpicZoneMode;
 
 public class ZoneCommandHandler {
 
-	public static void Process(String[] data, PlayerChatEvent event)
+	private static EpicZones plugin;
+	
+	public static void Process(String[] data, PlayerChatEvent event, EpicZones instance)
 	{
 
+		plugin = instance;
+		
 		if(EpicZones.permissions.has(event.getPlayer(), "epiczones.admin"))
 		{
 
@@ -38,6 +43,8 @@ public class ZoneCommandHandler {
 				else if(data[1].equalsIgnoreCase("world")){World(data, event, ezp, playerID);}
 				else if(data[1].equalsIgnoreCase("cancel")){Cancel(data, event, ezp, playerID);}
 				else if(data[1].equalsIgnoreCase("delete")){Delete(data, event, ezp, playerID);}
+				else if(data[1].equalsIgnoreCase("list")){List(data, event, ezp, playerID);}
+				else if(data[1].equalsIgnoreCase("info")){Info(data, event, ezp, playerID);}
 				else {Help(event, ezp, playerID);}
 			}
 			else 
@@ -54,9 +61,11 @@ public class ZoneCommandHandler {
 	{
 		if(propertyName.equals("editzone")){General.getPlayer(playerID).setEditZone((EpicZone)value);}
 		else if(propertyName.equals("mode")){General.getPlayer(playerID).setMode((EpicZoneMode)value);}
-		else if(propertyName.equals("flag:pvp")){General.getPlayer(playerID).getEditZone().setPVP(Boolean.valueOf((String)value));}
-		//else if(propertyName.equals("flag:nomobs")){General.getPlayer(playerID).getEditZone().getFlags().put("nomobs", Boolean.valueOf((String)value));}
+		else if(propertyName.equals("flag:pvp")){General.getPlayer(playerID).getEditZone().setPVP(Boolean.valueOf(((String)value).trim()));}
+		else if(propertyName.equals("flag:mobs")){General.getPlayer(playerID).getEditZone().SetMobs((String)value);}
 		else if(propertyName.equals("flag:regen")){General.getPlayer(playerID).getEditZone().setRegen((String)value);}
+		else if(propertyName.equals("flag:fire")){System.out.println((String)value); General.getPlayer(playerID).getEditZone().setAllowFire(Boolean.valueOf(((String)value).trim()));}
+		else if(propertyName.equals("flag:explode")){General.getPlayer(playerID).getEditZone().setAllowExplode(Boolean.valueOf(((String)value).trim()));}
 		//else if(propertyName.equals("flag:noanimals")){General.getPlayer(playerID).getEditZone().getFlags().put("noanimals", Boolean.valueOf((String)value));}
 		else if(propertyName.equals("floor")){General.getPlayer(playerID).getEditZone().setFloor((Integer)value);}
 		else if(propertyName.equals("radius")){General.getPlayer(playerID).getEditZone().setRadius((Integer)value);}
@@ -145,7 +154,7 @@ public class ZoneCommandHandler {
 				General.myZones.remove(ezp.getEditZone().getTag());
 				General.myZones.put(ezp.getEditZone().getTag(), ezp.getEditZone());
 			}
-			General.SaveZones();
+			General.saveZones();
 			Set(playerID, "mode", EpicZoneMode.None);
 			SendMessage(event, "Zone Saved.");
 		}
@@ -176,7 +185,7 @@ public class ZoneCommandHandler {
 				else
 				{
 					SendMessage(event, "The flag [" + flag + "] is not a valid flag.");
-					SendMessage(event, "Valid flags are: pvp");
+					SendMessage(event, "Valid flags are: pvp, mobs, regen, fire, explode");
 				}
 			}
 		}
@@ -427,9 +436,13 @@ public class ZoneCommandHandler {
 	{
 		if(ezp.getMode() == EpicZoneMode.ZoneDeleteConfirm)
 		{
+			if(ezp.getEditZone().hasParent())
+			{
+				General.myZones.get(ezp.getEditZone().getParent().getTag()).removeChild(ezp.getEditZone().getTag());
+			}
 			General.myZoneTags.remove(ezp.getEditZone().getTag());
-			General.SaveZones();
-			General.loadZones(null);
+			General.saveZones();
+			plugin.setupEpicZones();
 			SendMessage(event, "Zone [" + ezp.getEditZone().getTag() + "] has been deleted.");
 			Set(playerID, "mode", EpicZoneMode.None);
 			Set(playerID, "editzone", null);
@@ -505,56 +518,178 @@ public class ZoneCommandHandler {
 			Help(event, ezp, playerID);
 		}
 	}
+	
+	private static void List(String[] data, PlayerChatEvent event, EpicZonePlayer ezp, int playerID)
+	{
+		if(ezp.getMode() == EpicZoneMode.None)
+		{
+			for(String zoneTag: General.myZoneTags)
+			{
+				String messageText;
+				EpicZone zone = General.myZones.get(zoneTag);
+				messageText = zone.getName() + " [" + zone.getTag() + "]";
+				if(zone.hasChildren())
+				{
+					messageText = messageText + " | Children (" + zone.getChildren().size() + ")";
+				}
+				if(zone.hasParent())
+				{
+					messageText = messageText + " | Parent Zone: " + zone.getParent().getTag();
+				}
+				SendMessage(event, messageText);
+			}
+		}
+		else
+		{
+			Help(event, ezp, playerID);
+		}
+	}
+	
+	private static void Info(String[] data, PlayerChatEvent event, EpicZonePlayer ezp, int playerID)
+	{
+		if(ezp.getMode() == EpicZoneMode.None)
+		{
+			if(data.length > 2)
+			{
+				EpicZone zone = General.myZones.get(data[2].trim());
+				if (zone != null)
+				{
+					String messageText;
+					
+					SendMessage(event, ChatColor.GOLD + "Zone: " + ChatColor.GREEN + zone.getName() + ChatColor.GOLD + " Tag: " + ChatColor.GREEN + "" + zone.getTag());
+					if(zone.getCenter() != null)
+					{
+						SendMessage(event, ChatColor.GOLD + "Shape: " + ChatColor.GREEN + "Circle " + ChatColor.WHITE + "| " + ChatColor.GOLD + "Radius: " + ChatColor.GREEN + "" + zone.getRadius());	
+					}
+					else
+					{
+						SendMessage(event, ChatColor.GOLD + "Shape: " + ChatColor.GREEN + "Polygon " + ChatColor.WHITE + "| " + ChatColor.GOLD + "Points " + ChatColor.GREEN + "(" + zone.getPolygon().npoints + ")");
+					}
+					if(zone.hasChildren())
+					{
+						messageText = ChatColor.GOLD + "Child Zone Tags:" + ChatColor.GREEN + "";
+						for(String childTag: zone.getChildrenTags())
+						{
+							messageText = messageText + " " + childTag;
+						}
+						SendMessage(event, messageText);
+					}
+					SendMessage(event, ChatColor.GOLD + "Enter Text: " + ChatColor.GREEN + "" + zone.getEnterText());
+					SendMessage(event, ChatColor.GOLD + "Exit Text: " + ChatColor.GREEN + "" + zone.getExitText());
+					if(zone.hasParent())
+					{
+						SendMessage(event, ChatColor.GOLD + "Parent Zone: " + ChatColor.GREEN + zone.getParent().getName() + ChatColor.GOLD + " Tag: " + ChatColor.GREEN + zone.getParent().getTag());
+					}
+					SendMessage(event, ChatColor.GOLD + "Zone Flags: ");
+					messageText = "";
+					if(zone.hasPVP())
+					{
+						messageText = messageText + ChatColor.AQUA + "PVP: " + ChatColor.GREEN + "ON ";
+					}
+					else
+					{
+						messageText = messageText + ChatColor.AQUA + "PVP: " + ChatColor.RED + "OFF ";
+					}
+					if(zone.getAllowFire())
+					{
+						messageText = messageText + ChatColor.AQUA + "FIRE: " + ChatColor.GREEN + "ON  ";
+					}
+					else
+					{
+						messageText = messageText + ChatColor.AQUA + "FIRE: " + ChatColor.RED + "OFF ";
+					}
+					if(zone.getAllowExplode())
+					{
+						messageText = messageText + ChatColor.AQUA + "EXPLODE: " + ChatColor.GREEN + "ON  ";
+					}
+					else
+					{
+						messageText = messageText + ChatColor.AQUA + "EXPLODE: " + ChatColor.RED + "OFF ";
+					}
+					if(zone.hasRegen())
+					{
+						SendMessage(event, messageText);
+						SendMessage(event, ChatColor.AQUA + "REGEN: " + ChatColor.GREEN + "Delay [" + zone.getRegenDelay() + "] Amount[" + zone.getRegenAmount() + "] Interval[" + zone.getRegenInterval() + "]");
+					}
+					else
+					{
+						messageText = messageText + ChatColor.AQUA + "REGEN: " + ChatColor.RED + "OFF ";
+						SendMessage(event, messageText);
+					}
+					messageText = ChatColor.AQUA + "MOBS:" + ChatColor.GREEN + "";
+					for(String mobType: zone.getAllowedMobs())
+					{
+						messageText = messageText + " " + mobType.replace("org.bukkit.craftbukkit.entity.Craft", "");
+					}
+					SendMessage(event, messageText);					
+				}
+				else
+				{
+					SendMessage(event, "No zone with the tag [" + data[2] + "] exists.");
+				}
+			}
+			
+		}
+		else
+		{
+			Help(event, ezp, playerID);
+		}
+	}
 
 	private static void Help(PlayerChatEvent event, EpicZonePlayer ezp, int playerID)
 	{
 		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 		{
-			SendMessage(event, "You are currently in Edit mode. The following commands are available.");
-			SendMessage(event, "/zone name [value] - Sets the name of the zone you are currently editing.");
-			SendMessage(event, "/zone flag [pvp] [true|false] - Sets the indicated flag true or false.");
-			SendMessage(event, "/zone floor [value] Sets the floor of the zone you are currently editing.");
-			SendMessage(event, "/zone ceiling [value] Sets the ceiling of the zone you are currently editing.");
-			SendMessage(event, "/zone addchildren|removechildren [value] [value]... - Adds or removes children from the zone you are currently editing.");
-			SendMessage(event, "/zone enter|exit [value] Sets the enter or exit message of the zone you are currently editing.");
-			SendMessage(event, "/zone world [value] world of the zone you are currently editing.");
-			SendMessage(event, "/zone draw - Prompts you to go back into Draw mode.");
-			SendMessage(event, "/zone cancel - Discards all changes for the current zone you are editing.");
-			SendMessage(event, "/zone delete - Deletes the zone you are currently editing.");
-			SendMessage(event, "/zone save - Saves all changes for the current zone you are editing, and dumps you out of edit mode.");
+			SendMessage(event, ChatColor.GOLD + "You are currently in Edit mode.");
+			SendMessage(event, ChatColor.GOLD + "/zone name " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Name.");
+			SendMessage(event, ChatColor.GOLD + "/zone flag " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Flag, " + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Value");
+			SendMessage(event, ChatColor.GOLD + "/zone floor " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Floor.");
+			SendMessage(event, ChatColor.GOLD + "/zone ceiling " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Ceiling.");
+			SendMessage(event, ChatColor.GOLD + "/zone addchildren " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Zone Tag, multiples allowed.");
+			SendMessage(event, ChatColor.GOLD + "/zone removechildren " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Zone Tag, multiples allowed.");
+			SendMessage(event, ChatColor.GOLD + "/zone enter " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Enter Message");
+			SendMessage(event, ChatColor.GOLD + "/zone exit " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Exit Message");
+			SendMessage(event, ChatColor.GOLD + "/zone world " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = World Name");
+			SendMessage(event, ChatColor.GOLD + "/zone draw " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Prompts you to go into Draw mode.");
+			SendMessage(event, ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Discards all current changes.");
+			SendMessage(event, ChatColor.GOLD + "/zone delete " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Deletes the zone you are currently editing.");
+			SendMessage(event, ChatColor.GOLD + "/zone save " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Saves all current changes.");
 		}
 		else if(ezp.getMode() == EpicZoneMode.ZoneDraw)
 		{
-			SendMessage(event, "You are currently in Draw mode. The following commands are available.");
-			SendMessage(event, "/zone save - Saves the point data you have drawn and puts you into Edit mode.");
-			SendMessage(event, "/zone cancel - Discards all changes for the current zone you are editing and dumps you out of Draw and Edit mode.");
+			SendMessage(event, ChatColor.GOLD + "You are currently in Draw mode.");
+			SendMessage(event, ChatColor.GOLD + "/zone save " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Saves the point data you have drawn.");
+			SendMessage(event, ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Discards all current changes.");
 		}
 		else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
 		{
-			SendMessage(event, "You are currently in Draw Confirm mode. The following commands are available.");
-			SendMessage(event, "/zone confirm - Clears point data for the current zone and puts you into Draw mode.");
-			SendMessage(event, "/zone cancel - Puts you back into EditMode.");
+			SendMessage(event, ChatColor.GOLD + "You are currently in Draw Confirm mode.");
+			SendMessage(event, ChatColor.GOLD + "/zone confirm " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Clears point data and puts you into Draw mode.");
+			SendMessage(event, ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Puts you back into EditMode.");
 		}
 		else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
 		{
-			SendMessage(event, "You are currently in Delete Confirm mode. The following commands are available.");
-			SendMessage(event, "/zone confirm - Deletes the zone you are currently editing.");
-			SendMessage(event, "/zone cancel - Puts you back into EditMode.");
+			SendMessage(event, ChatColor.GOLD + "You are currently in Delete Confirm mode.");
+			SendMessage(event, ChatColor.GOLD + "/zone confirm " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Deletes the zone you are currently editing.");
+			SendMessage(event, ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Puts you back into EditMode.");
 		}
 		else
 		{
-			SendMessage(event, "To use the /zone command, type one of the following commands.");
-			SendMessage(event, "/zone edit [tag] - Edits an existing zone and puts you into Edit mode.");
-			SendMessage(event, "/zone create [tag] - Creates a new zone and puts you into Draw mode.");
+			SendMessage(event, ChatColor.GOLD + "Help for /zone command.");
+			SendMessage(event, ChatColor.GOLD + "/zone edit " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Begin editing specified zone.");
+			SendMessage(event, ChatColor.GOLD + "/zone create " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Create new zone.");
+			SendMessage(event, ChatColor.GOLD + "/zone list " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Lists existing zones.");
+			SendMessage(event, ChatColor.GOLD + "/zone info " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Detailed info for specified zone.");
 		}
 	}
 
 	private static boolean ValidFlag(String flag)
 	{
 		if(flag.equals("pvp")){return true;}
-		//else if(flag.equals("nomobs")){return true;}
+		else if(flag.equals("mobs")){return true;}
 		else if(flag.equals("regen")){return true;}
-		//else if(flag.equals("noanimals")){return true;}
+		else if(flag.equals("fire")){return true;}
+		else if(flag.equals("explode")){return true;}
 		else {return false;}
 	}
 

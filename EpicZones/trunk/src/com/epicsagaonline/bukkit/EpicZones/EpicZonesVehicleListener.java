@@ -133,7 +133,7 @@ public class EpicZonesVehicleListener extends VehicleListener
 		}
 		else
 		{
-			result = General.getZoneForPoint(player, ezp, playerHeight, playerPoint, worldName);
+			result = General.getZoneForPoint(playerHeight, playerPoint, worldName);
 		}
 
 		return result;

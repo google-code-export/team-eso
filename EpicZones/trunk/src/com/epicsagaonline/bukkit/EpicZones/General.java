@@ -22,12 +22,14 @@ public class General {
 	public static Map<String, EpicZone> myZones = new HashMap<String, EpicZone>();
 	public static ArrayList<String> myZoneTags = new ArrayList<String>();
 	public static ArrayList<EpicZonePlayer> myPlayers = new ArrayList<EpicZonePlayer>();
-	private static final String ZONE_FILE = "zones.txt";
-	private static File myFile;
 	public static EpicZonesConfig config;
 	public static final String NO_PERM_ENTER = "You do not have permission to enter ";
 	public static final String NO_PERM_BORDER = "You have reached the border of the map.";
-	
+	public static EpicZones plugin;
+
+	private static final String ZONE_FILE = "zones.txt";
+	//private static File myFile;
+
 	public static EpicZonePlayer getPlayer(String name)
 	{
 		for(EpicZonePlayer ezp: myPlayers)
@@ -77,17 +79,17 @@ public class General {
 	public static boolean hasPermissions(Player player, EpicZone zone, String flag)
 	{
 
-//				if(zone != null)
-//				{
-//				System.out.println("Zone Tag: " + zone.getTag());
-//				System.out.println("Has Parent: " + zone.hasParent());
-//				System.out.println("Permission Allow Check: " + "epiczones." + zone.getTag() + "." + flag);
-//				System.out.println("Permission Deny Check: " + "epiczones." + zone.getTag() + "." + flag + ".deny");
-//				System.out.println("Permission Allow Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag));
-//				System.out.println("Permission Deny Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny"));
-//				System.out.println("Permission Composite Result: " + (EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag) && !EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny")));
-//				System.out.println("Player Can Ignore Permissions: " + EpicZones.permissions.has(player, "epiczones.ignorepermissions"));
-//				}
+		//				if(zone != null)
+		//				{
+		//				System.out.println("Zone Tag: " + zone.getTag());
+		//				System.out.println("Has Parent: " + zone.hasParent());
+		//				System.out.println("Permission Allow Check: " + "epiczones." + zone.getTag() + "." + flag);
+		//				System.out.println("Permission Deny Check: " + "epiczones." + zone.getTag() + "." + flag + ".deny");
+		//				System.out.println("Permission Allow Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag));
+		//				System.out.println("Permission Deny Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny"));
+		//				System.out.println("Permission Composite Result: " + (EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag) && !EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny")));
+		//				System.out.println("Player Can Ignore Permissions: " + EpicZones.permissions.has(player, "epiczones.ignorepermissions"));
+		//				}
 
 		if(!EpicZones.permissions.has(player, "epiczones.ignorepermissions"))
 		{
@@ -136,17 +138,14 @@ public class General {
 		return false;
 	}
 
-	public static void loadZones(File path)
+	public static void loadZones()
 	{
 		String line;
-		if (path != null){
-			File file = new File(path + File.separator + ZONE_FILE);
-			myFile = file;
-		}
+		File file = new File(plugin.getDataFolder() + File.separator + ZONE_FILE);
 
 		try
 		{
-			Scanner scanner = new Scanner(myFile);
+			Scanner scanner = new Scanner(file);
 			myZones.clear();
 			myZoneTags.clear();
 			try {
@@ -177,6 +176,8 @@ public class General {
 	private static void reconcileChildren()
 	{
 
+		ArrayList<String> badChildren = new ArrayList<String>();
+		
 		for(String zoneTag: myZoneTags)
 		{
 			EpicZone zone = myZones.get(zoneTag);
@@ -185,14 +186,31 @@ public class General {
 				//System.out.println("Attaching Child Zones To " + zone.getName() + "[" + zone.getTag() + "].");
 				for(String child: zone.getChildrenTags())
 				{
+					
 					EpicZone childZone = myZones.get(child);
-					//System.out.println("\t" + childZone.getName() + "[" + childZone.getTag() + "] added as a child of " + zone.getName() + "[" + zone.getTag() + "].");
+					
+					if(childZone != null)
+					{
+						//System.out.println("\t" + childZone.getName() + "[" + childZone.getTag() + "] added as a child of " + zone.getName() + "[" + zone.getTag() + "].");
+						childZone.setParent(zone);
+						zone.addChild(childZone);
 
-					childZone.setParent(zone);
-					zone.addChild(childZone);
-
-					myZones.remove(child);
-					myZones.put(child, childZone);
+						myZones.remove(child);
+						myZones.put(child, childZone);
+					}
+					else
+					{
+						System.out.println("[" + zoneTag + "] Invalid Child Zone Detected > [" + child + "]");
+						badChildren.add(child);
+					}
+				}
+				if (badChildren.size() > 0)
+				{
+					for(String badChild: badChildren)
+					{
+						zone.removeChild(badChild);
+					}
+					badChildren = new ArrayList<String>();
 				}
 			}
 			myZones.remove(zoneTag);
@@ -201,12 +219,14 @@ public class General {
 
 	}
 
-	public static void SaveZones()
+	public static void saveZones()
 	{
+		File file = new File(plugin.getDataFolder() + File.separator + ZONE_FILE);
+
 		try 
 		{
 			String data = BuildZoneData();
-			Writer output = new BufferedWriter(new FileWriter(myFile, false));
+			Writer output = new BufferedWriter(new FileWriter(file, false));
 			try 
 			{
 				output.write(data);
@@ -241,7 +261,6 @@ public class General {
 			line = line + BuildPointList(z) + "\n";
 			result = result + line;
 		}
-
 		return result;
 	}
 
@@ -250,12 +269,12 @@ public class General {
 		String result = "";
 
 		if(z.hasPVP())
-			{result = result + "pvp:true ";}
+		{result = result + "pvp:true ";}
 		else
-			{result = result + "pvp:false ";}
-		
+		{result = result + "pvp:false ";}
+
 		//if(z.getFlags().get("nomobs") != null){result = result + "nomobs:" + z.getFlags().get("nomobs").toString() + " ";}
-		
+
 		if(z.hasRegen())
 		{
 			if(z.getRegenDelay() > 0)
@@ -268,8 +287,34 @@ public class General {
 			}
 		}
 		
-		//if(z.getFlags().get("noanimals") != null){result = result + "noanimals:" + z.getFlags().get("noanimals").toString() + " ";}
+		if(z.getAllowedMobs() != null)
+		{
 
+			if(z.getAllowedMobs().size() > 0)
+			{
+				result = result + "mobs";
+				for(String mobType: z.getAllowedMobs())
+				{
+					result = result + ":" + mobType.replace("org.bukkit.craftbukkit.entity.Craft", "");
+				}
+				result = result + " ";
+			}
+			else
+			{
+				result = result + "mobs:all ";
+			}
+		}
+
+		if(z.getAllowFire())
+		{result = result + "fire:true ";}
+		else
+		{result = result + "fire:false ";}
+
+		if(z.getAllowExplode())
+		{result = result + "explode:true ";}
+		else
+		{result = result + "explode:false ";}
+		
 		return result;
 	}
 
@@ -291,7 +336,7 @@ public class General {
 		String result = "";
 		Polygon poly = z.getPolygon();
 
-		if(poly.npoints <= 1)
+		if(poly == null || poly.npoints <= 1)
 		{
 			result = z.getCenter().x + ":" + z.getCenter().y + " " + z.getRadius();
 		}
@@ -302,11 +347,11 @@ public class General {
 				result = result + poly.xpoints[i] + ":" + poly.ypoints[i] + " ";
 			}
 		}
-		
+
 		return result;
 	}
 
-	public static EpicZone getZoneForPoint(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint, String worldName)
+	public static EpicZone getZoneForPoint(int elevation, Point location, String worldName)
 	{
 
 		EpicZone result = null;
@@ -314,7 +359,7 @@ public class General {
 		for(String zoneTag: General.myZoneTags)
 		{
 			EpicZone zone = General.myZones.get(zoneTag);
-			resultTag = General.isPointInZone(zone, playerHeight, playerPoint, worldName);
+			resultTag = General.isPointInZone(zone, elevation, location, worldName);
 			if(resultTag.length() > 0)
 			{
 				result = General.myZones.get(resultTag);
@@ -355,7 +400,7 @@ public class General {
 
 		return result;
 	}
-	
+
 	public static boolean pointWithinBorder(Point point, Player player)
 	{
 
@@ -401,7 +446,7 @@ public class General {
 			return true;
 		}
 	}
-	
+
 	public static void WarnPlayer(Player player, EpicZonePlayer ezp, String message)
 	{
 		if (ezp.getLastWarned().before(new Date()))
@@ -410,7 +455,7 @@ public class General {
 			ezp.Warn();
 		}
 	}
-	
+
 	public static boolean ShouldCheckPlayer(EpicZonePlayer ezp)
 	{
 		if (ezp.getLastCheck().before(new Date()))
@@ -422,10 +467,10 @@ public class General {
 			return false;
 		}
 	}
-	
+
 	public static void Regen()
 	{
-		
+
 	}
-	
+
 }

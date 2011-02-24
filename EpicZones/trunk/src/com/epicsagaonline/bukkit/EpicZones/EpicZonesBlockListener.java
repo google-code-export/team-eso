@@ -3,7 +3,9 @@ package com.epicsagaonline.bukkit.EpicZones;
 import java.awt.Point;
 import java.util.Date;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
@@ -22,9 +24,35 @@ public class EpicZonesBlockListener extends BlockListener {
 		//this.plugin = plugin;
 	}
 
+	public @Override void onBlockIgnite(BlockIgniteEvent event)
+	{
+		EpicZone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
+		if (zone != null)
+		{
+			if(!zone.getAllowFire())
+			{
+				//System.out.println("Cancel Ignite [" + zone.getTag() + "]");
+				event.setCancelled(true);
+			}
+		}
+	}
+	
+	public @Override void onBlockBurn(BlockBurnEvent event)
+	{
+		EpicZone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
+		if (zone != null)
+		{
+			if(!zone.getAllowFire())
+			{
+				//System.out.println("Cancel Burn [" + zone.getTag() + "]");
+				event.setCancelled(true);
+			}
+		}
+	}
+	
 	public @Override void onBlockDamage(BlockDamageEvent event)
 	{
-
+		
 		Player player = event.getPlayer();
 		EpicZonePlayer ezp = General.getPlayer(player.getName());
 		Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
@@ -35,7 +63,7 @@ public class EpicZonesBlockListener extends BlockListener {
 
 		if(General.pointWithinBorder(blockPoint, player))
 		{
-			currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint, worldName);
+			currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
 			hasPerms = General.hasPermissions(player, currentZone, "destroy");
 
 			if(!hasPerms)
@@ -71,7 +99,7 @@ public class EpicZonesBlockListener extends BlockListener {
 
 		if(General.pointWithinBorder(blockPoint, player))
 		{
-			currentZone = General.getZoneForPoint(player, ezp, blockHeight, blockPoint, worldName);
+			currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
 			hasPerms = General.hasPermissions(player, currentZone, "build");
 
 			if(!hasPerms)
