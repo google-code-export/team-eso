@@ -27,7 +27,7 @@
  * @author sir.manic@gmail.com
  * @license MIT License
  */
-package com.bukkit.epicsaga.EpicManager.home;
+package com.epicsagaonline.bukkit.EpicManager.home;
 
 import org.bukkit.Location;
 

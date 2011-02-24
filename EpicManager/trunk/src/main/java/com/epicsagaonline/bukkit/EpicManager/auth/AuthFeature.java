@@ -29,7 +29,7 @@
  * @license MIT License
  */
 
-package com.bukkit.epicsaga.EpicManager.auth;
+package com.epicsagaonline.bukkit.EpicManager.auth;
 
 import java.io.FileNotFoundException;
 
@@ -43,10 +43,10 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.plugin.PluginManager;
 
-import com.bukkit.epicsaga.EpicManager.CommandHandler;
-import com.bukkit.epicsaga.EpicManager.EpicManager;
-import com.bukkit.epicsaga.EpicManager.PluginFeature;
-import com.bukkit.epicsaga.EpicManager.EpicManager.EnableError;
+import com.epicsagaonline.bukkit.EpicManager.CommandHandler;
+import com.epicsagaonline.bukkit.EpicManager.EpicManager;
+import com.epicsagaonline.bukkit.EpicManager.PluginFeature;
+import com.epicsagaonline.bukkit.EpicManager.EpicManager.EnableError;
 
 /* TODO: make the permission work directly from the permissions file.
  * Also support a banned reason to be included.

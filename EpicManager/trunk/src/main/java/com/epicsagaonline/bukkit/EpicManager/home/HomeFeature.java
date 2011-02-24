@@ -29,7 +29,7 @@
  * @license MIT License
  */
 
-package com.bukkit.epicsaga.EpicManager.home;
+package com.epicsagaonline.bukkit.EpicManager.home;
 
 import java.io.File;
 import java.util.HashSet;
@@ -50,9 +50,9 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.PluginManager;
 
-import com.bukkit.epicsaga.EpicManager.CommandHandler;
-import com.bukkit.epicsaga.EpicManager.EpicManager;
-import com.bukkit.epicsaga.EpicManager.PluginFeature;
+import com.epicsagaonline.bukkit.EpicManager.CommandHandler;
+import com.epicsagaonline.bukkit.EpicManager.EpicManager;
+import com.epicsagaonline.bukkit.EpicManager.PluginFeature;
 
 /**
  * A PluginFeature that handles a player's alternate spawn points.

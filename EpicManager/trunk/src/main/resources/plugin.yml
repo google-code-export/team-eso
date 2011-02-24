@@ -2,7 +2,7 @@ name: EpicManager
 description: General manager commands plugin 
 website: http://team-eso.googlecode.com
 author: Team ESO
-main: com.bukkit.epicsaga.EpicManager.EpicManager
+main: com.epicsagaonline.bukkit.EpicManager.EpicManager
 version: 0.2
 
 commands:

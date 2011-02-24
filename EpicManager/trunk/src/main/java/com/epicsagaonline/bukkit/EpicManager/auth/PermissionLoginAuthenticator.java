@@ -29,15 +29,15 @@
  * @license MIT License
  */
 
-package com.bukkit.epicsaga.EpicManager.auth;
+package com.epicsagaonline.bukkit.EpicManager.auth;
 
 import java.io.FileNotFoundException;
 
 import org.bukkit.Server;
 
-import com.bukkit.epicsaga.WritablePermissionHandler;
-import com.bukkit.epicsaga.EpicManager.EpicManager;
-import com.bukkit.epicsaga.WritablePermissionHandler.NotFound;
+import com.epicsagaonline.bukkit.WritablePermissionHandler;
+import com.epicsagaonline.bukkit.EpicManager.EpicManager;
+import com.epicsagaonline.bukkit.WritablePermissionHandler.NotFound;
 
 /**
  * Class that verifies a player login by checking for existance in

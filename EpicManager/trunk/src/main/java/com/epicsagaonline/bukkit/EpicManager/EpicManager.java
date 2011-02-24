@@ -30,7 +30,7 @@
  */
 
 
-package com.bukkit.epicsaga.EpicManager;
+package com.epicsagaonline.bukkit.EpicManager;
 
 import java.util.List;
 import java.io.File;
@@ -51,8 +51,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.permissions.PermissionHandler;
 
-import com.bukkit.epicsaga.EpicManager.auth.AuthFeature;
-import com.bukkit.epicsaga.EpicManager.home.HomeFeature;
+import com.epicsagaonline.bukkit.EpicManager.auth.AuthFeature;
+import com.epicsagaonline.bukkit.EpicManager.home.HomeFeature;
 
 /**
  * Core plugin handler.

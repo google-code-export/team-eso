@@ -29,7 +29,7 @@
  * @license MIT License
  */
 
-package com.bukkit.epicsaga.EpicManager.home;
+package com.epicsagaonline.bukkit.EpicManager.home;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -184,7 +184,7 @@ public class GroupHomeFile implements GroupHomeStore {
 		Location location;
 		String[] parts;
 
-		World[] worlds = server.getWorlds();
+		World[] worlds = server.getWorlds().toArray(new World[0]);
 
 		fileTime = file.lastModified();
 

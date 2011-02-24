@@ -29,7 +29,7 @@
  * @license MIT License
  */
 
-package com.bukkit.epicsaga.EpicManager.auth;
+package com.epicsagaonline.bukkit.EpicManager.auth;
 
 /**
  * A class that can authenticate a user by it's name.

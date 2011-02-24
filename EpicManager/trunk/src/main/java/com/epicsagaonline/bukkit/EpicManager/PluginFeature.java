@@ -29,7 +29,7 @@
  * @license MIT License
  */
 
-package com.bukkit.epicsaga.EpicManager;
+package com.epicsagaonline.bukkit.EpicManager;
 
 public interface PluginFeature {
 	/**

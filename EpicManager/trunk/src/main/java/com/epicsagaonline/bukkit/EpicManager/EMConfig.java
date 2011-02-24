@@ -29,11 +29,11 @@
  * @license MIT License
  */
 
-package com.bukkit.epicsaga.EpicManager;
+package com.epicsagaonline.bukkit.EpicManager;
 
 import java.io.File;
 
-import com.bukkit.epicsaga.WritableConfiguration;
+import com.epicsagaonline.bukkit.WritableConfiguration;
 
 public class EMConfig extends WritableConfiguration {
 	public String addGroup = null;

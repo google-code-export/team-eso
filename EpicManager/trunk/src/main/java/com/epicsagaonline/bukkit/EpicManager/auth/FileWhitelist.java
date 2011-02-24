@@ -29,7 +29,7 @@
  * @license MIT License
  */
 
-package com.bukkit.epicsaga.EpicManager.auth;
+package com.epicsagaonline.bukkit.EpicManager.auth;
 
 import java.io.BufferedWriter;
 import java.io.File;

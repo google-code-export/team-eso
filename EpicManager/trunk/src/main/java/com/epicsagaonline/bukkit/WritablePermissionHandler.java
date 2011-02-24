@@ -29,7 +29,7 @@
  * @license MIT License
  */
 
-package com.bukkit.epicsaga;
+package com.epicsagaonline.bukkit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
