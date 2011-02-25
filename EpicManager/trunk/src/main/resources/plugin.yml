@@ -3,9 +3,37 @@ description: General manager commands plugin
 website: http://team-eso.googlecode.com
 author: Team ESO
 main: com.epicsagaonline.bukkit.EpicManager.EpicManager
-version: 0.2
+version: 0.2.1
 
 commands:
+  ####################################
+  #  GIVE
+  ####################################
+  #
+  # permission: 
+  #   - epicmanager.give	# add an item to inventory
+  #
+  give:
+    aliases: i
+    description: Add an item to an inventory
+    usage: |
+           /<command> [to <player>] <id/name>[:<type>] [amount]
+           Example: /give 35:15 - give yourself 1 black wool
+           Example: /give to Notch PinkWool 10000 - Fill Notch's Inventory
+           /<command> list [page] - list items avialable(long)
+           /<command> l [page] - list items avialable(long)
+  
+  givelist:
+    aliases: [givel, ilist, il]
+    description: List items available to give
+    usage: |
+           /<command> [page]
+  
+
+  ####################################
+  #  AUTH
+  ####################################
+
   #
   # permission: 
   #   - epicmanager.ban		# ban a player
@@ -17,7 +45,7 @@ commands:
     description: Ban player(s) from server
     usage: /<command> <player> [reason] - ban player(s) from server
   unban:
-    aliases: allow, pardon 
+    aliases: [allow, pardon]
     description: Unban player(s) from server
     usage: /<command> <playerlist> - unban player(s) from server
   kick:

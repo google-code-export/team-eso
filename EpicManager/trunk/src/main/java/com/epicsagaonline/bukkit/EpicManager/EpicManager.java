@@ -39,19 +39,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.permissions.PermissionHandler;
 
 import com.epicsagaonline.bukkit.EpicManager.auth.AuthFeature;
+import com.epicsagaonline.bukkit.EpicManager.give.GiveFeature;
 import com.epicsagaonline.bukkit.EpicManager.home.HomeFeature;
 
 /**
@@ -60,7 +59,8 @@ import com.epicsagaonline.bukkit.EpicManager.home.HomeFeature;
  * @author _sir_maniac
  */
 public class EpicManager extends JavaPlugin {
-	private static final String CONFIG_FILE = "config.yml";
+	private static final String CONFIG_NAME = "config.yml";
+	private static final String MATERIALS_NAME = "item_aliases.txt";
 
 	private static List<PluginFeature> features = new ArrayList<PluginFeature>();
 
@@ -69,7 +69,8 @@ public class EpicManager extends JavaPlugin {
     public static PermissionHandler permissions = null;
 
     public EMConfig config;
-
+    private File materialsFile;
+    
 	private static String pluginName = "EpicManager";
     private Map<String, CommandHandler> handlers =
     			new HashMap<String, CommandHandler>();
@@ -77,25 +78,17 @@ public class EpicManager extends JavaPlugin {
     static {
     	features.add(new AuthFeature());
     	features.add(new HomeFeature());
+    	features.add(new GiveFeature());
     }
 
-    public EpicManager(PluginLoader pluginLoader, Server instance,
-    		PluginDescriptionFile desc, File folder, File plugin,
-    		ClassLoader cLoader) {
-        super(pluginLoader, instance, desc, folder, plugin, cLoader);
+    public void onEnable() {
 
         pluginName = this.getDescription().getName();
 
-        File file = new File(
-        		folder+File.separator+CONFIG_FILE);
-
+        File file = new File(getDataFolder()+File.separator+CONFIG_NAME);
         config = new EMConfig(file);
 
-        // NOTE: Event registration should be done in onEnable not here as all events are unregistered when a plugin is disabled
-    }
-
-
-    public void onEnable() {
+        materialsFile = new File(getDataFolder()+File.separator+MATERIALS_NAME);
 
     	try{
 	    	checkConfigDir();
@@ -147,6 +140,10 @@ public class EpicManager extends JavaPlugin {
     	config.load();
     }
 
+    public File getMaterialsFile() {
+    	return materialsFile;
+    }
+    
     private void checkConfigDir() throws EnableError {
     	File dir = this.getDataFolder();
 

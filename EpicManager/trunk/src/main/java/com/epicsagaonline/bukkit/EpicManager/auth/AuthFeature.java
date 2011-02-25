@@ -44,13 +44,10 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.plugin.PluginManager;
 
 import com.epicsagaonline.bukkit.EpicManager.CommandHandler;
+import com.epicsagaonline.bukkit.EpicManager.auth.PlayerAuthenticator;
 import com.epicsagaonline.bukkit.EpicManager.EpicManager;
 import com.epicsagaonline.bukkit.EpicManager.PluginFeature;
 import com.epicsagaonline.bukkit.EpicManager.EpicManager.EnableError;
-
-/* TODO: make the permission work directly from the permissions file.
- * Also support a banned reason to be included.
- */
 
 
 /**

@@ -21,8 +21,12 @@
     <!--
       Change these to move to another build, remember to:
 
-      - match the craftbukkit build to the buklkit build:
-          http://bamboo.lukegb.com/browse/BUKKIT-CRAFTBUKKIT/history
+      - match the craftbukkit build to the bukkit build:
+          (go to http://ci.bukkit.org/job/dev-CraftBukkit/ and click on the
+            right version in "build history", note the bukkit build in 
+            "upstream builds"s
+          )
+          
       - change the sha1 checksums below to the new files
 
      -->
