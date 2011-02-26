@@ -86,7 +86,13 @@ public class GiveFeature implements PluginFeature, CommandHandler {
 			   Material material, Byte data, int count) {
 		HashMap<Integer, ItemStack> ret;
 		
-		ret = player.getInventory().addItem(new ItemStack(material, count, data));
+		ItemStack stack;
+		if(data != null)
+			stack = new ItemStack(material, count, data);
+		else
+			stack = new ItemStack(material, count);
+			
+		ret = player.getInventory().addItem(stack);
 		
 		if (ret.isEmpty()) {
 			return count;
