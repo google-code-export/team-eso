@@ -1,0 +1,32 @@
+# A file of items, and their aliases.
+# All items have default names, thanks to Bukkit
+#
+# Items Examples:
+#  dirt, cobblestone, gravel, wool, gold_ore(GoldOre), iron_ore(IronOre)
+#  wood_sword(WoodSword), Glowstone, Netherack, soul_sand(SoulSand),
+#  jack_o_lantern(JackOLantern),
+#    
+#  (a list is available in-game with "/give list")
+#
+# Format:
+# <itemName/id>[:type] = alias[, alias [, ...]]
+# all names are case-insensitive
+
+4 = cobble, cob
+wool = cloth
+351:0 = ink_sack, InkSack, black_dye, BlackDye
+351:1 = rose_red, RoseRed, red_dye, RedDye
+351:2 = cactus_green, CactusGreen, green_dye, GreenDye
+351:3 = cocoa_beans, CocoaBeans, brown_dye, BrownDye
+351:4 = lapis_lazuli, LapisLazuli, lapis_dye, LapisDye, blue_dye, BlueDye
+351:5 = purple_dye, PurpleDye
+351:6 = cyan_dye, CyanDye
+351:7 = light_gray_dye, LightGrayDye
+351:8 = gray_dye, GrayDye
+351:9 = pink_dye, PinkDye
+351:10 = lime_dye, LimeDye, light_green_dye, LightGreenDye
+351:11 = dandelion_yellow, DandelionYellow, yellow_dye, YellowDye
+351:12 = light_blue_dye, LightBlueDye
+351:13 = magenta_dye, MagentaDye
+351:14 = orange_dye, OrangeDye
+351:15 = bone_meal, BoneMeal, white_dye, WhiteDye
