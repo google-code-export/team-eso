@@ -51,7 +51,7 @@ import com.nijiko.permissions.PermissionHandler;
 
 import com.epicsagaonline.bukkit.EpicManager.auth.AuthFeature;
 import com.epicsagaonline.bukkit.EpicManager.give.GiveFeature;
-import com.epicsagaonline.bukkit.EpicManager.home.HomeFeature;
+import com.epicsagaonline.bukkit.EpicManager.spawn.SpawnFeature;
 
 /**
  * Core plugin handler.
@@ -77,7 +77,7 @@ public class EpicManager extends JavaPlugin {
 
     static {
     	features.add(new AuthFeature());
-    	features.add(new HomeFeature());
+    	features.add(new SpawnFeature());
     	features.add(new GiveFeature());
     }
 

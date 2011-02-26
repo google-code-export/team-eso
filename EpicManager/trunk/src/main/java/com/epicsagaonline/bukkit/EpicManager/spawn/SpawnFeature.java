@@ -29,7 +29,7 @@
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicManager.home;
+package com.epicsagaonline.bukkit.EpicManager.spawn;
 
 import java.io.File;
 import java.util.HashSet;
@@ -83,7 +83,7 @@ import com.epicsagaonline.bukkit.EpicManager.PluginFeature;
  *
  * @author _sir_maniac
  */
-public class HomeFeature implements PluginFeature {
+public class SpawnFeature implements PluginFeature {
 	private static final String HOME_FILE = "playerhomes.txt";
 	private static final String GROUPHOME_FILE = "grouphomes.txt";
 
