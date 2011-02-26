@@ -20,13 +20,7 @@ public class EpicGatesConfig extends Configuration {
 
 	private File file;
 
-	public int mapRadius = 0;
-	public boolean defaultEnter;
-	public boolean defaultBuild;
-	public boolean defaultDestroy;
-	public boolean enableRadius;
-	public boolean enableHeroChat;
-	public int zoneTool = 280; //Default Tool Is Stick
+	public int reteleportDelay = 5;
 
 	public EpicGatesConfig(File file)
 	{
@@ -40,13 +34,7 @@ public class EpicGatesConfig extends Configuration {
 
 	public void setDefaults()
 	{
-		mapRadius = 1000;
-		defaultEnter = true;
-		defaultBuild = true;
-		defaultDestroy = true;
-		enableRadius = true;
-		enableHeroChat = false;
-		zoneTool = 280;
+		reteleportDelay = 5;
 	}
 
 	@Override
@@ -71,14 +59,7 @@ public class EpicGatesConfig extends Configuration {
 		else
 		{
 			super.load();
-
-			mapRadius = getInt("mapRadius", mapRadius);
-			defaultEnter = getBoolean("defaultEnter", true);
-			defaultBuild = getBoolean("defaultBuild", true);
-			defaultDestroy = getBoolean("defaultDestroy", true);
-			enableRadius = getBoolean("enableRadius", true);
-			enableHeroChat = getBoolean("enableHeroChat", false);
-			zoneTool = getInt("zoneTool", zoneTool);
+			reteleportDelay = getInt("reteleportDelay", reteleportDelay);		
 		}
 	}
 
@@ -91,14 +72,8 @@ public class EpicGatesConfig extends Configuration {
 		FileOutputStream stream;
 		BufferedWriter writer;
 
-		root.put("mapRadius", mapRadius);
-		root.put("defaultEnter", defaultEnter);
-		root.put("defaultBuild", defaultBuild);
-		root.put("defaultDestroy", defaultDestroy);
-		root.put("enableRadius", enableRadius);
-		root.put("enableHeroChat", enableHeroChat);
-		root.put("zoneTool", zoneTool);
-
+		root.put("reteleportDelay", reteleportDelay);
+		
 		try 
 		{
 			stream = new FileOutputStream(file);

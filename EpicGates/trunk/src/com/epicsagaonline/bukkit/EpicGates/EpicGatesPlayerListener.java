@@ -1,8 +1,12 @@
 package com.epicsagaonline.bukkit.EpicGates;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 /**
@@ -12,7 +16,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 public class EpicGatesPlayerListener extends PlayerListener
 {
 	//private final EpicGates plugin;
-	private int loopCount = 0;
 
 	public EpicGatesPlayerListener(EpicGates instance)
 	{
@@ -21,12 +24,20 @@ public class EpicGatesPlayerListener extends PlayerListener
 
 	public @Override void onPlayerMove(PlayerMoveEvent event)
 	{
-		if(EpicGates.permissions.has(event.getPlayer(), "epicgates.use"))
+
+		Player player = event.getPlayer();
+		EpicGatesPlayer egp = General.myPlayers.get(player.getName()); 
+		if(egp != null)
 		{
-			EpicGate gate = GetGateForPlayerLocation(event.getTo());
-			if(gate != null)
+			if(egp.shouldCheck())
 			{
-				Warp(event, gate);
+				egp.Check();
+				EpicGate gate = GetGateForPlayerLocation(event.getTo());
+				if(gate != null)
+				{
+					Warp(event, gate, egp);
+					egp.Teleported();
+				}
 			}
 		}
 	}
@@ -40,20 +51,34 @@ public class EpicGatesPlayerListener extends PlayerListener
 		}
 	}
 
-	private void Warp(PlayerMoveEvent event, EpicGate gate)
+	public @Override void onPlayerLogin(PlayerLoginEvent event)
+	{
+		if(event.getResult() == Result.ALLOWED)
+		{
+			General.addPlayer( event.getPlayer().getName());
+		}
+	}
+
+	public @Override void onPlayerQuit(PlayerEvent event)
+	{
+		General.removePlayer(event.getPlayer().getName());
+	}
+
+
+	private void Warp(PlayerMoveEvent event, EpicGate gate, EpicGatesPlayer egp)
 	{	
 		if(gate != null && gate.getTarget() != null)
 		{
-			if(gate.getTarget().getTargetTag().length() > 0 && loopCount < 5)
+			if(gate.getTarget().getTargetTag().length() > 0 && !gate.getTag().equals(gate.getTarget().getTargetTag())  && egp.getLoopCount() < 8)
 			{
-				loopCount++;
-				Warp(event, gate.getTarget());
+				egp.Looped();
+				Warp(event, gate.getTarget(), egp);
 			}
 			else
 			{
-				event.getPlayer().teleportTo(gate.getTarget().getLocation());
-				event.setTo(gate.getTarget().getLocation());
-				loopCount = 0;
+				event.getPlayer().teleportTo(gate.getTarget().getLanding());
+				event.setTo(gate.getTarget().getLanding());
+				egp.setLoopCount(0);
 			}
 		}
 	}
@@ -63,13 +88,11 @@ public class EpicGatesPlayerListener extends PlayerListener
 		for(String gateTag: General.myGateTags)
 		{
 			EpicGate gate = General.myGates.get(gateTag);
-			if(gate.getLocation().getWorld().getName().equals(loc.getWorld().getName()))
+			if(gate.getLocation().getWorld().getName().equalsIgnoreCase(loc.getWorld().getName()))
 			{
 				if(gate.getTargetTag().length() > 0)
 				{
-					if(gate.getLocation().getBlockX() == loc.getBlockX()
-							&& gate.getLocation().getBlockY() == loc.getBlockY()
-							&& gate.getLocation().getBlockZ() == loc.getBlockZ())
+					if(PlayerWithinGate(gate, loc))
 					{
 						return gate;
 					}
@@ -77,5 +100,23 @@ public class EpicGatesPlayerListener extends PlayerListener
 			}
 		}
 		return null;
+	}
+
+	private boolean PlayerWithinGate(EpicGate gate, Location playerLoc)
+	{
+
+		boolean result = false;
+		
+		if ((int)gate.getLocation().getBlockY() == (int)playerLoc.getBlockY())
+		{
+			if(playerLoc.getX() <= Math.ceil(gate.getLocation().getX()) && playerLoc.getX() >= Math.floor(gate.getLocation().getX()))
+			{
+				if(playerLoc.getZ() <= Math.ceil(gate.getLocation().getZ()) && playerLoc.getZ() >= Math.floor(gate.getLocation().getZ()))					{
+					result = true;
+				}
+			}
+		}
+
+		return result;
 	}
 }

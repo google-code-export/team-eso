@@ -13,7 +13,9 @@ public class General {
 
 	public static Map<String, EpicGate> myGates = new HashMap<String, EpicGate>();
 	public static ArrayList<String> myGateTags = new ArrayList<String>();
-	//public static EpicGatesConfig config;
+	public static Map<String, EpicGatesPlayer> myPlayers = new HashMap<String, EpicGatesPlayer>();
+	
+	public static EpicGatesConfig config;
 	public static final String NO_PERM_ENTER = "You do not have permission to enter ";
 	public static final String NO_PERM_BORDER = "You have reached the border of the map.";
 	public static EpicGates plugin;
@@ -104,10 +106,21 @@ public class General {
 			line = line + gate.getLocation().getBlockX() + ",";
 			line = line + gate.getLocation().getBlockY() + ",";
 			line = line + gate.getLocation().getBlockZ() + ",";
-			line = line + gate.getTargetTag() + "\n";
+			line = line + gate.getTargetTag() + ",";
+			line = line + gate.getDirection() + "\n";
 			result = result + line;
 		}
 		return result;
+	}
+	
+	public static void addPlayer(String name)
+	{
+		myPlayers.put(name, new EpicGatesPlayer());
+	}
+
+	public static void removePlayer(String name)
+	{
+		myPlayers.remove(name);
 	}
 
 }

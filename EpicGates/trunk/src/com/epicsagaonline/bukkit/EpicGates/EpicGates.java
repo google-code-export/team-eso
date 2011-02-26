@@ -1,6 +1,8 @@
 package com.epicsagaonline.bukkit.EpicGates;
 
 import java.io.File;
+
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,10 +27,8 @@ public class EpicGates extends JavaPlugin
 
 	public void onEnable() {
 
-		
-		
 		File file = new File(this.getDataFolder() + File.separator + CONFIG_FILE);
-		//General.config = new EpicGatesConfig(file);
+		General.config = new EpicGatesConfig(file);
 		
 		PluginDescriptionFile pdfFile = this.getDescription();
 
@@ -39,6 +39,8 @@ public class EpicGates extends JavaPlugin
 			
 			pm.registerEvent(Event.Type.PLAYER_MOVE, this.playerListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_COMMAND, this.playerListener, Event.Priority.Normal, this);
+			pm.registerEvent(Event.Type.PLAYER_LOGIN, this.playerListener, Event.Priority.Monitor, this);
+			pm.registerEvent(Event.Type.PLAYER_QUIT, this.playerListener, Event.Priority.Monitor, this);
 			
 			setupEpicGates();
 			setupPermissions();
@@ -80,9 +82,15 @@ public class EpicGates extends JavaPlugin
 		General.plugin = this;
 		General.myGates.clear();
 		General.myGateTags.clear();
-		//General.config.load();
-		//General.config.save();
+		General.myPlayers.clear();
+		General.config.load();
+		General.config.save();
 		General.loadGates();
+		General.saveGates();
+		for(Player p:getServer().getOnlinePlayers())
+		{
+			General.addPlayer(p.getName());
+		}
 	}
 }
 
