@@ -57,7 +57,6 @@ public class GiveFeature implements PluginFeature, CommandHandler {
 	private EpicManager plugin;
 
 	private MaterialDB db = new MaterialDB();
-	MaterialType[] types;
 	
 	public GiveFeature() {
 	}
@@ -65,8 +64,7 @@ public class GiveFeature implements PluginFeature, CommandHandler {
 	public void onEnable(EpicManager em) throws EnableError {
 		plugin = em;
 		db.setFile(plugin.getMaterialsFile());
-		db.load();
-		types = db.toArray();
+		db.reload();
 		
 		for (String command : COMMANDS) {
 			em.registerCommand(command, this);
@@ -147,6 +145,8 @@ public class GiveFeature implements PluginFeature, CommandHandler {
 		final int COLUMN_WIDTH = 32;
 		final int COLUMNS = 2;
 		
+		db.reload();
+		MaterialType[] types = db.toArray();
 		
 		if (args.length > 1) { 
 			sender.sendMessage(ChatColor.RED+"Too many arguments.");

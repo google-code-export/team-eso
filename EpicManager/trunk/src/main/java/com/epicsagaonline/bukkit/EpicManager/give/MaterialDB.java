@@ -105,6 +105,7 @@ public class MaterialDB implements Iterable<MaterialType> {
 	 * returns Iterator that is sorted by material.id, data
 	 */
 	public Iterator<MaterialType> iterator() {
+		reload();
 		return new IteratorImpl(); 
 	}
 
@@ -114,6 +115,7 @@ public class MaterialDB implements Iterable<MaterialType> {
 	 * @return true if the item by this name exists
 	 */
 	public boolean hasByName(String name) {
+		reload();
 		return materialByName.containsKey(name);
 	}
 
@@ -123,6 +125,7 @@ public class MaterialDB implements Iterable<MaterialType> {
 	 * @return true if item described by this description can exist
 	 */
 	public boolean hasByDesc(String desc) {
+		reload();
 		return parseItem(desc) != null;
 	}
 	
@@ -133,10 +136,12 @@ public class MaterialDB implements Iterable<MaterialType> {
 	 * @return
 	 */
 	public int size() {
+		reload();
 		return namesByType.size();
 	}
 	
-	MaterialType[] toArray() {
+	public MaterialType[] toArray() {
+		reload();
 		return namesByType.keySet().toArray(new MaterialType[0]);
 	}
 	
@@ -146,6 +151,8 @@ public class MaterialDB implements Iterable<MaterialType> {
 	 * @return the MaterialDef of this name, or null if not found
 	 */
 	public MaterialType getByName(String name) {
+		reload();
+		
 		return materialByName.get(name.toLowerCase());
 	}
 	
@@ -158,14 +165,22 @@ public class MaterialDB implements Iterable<MaterialType> {
 	 * 			or name|id not found </li>
 	 */
 	public MaterialType getByDesc(String desc) {
+		reload();
+		
 		return parseItem(desc);
 	}
 	
 	public void setFile(File file) {
 		this.file = file;
+		this.fileModified = 0;
+		
+		reload();
 	}
 	
-	public void load() {
+	/**
+	 * re-checks on-disk file's modification date, if file has changed, reload it.
+	 */
+	public void reload() {
 		if (file.lastModified() <= fileModified)
 			return;
 	
