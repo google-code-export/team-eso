@@ -89,7 +89,11 @@ public class GroupHomeFile implements GroupHomeStore {
 	public Location getGroupHome(String groupName) {
 		checkFile();
 
-		return groupHomes.get(groupName);
+		Location loc = groupHomes.get(groupName);
+		if (loc == null)
+			return null;
+		
+		return loc.clone();
 	}
 
 	/**
@@ -158,7 +162,7 @@ public class GroupHomeFile implements GroupHomeStore {
 					 */
 
 					line = String.format("%s : %s %d %d %d\n", home.getKey(),
-							Long.toString(worldId,16), x, y, z);
+							Long.toString(worldId, 16), x, y, z);
 
 					writer.write(line);
 				}
@@ -205,7 +209,7 @@ public class GroupHomeFile implements GroupHomeStore {
 					if(line.startsWith("#") || line.isEmpty())
 						continue;
 
-					parts = line.split(":",2);
+					parts = line.split(":", 2);
 					if(parts.length != 2)
 						continue;
 

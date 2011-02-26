@@ -4,14 +4,8 @@ EpicManager - a general purpose bukkit plugin.
 This plugin implements multiple simple commands:
 
 
-
 1. INSTALATION
- This project is most easily built with maven.
-
- You can run:
-   mvn clean install
-
-   To build the package, which is found in the target/ folder.
+	Extract the zip file in the plugins directory of the server.
 
 ===================   
 2. USING
@@ -38,7 +32,7 @@ messages:
 
 
 ===================   
-2.2 Home and GroupHome feature
+2.2 Spawn features
 
 ===================
 2.2.1 Setting the home or group home

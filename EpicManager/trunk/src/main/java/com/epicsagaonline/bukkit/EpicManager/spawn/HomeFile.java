@@ -89,7 +89,10 @@ public class HomeFile implements HomeStore {
 	public Location getHome(String playerName) {
 		checkFile();
 
-		return homes.get(playerName);
+		Location loc = homes.get(playerName);
+		if (loc == null)
+			return null;
+		return loc.clone();
 	}
 
 	/**

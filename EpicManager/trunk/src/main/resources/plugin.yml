@@ -52,6 +52,19 @@ commands:
     description: Kick player(s) from server
     usage: /<command> <playerlist> - kick player(s) from server
 
+  #   
+  # permissions: 
+  #  - general.spawn.set        # set default spawn point
+  #                             # ('default_spawn' in grouphomes.txt)
+  #  - general.spawn   			# teleport to the spawn point
+  #
+  setspawn:
+    description: Set default spawn point (a group home named 'default_spawn')
+    usage: /<command> - Teleport to default spawn point
+  spawn:
+    description: Teleport to default spawn point.
+    usage: /<command> - Teleport to default spawn point
+
   ####################################
   #  PLAYER HOMES
   ####################################
