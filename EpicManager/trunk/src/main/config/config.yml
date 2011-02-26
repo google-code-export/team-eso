@@ -1,6 +1,3 @@
-auth:
-	# the Permisisons plugin group group to add new players to
-	assign-group-on-add: Default
 messages:
 	#message to player when they are kicked
 	kick: 'Kicked by admin'

@@ -31,8 +31,6 @@
 
 package com.epicsagaonline.bukkit.EpicManager.auth;
 
-import java.io.FileNotFoundException;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -44,10 +42,9 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.plugin.PluginManager;
 
 import com.epicsagaonline.bukkit.EpicManager.CommandHandler;
-import com.epicsagaonline.bukkit.EpicManager.auth.PlayerAuthenticator;
 import com.epicsagaonline.bukkit.EpicManager.EpicManager;
 import com.epicsagaonline.bukkit.EpicManager.PluginFeature;
-import com.epicsagaonline.bukkit.EpicManager.EpicManager.EnableError;
+import com.epicsagaonline.bukkit.EnableError;
 
 
 /**
@@ -80,14 +77,7 @@ public class AuthFeature implements PluginFeature{
 	public void onEnable(EpicManager em) throws EnableError {
 		plugin = em;
 
-        try {
-        	userAuth = new PermissionLoginAuthenticator(em.getServer(), 
-        					plugin.config.addGroup);
-		}
-        catch (FileNotFoundException e) {
-    		throw new EnableError(" Could not access permissions.  " +
-    				"Is Permissions plugin installed?" , e);
-		}
+    	userAuth = new PermissionLoginAuthenticator(em.getPermissionManager());
 
         for (String cmd : BAN_COMMANDS) {
             em.registerCommand(cmd, banHandler);
@@ -113,7 +103,7 @@ public class AuthFeature implements PluginFeature{
 	private CommandHandler banHandler = new CommandHandler() {
 	    public boolean onCommand(String command, CommandSender op, String[] args) {
 	    	if(op instanceof Player &&
-	    	   !EpicManager.permissions.has((Player)op, PERM_BAN))
+	    	   !plugin.getPermissionManager().has((Player)op, PERM_BAN))
 		    		return true;
 	
 	    	if(args.length == 0)
@@ -165,7 +155,7 @@ public class AuthFeature implements PluginFeature{
 	private CommandHandler allowHandler = new CommandHandler() {
 	    public boolean onCommand(String command, CommandSender op, String[] args) {
 	    	if(op instanceof Player &&
-	    	   !EpicManager.permissions.has((Player)op, PERM_UNBAN))
+	    	   !plugin.getPermissionManager().has((Player)op, PERM_UNBAN))
 	    		return true;
 	
 	    	if(args.length == 0)
@@ -195,7 +185,7 @@ public class AuthFeature implements PluginFeature{
 	    public boolean onCommand(String command, CommandSender op,
 	    		String[] playerNames) {
 	    	if(op instanceof Player &&
-	    	   !EpicManager.permissions.has((Player)op, PERM_KICK))
+	    	   !plugin.getPermissionManager().has((Player)op, PERM_KICK))
 	    		return true;
 
 	    	if(playerNames.length == 0)

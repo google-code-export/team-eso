@@ -55,12 +55,13 @@
     </craftbukkit.url>
 
     <!--
-      Change this to use a different version of permissions, remember to change
-      the checksum.
+      Change this to use a different version of Group, remember to change
+      the checksums. (which can be commented out for initial download)
     -->
-    <permissions.version>2.0</permissions.version>
-    <permissions.url>http://mirror.nexua.org/Permissions/JARS/${permissions.version}/Permissions.jar</permissions.url>
-    <permissions.sha1>f78d01af5c4257b0bd91764d2dff80e51e69a0d7</permissions.sha1>
+    <groupManager.version>0.99c</groupManager.version>
+    <groupManager.url>http://www.mdn.fm/files/270340_vuz5z/GroupManager-${groupManager.version}.zip</groupManager.url>
+    <groupManager.sha1>5fcbaa997dcafbfe55839244b744c4af</groupManager.sha1>
+    <fakePermissions.sha1>28f2fc0546060a8d9ef222e1998742b6</fakePermissions.sha1>
   </properties>
 
 
@@ -142,12 +143,22 @@
 
           <!-- external permissions -->
             <artifactItem>
-              <groupId>com.nijikokun</groupId>
-              <artifactId>Permissions</artifactId>
-              <version>${permissions.version}</version>
+              <groupId>org.anjocaido</groupId>
+              <artifactId>GroupManager</artifactId>
+              <version>${groupManager.version}</version>
               <packaging>jar</packaging>
-              <downloadUrl>${permissions.url}</downloadUrl>
-              <checksum>${permissions.sha1}</checksum>
+              <downloadUrl>${groupManager.url}</downloadUrl>
+              <extractFile>GroupManager.jar</extractFile>
+              <extractFileChecksum>${groupManager.sha1}</extractFileChecksum>
+            </artifactItem>
+            <artifactItem>
+              <groupId>org.anjocaido</groupId>
+              <artifactId>FakePermissions</artifactId>
+              <version>${groupManager.version}</version>
+              <packaging>jar</packaging>
+              <downloadUrl>${groupManager.url}</downloadUrl>
+              <extractFile>FakePermissions.jar</extractFile>
+              <extractFileChecksum>${fakePermissions.sha1}</extractFileChecksum>
             </artifactItem>
 
           </artifactItems>
@@ -171,19 +182,22 @@
   </profiles>
   <repositories>
     <repository>
-      <id>team-eso-repo</id>
-      <url>http://team-eso.googlecode.com/svn/deprepo</url>
-    </repository>
-    <repository>
       <id>bukkut-repo</id>
       <url>http://artifacts.lukegb.com/artifactory/repo</url>
     </repository>
   </repositories>
   <dependencies>
     <dependency>
- 	  <groupId>com.nijikokun</groupId>
-  	  <artifactId>Permissions</artifactId>
-	  <version>${permissions.version}</version>
+ 	  <groupId>org.anjocaido</groupId>
+  	  <artifactId>FakePermissions</artifactId>
+	  <version>${groupManager.version}</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+ 	  <groupId>org.anjocaido</groupId>
+  	  <artifactId>GroupManager</artifactId>
+	  <version>${groupManager.version}</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>

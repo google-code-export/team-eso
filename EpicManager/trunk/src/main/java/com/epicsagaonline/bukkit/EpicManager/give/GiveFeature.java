@@ -44,10 +44,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.epicsagaonline.bukkit.EnableError;
 import com.epicsagaonline.bukkit.EpicManager.CommandHandler;
 import com.epicsagaonline.bukkit.EpicManager.EpicManager;
 import com.epicsagaonline.bukkit.EpicManager.PluginFeature;
-import com.epicsagaonline.bukkit.EpicManager.EpicManager.EnableError;
 
 public class GiveFeature implements PluginFeature, CommandHandler {
 	private static final String PERM_GIVE = "epicmanager.give";
@@ -350,7 +350,7 @@ public class GiveFeature implements PluginFeature, CommandHandler {
 	 */
 	public boolean onCommand(String command, CommandSender sender, String[] args) {
 		if (sender instanceof Player && 
-				!EpicManager.permissions.has((Player)sender, PERM_GIVE)) {
+				!plugin.getPermissionManager().has((Player)sender, PERM_GIVE)) {
 			return true;
 		}
 		

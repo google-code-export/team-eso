@@ -31,6 +31,8 @@
 
 package com.epicsagaonline.bukkit.EpicManager;
 
+import com.epicsagaonline.bukkit.EnableError;
+
 public interface PluginFeature {
 	/**
 	 *
@@ -38,6 +40,6 @@ public interface PluginFeature {
 	 * @param em
 	 * @throws EpicManager.EnableError on fatal initialization error
 	 */
-	void onEnable(EpicManager em) throws EpicManager.EnableError;
+	void onEnable(EpicManager em) throws EnableError;
 	void onDisable(EpicManager em);
 }

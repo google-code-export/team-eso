@@ -42,16 +42,15 @@ import java.util.logging.Logger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.nijikokun.bukkit.Permissions.Permissions;
-import com.nijiko.permissions.PermissionHandler;
-
+import com.epicsagaonline.bukkit.EnableError;
 import com.epicsagaonline.bukkit.EpicManager.auth.AuthFeature;
 import com.epicsagaonline.bukkit.EpicManager.give.GiveFeature;
 import com.epicsagaonline.bukkit.EpicManager.spawn.SpawnFeature;
+import com.epicsagaonline.bukkit.permissions.PermissionManager;
+import com.epicsagaonline.bukkit.permissions.PermissionManagerFactory;
 
 /**
  * Core plugin handler.
@@ -66,12 +65,12 @@ public class EpicManager extends JavaPlugin {
 
 	public static final Logger log = Logger.getLogger("Minecraft");
 
-    public static PermissionHandler permissions = null;
+    private PermissionManager perms = null;
 
     public EMConfig config;
     private File materialsFile;
     
-	private static String pluginName = "EpicManager";
+	private static String pluginName = EpicManager.class.getName();
     private Map<String, CommandHandler> handlers =
     			new HashMap<String, CommandHandler>();
 
@@ -81,8 +80,8 @@ public class EpicManager extends JavaPlugin {
     	features.add(new GiveFeature());
     }
 
+    
     public void onEnable() {
-
         pluginName = this.getDescription().getName();
 
         File file = new File(getDataFolder()+File.separator+CONFIG_NAME);
@@ -93,8 +92,9 @@ public class EpicManager extends JavaPlugin {
     	try{
 	    	checkConfigDir();
 	    	config.load();
-	    	setupPermissions();
 
+	    	perms = PermissionManagerFactory.getPermissionManager(getServer());
+	    	
 	    	for(PluginFeature feature : features) {
 	    		feature.onEnable(this);
 	    	}
@@ -111,7 +111,6 @@ public class EpicManager extends JavaPlugin {
     }
 
     public void onDisable() {
-        // NOTE: All registered events are automatically unregistered when a plugin is disabled
     	for(PluginFeature subPlugin : features) {
     		subPlugin.onDisable(this);
     	}
@@ -132,6 +131,10 @@ public class EpicManager extends JavaPlugin {
 		return handler.onCommand(commandLabel, sender, args);
 	}
 
+    public PermissionManager getPermissionManager() {
+    	return perms;
+    }
+    
     /**
      * Reload configuration information.
      *
@@ -152,22 +155,6 @@ public class EpicManager extends JavaPlugin {
     				dir.getPath());
     	}
     }
-
-    private void setupPermissions() throws EnableError {
-    	Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
-    	if(test != null) {
-    		// make sure Permissions gets enabled first
-    		if(!test.isEnabled())
-    			getServer().getPluginManager().enablePlugin(test);
-
-    		permissions = ((Permissions)test).getHandler();
-
-    	}
-    	else {
-    		throw new EnableError("Permission plugin not available.");
-    	}
-    }
-
 
     /**
      * @return val with all minecraft formatting removed
@@ -257,32 +244,5 @@ public class EpicManager extends JavaPlugin {
     public static void logInfo(String message) {
     	log.info("[" + pluginName + "] " + message);
     }
-
-
-
-	public static class EnableError extends Exception {
-
-		/**
-		 *
-		 */
-		private static final long serialVersionUID = 6666252142075352300L;
-
-		public EnableError() {
-			super();
-		}
-
-		public EnableError(String message, Throwable cause) {
-			super(message, cause);
-		}
-
-		public EnableError(String message) {
-			super(message);
-		}
-
-		public EnableError(Throwable cause) {
-			super(cause);
-		}
-
-	}
 
 }

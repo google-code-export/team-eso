@@ -31,13 +31,10 @@
 
 package com.epicsagaonline.bukkit.EpicManager.auth;
 
-import java.io.FileNotFoundException;
-
-import org.bukkit.Server;
-
-import com.epicsagaonline.bukkit.WritablePermissionHandler;
+import com.epicsagaonline.bukkit.NotFoundError;
 import com.epicsagaonline.bukkit.EpicManager.EpicManager;
-import com.epicsagaonline.bukkit.WritablePermissionHandler.NotFound;
+import com.epicsagaonline.bukkit.permissions.PermissionManager;
+import com.epicsagaonline.bukkit.permissions.VariableContainer;
 
 /**
  * Class that verifies a player login by checking for existance in
@@ -52,10 +49,8 @@ public class PermissionLoginAuthenticator implements PlayerAuthenticator {
 	private static final String BANNED_VAR = "banned";
 	private static final String BANNED_TIMES_VAR = "banned-times";
 	private static final String BANNED_REASON_VAR = "banned-reason";
-	
-	private WritablePermissionHandler permission;
-	private String addGroup;
 
+	PermissionManager manager;
 	/**
 	 * 
 	 * @param addGroup the group to add users to, if they are added.
@@ -63,10 +58,8 @@ public class PermissionLoginAuthenticator implements PlayerAuthenticator {
 	 * @throws FileNotFoundException if Permissions plugin doesn't exists, or if
 	 * 	it's config.yml doesn't exist
 	 */
-	public PermissionLoginAuthenticator(Server server, String addGroup) 
-			throws FileNotFoundException {
-		this.permission = new WritablePermissionHandler(server);
-		this.addGroup = addGroup;
+	public PermissionLoginAuthenticator(PermissionManager manager) {
+		this.manager = manager;
 	}
 
 	/**
@@ -76,26 +69,23 @@ public class PermissionLoginAuthenticator implements PlayerAuthenticator {
 	public void accept(String name) {
 		name = name.toLowerCase();
 		
-		if(!permission.hasUser(name)) {
-			try {
-				permission.addPlayer(name, addGroup, null);
-			}
-			catch (NotFound e) {
-				e.printStackTrace();
-				EpicManager.logSevere("PermissionLoginAuthenticator: " +
-						"Error adding player to permissions file.");
-				return;
-			}
+		if(!manager.hasUser(name)) {
+			manager.addUser(name, null);
 		}
 		
+		VariableContainer vars;
 		try {
-			permission.setUserPermissionVariable(name, BANNED_VAR, false);
+			vars = manager.getUserVars(name);
 		}
-		catch (NotFound e) {
+		catch (NotFoundError e) {
 			e.printStackTrace();
-			EpicManager.logSevere("PermissionLoginAuthenticator: " +
-					"Error adding variable: "+BANNED_VAR+" to file.");
 			return;
+		}
+		
+		// set banned to false if set to true
+		Boolean isBanned = vars.getBoolean(BANNED_VAR);
+		if(isBanned != null && isBanned) {
+			vars.set(BANNED_VAR, false);
 		}
 	}
 
@@ -105,52 +95,62 @@ public class PermissionLoginAuthenticator implements PlayerAuthenticator {
 
 	public void deny(String name, String reason) {
 		name = name.toLowerCase();
-		int timesBanned = 
-			permission.getUserPermissionInteger(name, BANNED_TIMES_VAR);
-		if(timesBanned == -1)
+
+		VariableContainer vars;
+		try {
+			vars = manager.getUserVars(name);
+		}
+		catch (NotFoundError e) {
+			EpicManager.logWarning("PermissionLoginAuthenticator: " +
+					"User "+name+" not found in permissions when trying to deny.");
+			return;
+		}
+
+		Integer timesBanned = 
+			vars.getInteger(BANNED_TIMES_VAR);
+		if (timesBanned == null)
 			timesBanned = 0;
 		
-		boolean isBanned = permission.getPermissionBoolean(name, BANNED_VAR); 
+		Boolean isBanned = vars.getBoolean(BANNED_VAR);
 		
 		timesBanned++;
 		isBanned = true;
 		
-		try {
-			permission.setUserPermissionVariable(name, BANNED_TIMES_VAR, timesBanned);
-			permission.setUserPermissionVariable(name, BANNED_VAR, isBanned);
-			permission.setUserPermissionVariable(name, BANNED_REASON_VAR, reason);
-		}
-		catch (NotFound e) {
-			EpicManager.logWarning("PermissionLoginAuthenticator: " +
-					"User "+name+" not found in permissions when trying to deny.");
-		}
+		vars.set(BANNED_TIMES_VAR, timesBanned);
+		vars.set(BANNED_VAR, isBanned);
+		vars.set(BANNED_REASON_VAR, reason);
 	}
 
 
 	public boolean isAllowed(String name) {
 		name = name.toLowerCase();
-		
-		permission.reload();
-		
-		if (!permission.hasUser(name))
+
+		VariableContainer vars;
+		try {
+			vars = manager.getUserVars(name);
+		}
+		catch (NotFoundError e) {
 			return false;
+		}
 		
-		boolean ret = !permission.getPermissionBoolean(name.toLowerCase(), 
-				BANNED_VAR); 
+		Boolean isBanned = vars.getBoolean(BANNED_VAR);
+		if (isBanned == null)
+			isBanned = false;
 		
-		return ret;
+		return isBanned; 
 	}
 
 	public String getBannedReason(String name) {
 		name = name.toLowerCase();
 
-		permission.reload();
-		
-		String ret = permission.getUserPermissionString(name, BANNED_REASON_VAR);
-		if(ret != null && ret.isEmpty())
+		VariableContainer vars;
+		try {
+			vars = manager.getUserVars(name);
+		}
+		catch (NotFoundError e) {
 			return null;
-		return ret;
+		}
+		
+		return vars.getString(BANNED_REASON_VAR);
 	}
-	
-
 }

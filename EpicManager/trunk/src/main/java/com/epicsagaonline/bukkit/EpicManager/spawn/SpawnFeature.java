@@ -52,6 +52,8 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.PluginManager;
 
+import com.epicsagaonline.bukkit.EnableError;
+import com.epicsagaonline.bukkit.NotFoundError;
 import com.epicsagaonline.bukkit.EpicManager.CommandHandler;
 import com.epicsagaonline.bukkit.EpicManager.EpicManager;
 import com.epicsagaonline.bukkit.EpicManager.PluginFeature;
@@ -85,9 +87,6 @@ import com.epicsagaonline.bukkit.EpicManager.PluginFeature;
  * <li>Currently,{@literal /sethome <player>} requires the player to be online.</li>
  * <li>{@literal /rmhome <player>}, when the player is offline, may not find find the
  *    actual player if it's displayName is signifigantly different then login name.</li>
- * <li>doesn't detect if the spawn point is free of obstructions...</li>
- * 
- * TODO: check for obstrcutions during spawn
  *
  * @author _sir_maniac
  */
@@ -137,7 +136,7 @@ public class SpawnFeature implements PluginFeature {
     private Set<Integer> deadPlayers = new HashSet<Integer>();
     private Set<Integer> spawningPlayers = new HashSet<Integer>();
 
-	public void onEnable(EpicManager em) throws EpicManager.EnableError {
+	public void onEnable(EpicManager em) throws EnableError {
 		plugin = em;
 		Server server = em.getServer();
 
@@ -237,15 +236,19 @@ public class SpawnFeature implements PluginFeature {
 				overrideDest(event, playerId, dest);
 				return;
 			}
-
 			
-			String group = EpicManager.permissions.getGroup(playerName);
-			if(group != null) {
+			String group;
+			try {
+				group = plugin.getPermissionManager().getGroup(playerName);
+
 				dest = groupHomes.getGroupHome(group);
 				if (dest != null) {
 					overrideDest(event, playerId, dest);
 					return;
 				}
+			}
+			catch (NotFoundError e) {
+				dest = null;
 			}
 
 			// spawn to the default spawn location if available
@@ -313,13 +316,13 @@ public class SpawnFeature implements PluginFeature {
 		throws PlayerNotFoundException, PermissionException {
 
 		if(args.length == 0) {
-        	if(!EpicManager.permissions.has((Player)op, selfPerm))
+        	if(!plugin.getPermissionManager().has((Player)op, selfPerm))
         		throw new PermissionException();
 
         	return new PlayerInfo(((Player)op).getName(), null);
     	}
     	else {
-        	if(!EpicManager.permissions.has((Player)op, otherPerm))
+        	if(!plugin.getPermissionManager().has((Player)op, otherPerm))
         		throw new SecurityException();
 
         	Player player = plugin.getPlayerByDisplayName(args[0]);
@@ -333,7 +336,7 @@ public class SpawnFeature implements PluginFeature {
 	private class SpawnCommand implements CommandHandler {
 	    public boolean onCommand(String command, CommandSender op, String[] args) {
 	    	if(!(op instanceof Player) || 
-	    			!EpicManager.permissions.has((Player)op, PERM_SPAWN))
+	    			!plugin.getPermissionManager().has((Player)op, PERM_SPAWN))
 	    		return true;
 
 	    	Player player = (Player)op;
@@ -356,7 +359,7 @@ public class SpawnFeature implements PluginFeature {
 	private class SetSpawnCommand implements CommandHandler {
 	    public boolean onCommand(String command, CommandSender op, String[] args) {
 	    	if(!(op instanceof Player) || 
-	    			!EpicManager.permissions.has((Player)op, PERM_SETSPAWN))
+	    			!plugin.getPermissionManager().has((Player)op, PERM_SETSPAWN))
 	    		return true;
 
 	    	groupHomes.setGroupHome(DEFAULT_SPAWN, ((Player)op).getLocation());
@@ -454,8 +457,11 @@ public class SpawnFeature implements PluginFeature {
 
 			Location dest = homes.getHome(ret.name);
 			if(dest == null) {
-				String group = EpicManager.permissions.getGroup(ret.name);
-				if (group == null) {
+				String group;
+				try {
+					group = plugin.getPermissionManager().getGroup(ret.name);
+				}
+				catch (NotFoundError e) {
 					op.sendMessage(errMsg);
 					return true;
 				}
@@ -480,7 +486,7 @@ public class SpawnFeature implements PluginFeature {
 	    	if(!(op instanceof Player))
 	    		return true;
 
-	    	if (!EpicManager.permissions.has((Player)op, PERM_GHO_SETGHOME))
+	    	if (!plugin.getPermissionManager().has((Player)op, PERM_GHO_SETGHOME))
 	    		return true;
 
 	    	if (args.length != 1)
@@ -503,7 +509,7 @@ public class SpawnFeature implements PluginFeature {
 	    	if(!(op instanceof Player))
 	    		return true;
 
-	    	if (!EpicManager.permissions.has((Player)op, PERM_GHO_RMGHOME))
+	    	if (!plugin.getPermissionManager().has((Player)op, PERM_GHO_RMGHOME))
 	    		return true;
 
 	    	if (args.length != 1)
@@ -527,19 +533,22 @@ public class SpawnFeature implements PluginFeature {
 
 	    	Location dest;
 	    	if (args.length == 0) {
-	    		if (!EpicManager.permissions.has((Player)op, PERM_GH_GHOME))
+	    		if (!plugin.getPermissionManager().has((Player)op, PERM_GH_GHOME))
 	    			return true;
 
-	    		String group = EpicManager.permissions.getGroup(((Player)op).getName());
-	    		if (group == null) {
+	    		String group;
+				try {
+					group = plugin.getPermissionManager().getGroup(((Player)op).getName());
+				}
+				catch (NotFoundError e) {
 	    			op.sendMessage(ChatColor.YELLOW+"Group not found.");
 	    			return true;
-	    		}
+				}
 
 	    		dest = groupHomes.getGroupHome(group);
 	    	}
 	    	else {
-	    		if (!EpicManager.permissions.has((Player)op, PERM_GHO_GHOME))
+	    		if (!plugin.getPermissionManager().has((Player)op, PERM_GHO_GHOME))
 	    			return true;
 
 	    		dest = groupHomes.getGroupHome(args[0]);
@@ -551,12 +560,14 @@ public class SpawnFeature implements PluginFeature {
 		    			return true;
 	    			}
 
-	    			String group = EpicManager.permissions.getGroup(player.getName());
-
-	    			if(group == null) {
+	    			String group;
+					try {
+						group = plugin.getPermissionManager().getGroup(player.getName());
+					}
+					catch (NotFoundError e) {
 		    			op.sendMessage(ChatColor.YELLOW+"Player's group not found.");
 		    			return true;
-	    			}
+					}
 
 	    			dest = groupHomes.getGroupHome(group);
 	    		}

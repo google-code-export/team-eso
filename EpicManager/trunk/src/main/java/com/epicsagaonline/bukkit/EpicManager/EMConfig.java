@@ -36,7 +36,6 @@ import java.io.File;
 import com.epicsagaonline.bukkit.WritableConfiguration;
 
 public class EMConfig extends WritableConfiguration {
-	public String addGroup = null;
 	public String kickMessage = null;
 	public String banMessage = null;
 	public String noLoginMessage = null;
@@ -46,7 +45,6 @@ public class EMConfig extends WritableConfiguration {
 	}
 
 	public void setDefaults() {
-		addGroup = "Default";
 		kickMessage = "Kicked by admin";
 		banMessage = "You have been banned.";
 		noLoginMessage = "You are not allowed on this server.";
@@ -91,13 +89,6 @@ public class EMConfig extends WritableConfiguration {
 				hasEmpty = true;
 		}
 		
-		ret = getString("auth.assign-group-on-add");
-		if(ret != null) {
-			addGroup = ret;
-		}
-		else 
-			hasEmpty = true;
-		
 		if (hasEmpty) {
 			save();
 		}
@@ -110,7 +101,6 @@ public class EMConfig extends WritableConfiguration {
 		setProperty("messages.nologin", noLoginMessage);
 		setProperty("messages.ban", banMessage);
 		setProperty("messages.kick", kickMessage);
-		setProperty("auth.assign-group-on-add", addGroup);
 		
 		return super.save();
 	}
