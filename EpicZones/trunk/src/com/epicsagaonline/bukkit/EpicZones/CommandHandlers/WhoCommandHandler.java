@@ -1,47 +1,76 @@
+/*
+
+This file is part of EpicZones
+
+Copyright (C) 2011 by Team ESO
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+*/
+
+/**
+* @author jblaske@gmail.com
+* @license MIT License
+*/
+
 package com.epicsagaonline.bukkit.EpicZones.CommandHandlers;
 
 import java.util.ArrayList;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerChatEvent;
 
-import com.epicsagaonline.bukkit.EpicZones.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.Zone;
 import com.epicsagaonline.bukkit.EpicZones.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 
-public class WhoCommandHandler {
+public class WhoCommandHandler implements CommandHandler {
 
-	public static void Process(String[] data, PlayerChatEvent event)
-	{
+	public boolean onCommand(String command, CommandSender sender, String[] args) {
 
-		int pageNumber = 1;
-
-		if(EpicZones.permissions.has(event.getPlayer(), "epiczones.who"))
+		if((sender instanceof Player && EpicZones.permissions.hasPermission((Player)sender, "epiczones.admin")))
 		{
-			if (data.length > 1)
+			Player player = (Player)sender;
+			int pageNumber = 1;
+			if (args.length > 0)
 			{
-				if (data[1].equalsIgnoreCase("all"))
+				if (args[0].equalsIgnoreCase("all"))
 				{
-					if (data.length > 2)
+					if (args.length > 1)
 					{
 						try
 						{
-							pageNumber = Integer.parseInt(data[2]);
+							pageNumber = Integer.parseInt(args[1]);
 						}
 						catch(NumberFormatException nfe)
 						{
 							pageNumber = 1;
 						}
 					}
-					buildWho(General.getPlayer(event.getPlayer().getName()), event.getPlayer(), pageNumber, true);
-					return;
+					buildWho(General.getPlayer(player.getName()), player, sender, pageNumber, true);
 				}
 				else
 				{
 					try
 					{
-						pageNumber = Integer.parseInt(data[1]);
+						pageNumber = Integer.parseInt(args[0]);
 					}
 					catch(NumberFormatException nfe)
 					{
@@ -49,15 +78,16 @@ public class WhoCommandHandler {
 					}
 				}
 			}
-			buildWho(General.getPlayer(event.getPlayer().getName()), event.getPlayer(), pageNumber, false);
-			event.setCancelled(true);
+			buildWho(General.getPlayer(player.getName()), player, sender, pageNumber, false);
+			return true;
 		}
+		return false;
 	}
 
-	private static void buildWho(EpicZonePlayer ezp, Player player, int pageNumber, boolean allZones)
+	private static void buildWho(EpicZonePlayer ezp, Player player, CommandSender sender, int pageNumber, boolean allZones)
 	{
 
-		EpicZone currentZone = General.getPlayer(player.getName()).getCurrentZone();
+		Zone currentZone = General.getPlayer(player.getName()).getCurrentZone();
 		if(currentZone == null){allZones = true;}
 		ArrayList<EpicZonePlayer> players = getPlayers(currentZone, allZones);
 		int playersPerPage = 8;
@@ -65,23 +95,23 @@ public class WhoCommandHandler {
 
 		if (allZones)
 		{
-			player.sendMessage(playerCount + " Players Online [Page " + pageNumber + " of " + ((int)Math.ceil((double)playerCount / (double)playersPerPage)) + "]");
+			sender.sendMessage(playerCount + " Players Online [Page " + pageNumber + " of " + ((int)Math.ceil((double)playerCount / (double)playersPerPage)) + "]");
 			for(int i = (pageNumber - 1) * playersPerPage; i < (pageNumber * playersPerPage); i++)
 			{
 				if (players.size() > i)
 				{
-					player.sendMessage(buildWhoPlayerName(ezp, players, i, allZones));
+					sender.sendMessage(buildWhoPlayerName(ezp, players, i, allZones));
 				}
 			}
 		}
 		else
 		{
-			player.sendMessage(playerCount + " Players Online in " + currentZone.getName() + " [Page " + pageNumber + " of " + ((int)Math.ceil((double)playerCount / playersPerPage) + 1) + "]");
+			sender.sendMessage(playerCount + " Players Online in " + currentZone.getName() + " [Page " + pageNumber + " of " + ((int)Math.ceil((double)playerCount / playersPerPage) + 1) + "]");
 			for(int i = (pageNumber - 1) * playersPerPage; i < pageNumber * playersPerPage; i++)
 			{
 				if (players.size() > i)
 				{
-					player.sendMessage(buildWhoPlayerName(ezp, players, i, allZones));
+					sender.sendMessage(buildWhoPlayerName(ezp, players, i, allZones));
 				}
 			}
 		}
@@ -125,7 +155,7 @@ public class WhoCommandHandler {
 		return result;
 	}
 
-	private static ArrayList<EpicZonePlayer> getPlayers(EpicZone currentZone, boolean allZones)
+	private static ArrayList<EpicZonePlayer> getPlayers(Zone currentZone, boolean allZones)
 	{
 		if (allZones)
 		{

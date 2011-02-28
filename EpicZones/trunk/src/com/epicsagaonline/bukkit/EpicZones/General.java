@@ -1,3 +1,34 @@
+/*
+
+This file is part of EpicZones
+
+Copyright (C) 2011 by Team ESO
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+ */
+
+/**
+ * @author jblaske@gmail.com
+ * @license MIT License
+ */
+
 package com.epicsagaonline.bukkit.EpicZones;
 
 import java.awt.Point;
@@ -12,17 +43,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import org.bukkit.entity.Player;
-import com.epicsagaonline.bukkit.EpicZones.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.Zone;
 import com.epicsagaonline.bukkit.EpicZones.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 
 public class General {
 
-	public static Map<String, EpicZone> myZones = new HashMap<String, EpicZone>();
+	public static Map<String, Zone> myZones = new HashMap<String, Zone>();
 	public static ArrayList<String> myZoneTags = new ArrayList<String>();
 	public static ArrayList<EpicZonePlayer> myPlayers = new ArrayList<EpicZonePlayer>();
-	public static EpicZonesConfig config;
+	public static Config config;
 	public static final String NO_PERM_ENTER = "You do not have permission to enter ";
 	public static final String NO_PERM_BORDER = "You have reached the border of the map.";
 	public static EpicZones plugin;
@@ -76,7 +107,7 @@ public class General {
 
 	}
 
-	public static boolean hasPermissions(Player player, EpicZone zone, String flag)
+	public static boolean hasPermissions(Player player, Zone zone, String flag)
 	{
 
 		//				if(zone != null)
@@ -91,19 +122,19 @@ public class General {
 		//				System.out.println("Player Can Ignore Permissions: " + EpicZones.permissions.has(player, "epiczones.ignorepermissions"));
 		//				}
 
-		if(!EpicZones.permissions.has(player, "epiczones.ignorepermissions"))
+		if(!EpicZones.permissions.hasPermission(player, "epiczones.ignorepermissions"))
 		{
 			if(zone == null)
 			{
 				//System.out.println("1");
 				return getDefaultPerm(flag);
 			}
-			else if(EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny"))
+			else if(EpicZones.permissions.hasPermission(player, "epiczones." + zone.getTag() + "." + flag + ".deny"))
 			{
 				//System.out.println("1.5");
 				return false;
 			}
-			else if(EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag))
+			else if(EpicZones.permissions.hasPermission(player, "epiczones." + zone.getTag() + "." + flag))
 			{
 				//System.out.println("2");
 				return true;
@@ -151,10 +182,10 @@ public class General {
 			try {
 				while(scanner.hasNext())
 				{
-					EpicZone newZone;
+					Zone newZone;
 					line = scanner.nextLine().trim();
 					if(line.startsWith("#") || line.isEmpty()){continue;}
-					newZone = new EpicZone(line);;
+					newZone = new Zone(line);;
 					General.myZones.put(newZone.getTag(), newZone);
 					General.myZoneTags.add(newZone.getTag());
 				}
@@ -177,18 +208,18 @@ public class General {
 	{
 
 		ArrayList<String> badChildren = new ArrayList<String>();
-		
+
 		for(String zoneTag: myZoneTags)
 		{
-			EpicZone zone = myZones.get(zoneTag);
+			Zone zone = myZones.get(zoneTag);
 			if(zone.hasChildren())
 			{
 				//System.out.println("Attaching Child Zones To " + zone.getName() + "[" + zone.getTag() + "].");
 				for(String child: zone.getChildrenTags())
 				{
-					
-					EpicZone childZone = myZones.get(child);
-					
+
+					Zone childZone = myZones.get(child);
+
 					if(childZone != null)
 					{
 						//System.out.println("\t" + childZone.getName() + "[" + childZone.getTag() + "] added as a child of " + zone.getName() + "[" + zone.getTag() + "].");
@@ -248,7 +279,7 @@ public class General {
 
 		for(String tag: myZoneTags)
 		{
-			EpicZone z = myZones.get(tag);
+			Zone z = myZones.get(tag);
 			line = z.getTag() + "|";
 			line = line + z.getWorld() + "|";
 			line = line + z.getName() + "|";
@@ -264,7 +295,7 @@ public class General {
 		return result;
 	}
 
-	private static String BuildFlags(EpicZone z)
+	private static String BuildFlags(Zone z)
 	{
 		String result = "";
 
@@ -286,7 +317,7 @@ public class General {
 				result = result + "regen:" + z.getRegenInterval() + ":" + z.getRegenAmount() + " ";	
 			}
 		}
-		
+
 		if(z.getAllowedMobs() != null)
 		{
 
@@ -314,11 +345,11 @@ public class General {
 		{result = result + "explode:true ";}
 		else
 		{result = result + "explode:false ";}
-		
+
 		return result;
 	}
 
-	private static String BuildChildren(EpicZone z)
+	private static String BuildChildren(Zone z)
 	{
 		String result = "";
 
@@ -330,7 +361,7 @@ public class General {
 		return result;
 	}
 
-	private static String BuildPointList(EpicZone z)
+	private static String BuildPointList(Zone z)
 	{
 
 		String result = "";
@@ -351,14 +382,14 @@ public class General {
 		return result;
 	}
 
-	public static EpicZone getZoneForPoint(int elevation, Point location, String worldName)
+	public static Zone getZoneForPoint(int elevation, Point location, String worldName)
 	{
 
-		EpicZone result = null;
+		Zone result = null;
 		String resultTag = "";
 		for(String zoneTag: General.myZoneTags)
 		{
-			EpicZone zone = General.myZones.get(zoneTag);
+			Zone zone = General.myZones.get(zoneTag);
 			resultTag = General.isPointInZone(zone, elevation, location, worldName);
 			if(resultTag.length() > 0)
 			{
@@ -371,7 +402,7 @@ public class General {
 
 	}
 
-	public static String isPointInZone(EpicZone zone, int playerHeight, Point playerPoint, String worldName)
+	public static String isPointInZone(Zone zone, int playerHeight, Point playerPoint, String worldName)
 	{
 
 		String result = "";
@@ -414,7 +445,7 @@ public class General {
 
 			ezp.setDistanceFromCenter((int)distanceFromCenter);
 
-			if(distanceFromCenter <= General.config.mapRadius)
+			if(distanceFromCenter <= General.config.mapRadius.get(player.getWorld().getName()))
 			{
 				if(ezp.getPastBorder())
 				{
@@ -425,7 +456,7 @@ public class General {
 			}
 			else
 			{
-				if(EpicZones.permissions.has(player, "epiczones.ignoremapradius"))
+				if(EpicZones.permissions.hasPermission(player, "epiczones.ignoremapradius"))
 				{
 					if(!ezp.getPastBorder())
 					{
@@ -468,9 +499,10 @@ public class General {
 		}
 	}
 
-	public static void Regen()
+	public static boolean IsNumeric(String data)
 	{
-
+		if (data.matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+")){return true;}
+		else {return false;} 
 	}
 
 }

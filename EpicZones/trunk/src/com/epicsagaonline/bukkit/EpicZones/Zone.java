@@ -1,3 +1,34 @@
+/*
+
+This file is part of EpicZones
+
+Copyright (C) 2011 by Team ESO
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+*/
+
+/**
+* @author jblaske@gmail.com
+* @license MIT License
+*/
+
 package com.epicsagaonline.bukkit.EpicZones;
 import java.awt.Point;
 import java.awt.Polygon;
@@ -10,7 +41,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class EpicZone {
+public class Zone {
 
 	private String tag = "";
 	private String name = "";
@@ -23,8 +54,8 @@ public class EpicZone {
 	private Rectangle boundingBox = new Rectangle(); 
 	private String enterText = "";
 	private String exitText = "";
-	private EpicZone parent = null;
-	private Map<String, EpicZone> children = new HashMap<String, EpicZone>();
+	private Zone parent = null;
+	private Map<String, Zone> children = new HashMap<String, Zone>();
 	private Set<String> childrenTags = new HashSet<String>();
 	private boolean hasChildrenFlag = false;
 	private boolean hasParentFlag = false;
@@ -40,9 +71,9 @@ public class EpicZone {
 	private boolean allowExplode = false;
 
 
-	public EpicZone(){}
+	public Zone(){}
 
-	public EpicZone(EpicZone prime)
+	public Zone(Zone prime)
 	{
 		this.tag = prime.tag;
 		this.name = prime.name;
@@ -71,7 +102,7 @@ public class EpicZone {
 		this.allowExplode = prime.allowExplode;
 	}
 
-	public EpicZone(String zoneData)
+	public Zone(String zoneData)
 	{
 
 		String[] split = zoneData.split("\\|");
@@ -108,8 +139,8 @@ public class EpicZone {
 	public String getEnterText(){return enterText;}
 	public String getExitText(){return exitText;}
 	public String getWorld(){return world;}
-	public EpicZone getParent(){return parent;}
-	public Map<String, EpicZone> getChildren(){return children;}
+	public Zone getParent(){return parent;}
+	public Map<String, Zone> getChildren(){return children;}
 	public Set<String> getChildrenTags(){return childrenTags;}
 	public boolean hasChildren(){return hasChildrenFlag;}
 	public boolean hasParent(){return hasParentFlag;}
@@ -119,9 +150,9 @@ public class EpicZone {
 	public ArrayList<String> getAllowedMobs(){return allowedMobs;}
 	public boolean getAllowFire(){return allowFire;}
 	public boolean getAllowExplode(){return allowExplode;}
-	public void addChild(EpicZone childZone)
+	public void addChild(Zone childZone)
 	{
-		if(this.children == null){this.children = new HashMap<String, EpicZone>();}
+		if(this.children == null){this.children = new HashMap<String, Zone>();}
 		this.children.put(childZone.getTag(), childZone);
 	}
 
@@ -225,7 +256,7 @@ public class EpicZone {
 		this.center = value;
 	}
 
-	public void setParent(EpicZone parent)
+	public void setParent(Zone parent)
 	{
 		this.parent = parent;
 		this.hasParentFlag = true;

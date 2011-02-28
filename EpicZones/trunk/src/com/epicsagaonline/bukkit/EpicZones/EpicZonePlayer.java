@@ -1,3 +1,34 @@
+/*
+
+This file is part of EpicZones
+
+Copyright (C) 2011 by Team ESO
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+*/
+
+/**
+* @author jblaske@gmail.com
+* @license MIT License
+*/
+
 package com.epicsagaonline.bukkit.EpicZones;
 
 import org.bukkit.Location;
@@ -6,7 +37,7 @@ import java.util.Date;
 
 public class EpicZonePlayer {
 
-	private EpicZone currentZone;
+	private Zone currentZone;
 	private int entityID;
 	private String name;
 	private Location currentLocation;
@@ -15,12 +46,12 @@ public class EpicZonePlayer {
 	private boolean teleporting = false;
 	private Date lastCheck = new Date();
 	private EpicZoneMode mode = EpicZoneMode.None; 
-	private EpicZone editZone = null;
+	private Zone editZone = null;
 	private boolean pastBorder = false;
 	private Date enteredZone = new Date();
 	private String previousZoneTag = "";
 	
-	public EpicZone getCurrentZone(){return currentZone;}
+	public Zone getCurrentZone(){return currentZone;}
 	public int getEntityID(){return entityID;}
 	public String getName(){return name;}
 	public Location getCurrentLocation(){return currentLocation;}
@@ -29,7 +60,7 @@ public class EpicZonePlayer {
 	public int getDistanceFromCenter(){return distanceFromCenter;}
 	public boolean isTeleporting(){return teleporting;}
 	public EpicZoneMode getMode(){return mode;}
-	public EpicZone getEditZone(){return editZone;}
+	public Zone getEditZone(){return editZone;}
 	public boolean getPastBorder(){return pastBorder;}
 	public Date getEnteredZone(){return enteredZone;}
 	public String getPreviousZoneTag(){return previousZoneTag;}
@@ -56,7 +87,7 @@ public class EpicZonePlayer {
 		this.mode = value;
 	}
 	
-	public void setEditZone(EpicZone value)
+	public void setEditZone(Zone value)
 	{
 		this.editZone = value;
 	}
@@ -67,7 +98,7 @@ public class EpicZonePlayer {
 		this.name = name;
 	}
 	
-	public void setCurrentZone(EpicZone z)
+	public void setCurrentZone(Zone z)
 	{
 		this.currentZone = z;
 		this.enteredZone = new Date();

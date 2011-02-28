@@ -1,3 +1,34 @@
+/*
+
+This file is part of EpicZones
+
+Copyright (C) 2011 by Team ESO
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+*/
+
+/**
+* @author jblaske@gmail.com
+* @license MIT License
+*/
+
 package com.epicsagaonline.bukkit.EpicZones;
 
 import java.awt.Point;
@@ -10,19 +41,19 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 
-public class EpicZonesEntityListener extends EntityListener 
+public class LEntity extends EntityListener 
 {
 
 	//private final EpicZones plugin;
 
-	public EpicZonesEntityListener(EpicZones instance)
+	public LEntity(EpicZones instance)
 	{
 		//plugin = instance;
 	}
 
 	public @Override void onEntityExplode(EntityExplodeEvent event)
 	{
-		EpicZone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
+		Zone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
 		if (zone != null)
 		{
 			if(!zone.getAllowExplode())
@@ -43,7 +74,7 @@ public class EpicZonesEntityListener extends EntityListener
 				if(isPlayer(sub.getEntity()) && isPlayer(sub.getDamager()))
 				{
 					EpicZonePlayer ezp = General.getPlayer(sub.getEntity().getEntityId());
-					EpicZone zone = ezp.getCurrentZone();
+					Zone zone = ezp.getCurrentZone();
 					if(zone != null)
 					{
 						if(!zone.hasPVP())
@@ -59,7 +90,7 @@ public class EpicZonesEntityListener extends EntityListener
 				if(isPlayer(sub.getEntity()) && isPlayer(sub.getDamager()))
 				{
 					EpicZonePlayer ezp = General.getPlayer(sub.getEntity().getEntityId());
-					EpicZone zone = ezp.getCurrentZone();
+					Zone zone = ezp.getCurrentZone();
 					if(zone != null)
 					{
 						if(!zone.hasPVP())
@@ -76,7 +107,7 @@ public class EpicZonesEntityListener extends EntityListener
 	{
 
 		Entity mob = event.getEntity();
-		EpicZone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
+		Zone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
 
 		if(zone != null)
 		{

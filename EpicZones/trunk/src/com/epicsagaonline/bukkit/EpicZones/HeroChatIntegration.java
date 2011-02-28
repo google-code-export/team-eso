@@ -29,26 +29,46 @@ THE SOFTWARE.
 * @license MIT License
 */
 
-package com.epicsagaonline.bukkit.EpicZones.CommandHandlers;
+package com.epicsagaonline.bukkit.EpicZones;
 
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.epicsagaonline.bukkit.EpicZones.EpicZones;
-import com.epicsagaonline.bukkit.EpicZones.General;
 
-public class ReloadCommandHandler implements CommandHandler {
+public class HeroChatIntegration 
 
-	public boolean onCommand(String command, CommandSender sender, String[] args) {
+{
 
-		if((sender instanceof Player && EpicZones.permissions.hasPermission((Player)sender, "epiczones.admin")) || !(sender instanceof Player))
+	public static void joinChat(String zoneTag, EpicZonePlayer ezp, Player player)
+	{
+		if(General.config.enableHeroChat)
 		{
-			General.plugin.setupPermissions();
-			General.plugin.setupHeroChat();
-			General.plugin.setupEpicZones();
-			sender.sendMessage("EpicZones Reloaded.");
-			return true;
+			if(EpicZones.heroChat != null)
+			{
+				Zone theZone = General.myZones.get(zoneTag);
+				while(EpicZones.heroChat.getChannel(theZone.getTag()) == null && theZone.hasParent())
+				{
+					theZone = General.myZones.get(theZone.getParent().getTag());
+				}
+				if(!ezp.getPreviousZoneTag().equals(theZone.getTag()))
+				{
+					EpicZones.heroChat.getChannel(theZone.getTag()).addPlayer(player);
+					EpicZones.heroChat.setActiveChannel(player, EpicZones.heroChat.getChannel(zoneTag));
+				}
+			}
 		}
-		return false;
+	}
+
+	public static void leaveChat(String zoneTag, Player player)
+	{
+		if(General.config.enableHeroChat)
+		{
+			if(EpicZones.heroChat != null)
+			{
+				if(EpicZones.heroChat.getChannel(zoneTag) != null)
+				{
+					EpicZones.heroChat.getChannel(zoneTag).removePlayer(player);
+				}
+			}
+		}
 	}
 
 }

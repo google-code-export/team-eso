@@ -1,3 +1,34 @@
+/*
+
+This file is part of EpicZones
+
+Copyright (C) 2011 by Team ESO
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+*/
+
+/**
+* @author jblaske@gmail.com
+* @license MIT License
+*/
+
 package com.epicsagaonline.bukkit.EpicZones;
 
 import java.awt.Point;
@@ -6,33 +37,28 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerItemEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
-
 import com.epicsagaonline.bukkit.EpicZones.EpicZonePlayer.EpicZoneMode;
-import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.ReloadCommandHandler;
-import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.WhoCommandHandler;
-import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.ZoneCommandHandler;
+
 
 /**
  * Handle events for all Player related events
  * @author jblaske
  */
-public class EpicZonesPlayerListener extends PlayerListener
+public class LPlayer extends PlayerListener
 {
-	private final EpicZones plugin;
+	
 	private static final String NO_PERM_BUCKET = "You do not have permissions to do that in this zone.";
 	private static final int EMPTY_BUCKET = 325;
 	private Set<Integer> itemsOfDestruction = new HashSet<Integer>();
 
-	public EpicZonesPlayerListener(EpicZones instance)
+	public LPlayer(EpicZones instance)
 	{
-		plugin = instance;
 		itemsOfDestruction.add(259);
 		itemsOfDestruction.add(326);
 		itemsOfDestruction.add(327);
@@ -112,17 +138,6 @@ public class EpicZonesPlayerListener extends PlayerListener
 		General.removePlayer(event.getPlayer().getEntityId());
 	}
 
-	public @Override void onPlayerCommand(PlayerChatEvent event)
-	{
-		if(!event.isCancelled())
-		{
-			String[] split = event.getMessage().split("\\s");
-			if (split[0].equalsIgnoreCase("/who")){WhoCommandHandler.Process(split, event);}
-			else if (split[0].equalsIgnoreCase("/reloadez")){ReloadCommandHandler.Process(split, event, plugin);}
-			else if (split[0].equalsIgnoreCase("/zone")){ZoneCommandHandler.Process(split, event, plugin);}
-		}
-	}
-
 	public @Override void onPlayerItem(PlayerItemEvent event)
 	{
 
@@ -136,7 +151,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 			int blockHeight = event.getBlockClicked().getLocation().getBlockY();
 			boolean hasPerms = false;
 
-			EpicZone currentZone = null;
+			Zone currentZone = null;
 			if(General.pointWithinBorder(blockPoint, player))
 			{
 				currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
@@ -162,7 +177,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 			int blockHeight = event.getBlockClicked().getLocation().getBlockY();
 			boolean hasPerms = false;
 
-			EpicZone currentZone = null;
+			Zone currentZone = null;
 			if(General.pointWithinBorder(blockPoint, player))
 			{
 				currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
@@ -193,7 +208,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 	private boolean PlayerWithinZoneLogic(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint)
 	{
 
-		EpicZone foundZone = null;
+		Zone foundZone = null;
 		String worldName = player.getWorld().getName();
 		if(General.pointWithinBorder(playerPoint, player))
 		{
@@ -207,7 +222,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 					{
 						if(ezp.getCurrentZone() != null){ezp.setPreviousZoneTag(ezp.getCurrentZone().getTag());}
 						ezp.setCurrentZone(foundZone);
-						EpicZonesHeroChat.joinChat(foundZone.getTag(), ezp, player);
+						HeroChatIntegration.joinChat(foundZone.getTag(), ezp, player);
 						if(foundZone.getEnterText().length() > 0){player.sendMessage(foundZone.getEnterText());}
 					}
 					else
@@ -223,7 +238,7 @@ public class EpicZonesPlayerListener extends PlayerListener
 				if (ezp.getCurrentZone() != null)
 				{
 					if(ezp.getCurrentZone().getExitText().length() > 0){player.sendMessage(ezp.getCurrentZone().getExitText());}
-					EpicZonesHeroChat.leaveChat(ezp.getCurrentZone().getTag(), player);
+					HeroChatIntegration.leaveChat(ezp.getCurrentZone().getTag(), player);
 					ezp.setCurrentZone(null);
 				}
 			}
@@ -238,10 +253,10 @@ public class EpicZonesPlayerListener extends PlayerListener
 
 	}
 
-	private EpicZone FindZone(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint, String worldName)
+	private Zone FindZone(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint, String worldName)
 	{
 
-		EpicZone result = null;
+		Zone result = null;
 
 		if(ezp.getCurrentZone() != null)
 		{
