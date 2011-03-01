@@ -111,9 +111,9 @@ public class ZoneCommandHandler implements CommandHandler {
 
 		if(ezp.getMode() == EpicZoneMode.None)
 		{
-			if(data.length > 2 && data[2].length() > 0)
+			if(data.length > 1 && data[1].length() > 0)
 			{
-				String tag = data[2].replaceAll("[^a-zA-Z0-9]", "");
+				String tag = data[1].replaceAll("[^a-zA-Z0-9]", "");
 				if(General.myZones.get(tag) == null)
 				{
 					Zone zone = new Zone();
@@ -189,11 +189,11 @@ public class ZoneCommandHandler implements CommandHandler {
 	{
 		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 		{
-			if(data.length > 3 && data[2].length() > 0 && data[3].length() > 0)
+			if(data.length > 2 && data[1].length() > 0 && data[2].length() > 0)
 			{
-				String flag = data[2];
+				String flag = data[1];
 				String value = "";
-				for(int i = 3; i < data.length; i++)
+				for(int i = 2; i < data.length; i++)
 				{
 					value = value + data[i] + " ";
 				}			
@@ -221,15 +221,15 @@ public class ZoneCommandHandler implements CommandHandler {
 		{
 			if (ezp.getEditZone().getPolygon().npoints == 1)
 			{
-				if(data.length > 2 && General.IsNumeric(data[2]))
+				if(data.length > 1 && General.IsNumeric(data[1]))
 				{
-					Integer value = Integer.parseInt(data[2]);
+					Integer value = Integer.parseInt(data[1]);
 					Set(playerID, "radius", value);
 					sender.sendMessage("Zone Updated. Radius set to: " + value);
 				}
 				else
 				{
-					sender.sendMessage("[" + data[2] + "] is not a valid value for radius.");
+					sender.sendMessage("[" + data[1] + "] is not a valid value for radius.");
 				}
 			}
 			else
@@ -247,15 +247,15 @@ public class ZoneCommandHandler implements CommandHandler {
 	{
 		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 		{
-			if(data.length > 2 && General.IsNumeric(data[2]))
+			if(data.length > 1 && General.IsNumeric(data[1]))
 			{
-				Integer value = Integer.parseInt(data[2]);
+				Integer value = Integer.parseInt(data[1]);
 				Set(playerID, "floor", value);
 				sender.sendMessage("Zone Updated. Floor to: " + value);
 			}
 			else
 			{
-				sender.sendMessage("[" + data[2] + "] is not a valid value for floor.");
+				sender.sendMessage("[" + data[1] + "] is not a valid value for floor.");
 			}
 		}
 		else
@@ -268,15 +268,15 @@ public class ZoneCommandHandler implements CommandHandler {
 	{
 		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 		{
-			if(data.length > 2 && General.IsNumeric(data[2]))
+			if(data.length > 1 && General.IsNumeric(data[1]))
 			{
-				Integer value = Integer.parseInt(data[2]);
+				Integer value = Integer.parseInt(data[1]);
 				Set(playerID, "ceiling", value);
 				sender.sendMessage("Zone Updated. Ceiling to: " + value);
 			}
 			else
 			{
-				sender.sendMessage("[" + data[2] + "] is not a valid value for ceiling.");
+				sender.sendMessage("[" + data[1] + "] is not a valid value for ceiling.");
 			}
 		}
 		else
@@ -289,9 +289,9 @@ public class ZoneCommandHandler implements CommandHandler {
 	{
 		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 		{
-			if(data.length > 2)
+			if(data.length > 1)
 			{
-				for(int i = 2; i < data.length; i++)
+				for(int i = 1; i < data.length; i++)
 				{
 					String tag = data[i].replaceAll("[^a-zA-Z0-9]", "");
 					if(tag.length() > 0 && General.myZones.get(tag) != null)
@@ -313,9 +313,9 @@ public class ZoneCommandHandler implements CommandHandler {
 	{
 		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 		{
-			if(data.length > 2)
+			if(data.length > 1)
 			{
-				for(int i = 2; i < data.length; i++)
+				for(int i = 1; i < data.length; i++)
 				{
 					String tag = data[i].replaceAll("[^a-zA-Z0-9]", "");
 					if(tag.length() > 0)
@@ -336,10 +336,10 @@ public class ZoneCommandHandler implements CommandHandler {
 	{
 		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 		{
-			if(data.length > 2)
+			if(data.length > 1)
 			{
 				String message = "";
-				for(int i = 2; i < data.length; i++)
+				for(int i = 1; i < data.length; i++)
 				{
 					message = message + data[i] + " ";
 				}
@@ -360,10 +360,10 @@ public class ZoneCommandHandler implements CommandHandler {
 	{
 		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 		{
-			if(data.length > 2)
+			if(data.length > 1)
 			{
 				String message = "";
-				for(int i = 2; i < data.length; i++)
+				for(int i = 1; i < data.length; i++)
 				{
 					message = message + data[i] + " ";
 				}
@@ -384,10 +384,10 @@ public class ZoneCommandHandler implements CommandHandler {
 	{
 		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 		{
-			if(data.length > 2)
+			if(data.length > 1)
 			{
 				String message = "";
-				for(int i = 2; i < data.length; i++)
+				for(int i = 1; i < data.length; i++)
 				{
 					message = message + data[i] + " ";
 				}
@@ -413,14 +413,14 @@ public class ZoneCommandHandler implements CommandHandler {
 		}
 		else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
 		{
-			if(data.length > 2)
+			if(data.length > 1)
 			{
-				if(data[2].equalsIgnoreCase("confirm"))
+				if(data[1].equalsIgnoreCase("confirm"))
 				{
 					Set(playerID, "mode", EpicZoneMode.ZoneDraw);
 					sender.sendMessage("Start drawing your zone with the zone edit tool. Type /zone save when you are done drawing.");
 				}
-				else if(data[2].equalsIgnoreCase("deny"))
+				else if(data[1].equalsIgnoreCase("deny"))
 				{
 					Set(playerID, "mode", EpicZoneMode.ZoneEdit);
 					sender.sendMessage("Draw Mode canceled, back in Edit Mode. type /zone for more options.");
@@ -437,12 +437,12 @@ public class ZoneCommandHandler implements CommandHandler {
 	{
 		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 		{
-			if(data.length > 2)
+			if(data.length > 1)
 			{
-				if(data[2].length() > 0)
+				if(data[1].length() > 0)
 				{
-					Set(playerID, "world", data[2]);
-					sender.sendMessage("Zone Updated. World set to: " + data[2]);
+					Set(playerID, "world", data[1]);
+					sender.sendMessage("Zone Updated. World set to: " + data[1]);
 				}
 			}
 		}
@@ -483,13 +483,13 @@ public class ZoneCommandHandler implements CommandHandler {
 	{
 		if(ezp.getMode() == EpicZoneMode.None)
 		{
-			if(data.length > 2)
+			if(data.length > 1)
 			{
-				if(data[2].length() > 0)
+				if(data[1].length() > 0)
 				{
-					if(General.myZones.get(data[2]) != null)
+					if(General.myZones.get(data[1]) != null)
 					{
-						String tag = data[2].replaceAll("[^a-zA-Z0-9]", "");
+						String tag = data[1].replaceAll("[^a-zA-Z0-9]", "");
 						Set(playerID, "editzone", new Zone(General.myZones.get(tag)));
 						Set(playerID, "mode", EpicZoneMode.ZoneEdit);
 						sender.sendMessage("Editing Zone: " + tag);
@@ -569,9 +569,9 @@ public class ZoneCommandHandler implements CommandHandler {
 	{
 		if(ezp.getMode() == EpicZoneMode.None)
 		{
-			if(data.length > 2)
+			if(data.length > 1)
 			{
-				Zone zone = General.myZones.get(data[2].trim());
+				Zone zone = General.myZones.get(data[1].trim());
 				if (zone != null)
 				{
 					String messageText;
@@ -645,7 +645,7 @@ public class ZoneCommandHandler implements CommandHandler {
 				}
 				else
 				{
-					sender.sendMessage("No zone with the tag [" + data[2] + "] exists.");
+					sender.sendMessage("No zone with the tag [" + data[1] + "] exists.");
 				}
 			}
 

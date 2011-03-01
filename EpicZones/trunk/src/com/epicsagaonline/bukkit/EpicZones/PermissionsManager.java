@@ -53,19 +53,45 @@ public class PermissionsManager
 
 	public PermissionsManager(EpicZones plugin)
 	{
+		boolean permStart = false;
 		this.plugin = plugin;
-
-		if (!startGroupManager() && !startPermissoins())
+		
+		if(General.config.permissionSystem.equalsIgnoreCase("GroupManager"))
 		{
-			System.out.println("[" + plugin.getDescription().getName() + "] Permission system not found. Disabling plugin.");
+			permStart = startGroupManager();	
+		}
+		else if (General.config.permissionSystem.equalsIgnoreCase("Permissions"))
+		{
+			permStart = startPermissions();
+		}
+		
+		if (!permStart)
+		{
+			System.out.println("[" + plugin.getDescription().getName() + "] Permission system [" + General.config.permissionSystem + "] not found. Disabling plugin.");
 			plugin.getServer().getPluginManager().disablePlugin(plugin);
 		}
 	}
 
 	public boolean hasPermission(Player player, String permission)
 	{
-		return ((GroupManager_Perms != null && GroupManager_Perms.has(player, permission)) 
-				|| (Permissions_Perms != null && Permissions_Perms.has(player, permission)));
+		
+		System.out.print("Perms Null? " + (Permissions_Perms == null));
+		System.out.print("Perms Tested: " + permission);
+		System.out.print("Player Tested: " + player.getName());
+		if(Permissions_Perms != null)
+		{
+			System.out.print("Has Perms? " + Permissions_Perms.has(player, permission));
+		}
+		
+		if(General.config.permissionSystem.equalsIgnoreCase("GroupManager"))
+		{
+			return (GroupManager_Perms != null && GroupManager_Perms.has(player, permission));	
+		}
+		else if (General.config.permissionSystem.equalsIgnoreCase("Permissions"))
+		{
+			return (Permissions_Perms != null && Permissions_Perms.has(player, permission));
+		}
+		return false;
 	}
 
 	public boolean startGroupManager()
@@ -77,14 +103,13 @@ public class PermissionsManager
 			{
 				plugin.getServer().getPluginManager().enablePlugin(p);
 			}
-			GroupManager _obj = (GroupManager) p;
-			GroupManager_Perms = _obj.getPermissionHandler();
+			GroupManager_Perms = ((GroupManager) p).getPermissionHandler();
 			return true;
 		}
 		return false;
 	}
 	
-	public boolean startPermissoins()
+	public boolean startPermissions()
 	{
 		Plugin p = plugin.getServer().getPluginManager().getPlugin("Permissions");
 		if (p != null)
@@ -93,8 +118,7 @@ public class PermissionsManager
 			{
 				plugin.getServer().getPluginManager().enablePlugin(p);
 			}
-			Permissions _obj = (Permissions) p;
-			Permissions_Perms = _obj.getHandler();
+			Permissions_Perms = ((Permissions)p).getHandler();
 			return true;
 		}
 		return false;

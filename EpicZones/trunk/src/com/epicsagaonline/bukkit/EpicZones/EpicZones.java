@@ -91,7 +91,6 @@ public class EpicZones extends JavaPlugin
 			pm.registerEvent(Event.Type.PLAYER_TELEPORT, this.playerListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_LOGIN, this.playerListener, Event.Priority.Monitor, this);
 			pm.registerEvent(Event.Type.PLAYER_QUIT, this.playerListener, Event.Priority.Monitor, this);
-			pm.registerEvent(Event.Type.PLAYER_COMMAND, this.playerListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_ITEM , this.playerListener, Event.Priority.Normal, this);
 
 			pm.registerEvent(Event.Type.BLOCK_DAMAGED, this.blockListener, Event.Priority.Normal, this);
@@ -109,7 +108,6 @@ public class EpicZones extends JavaPlugin
 			getServer().getScheduler().scheduleAsyncRepeatingTask(this, regen, 10, 10);
 
 			registerCommands();
-
 			setupEpicZones();
 			setupHeroChat();
 			setupPermissions();

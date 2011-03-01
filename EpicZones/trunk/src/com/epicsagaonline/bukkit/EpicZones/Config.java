@@ -61,6 +61,7 @@ public class Config extends Configuration {
 	public boolean defaultDestroy;
 	public boolean enableRadius;
 	public boolean enableHeroChat;
+	public String permissionSystem;
 	public int zoneTool = 280; //Default Tool Is Stick
 
 	public Config(File file)
@@ -82,6 +83,7 @@ public class Config extends Configuration {
 		enableRadius = true;
 		enableHeroChat = false;
 		zoneTool = 280;
+		permissionSystem = "GroupManager";
 	}
 
 	@Override
@@ -114,6 +116,17 @@ public class Config extends Configuration {
 			enableRadius = getBoolean("enableRadius", true);
 			enableHeroChat = getBoolean("enableHeroChat", false);
 			zoneTool = getInt("zoneTool", zoneTool);
+			permissionSystem = getString("permissionSystem");
+			
+			if(permissionSystem == null || permissionSystem.trim().length() == 0)
+			{
+				permissionSystem = "GroupManager";
+			}
+			else
+			{
+				permissionSystem = permissionSystem.trim();
+			}
+			
 		}
 	}
 
@@ -133,6 +146,7 @@ public class Config extends Configuration {
 		root.put("enableRadius", enableRadius);
 		root.put("enableHeroChat", enableHeroChat);
 		root.put("zoneTool", zoneTool);
+		root.put("permissionSystem", permissionSystem);
 
 		try 
 		{

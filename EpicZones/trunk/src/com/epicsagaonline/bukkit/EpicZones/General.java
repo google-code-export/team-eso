@@ -126,27 +126,41 @@ public class General {
 		{
 			if(zone == null)
 			{
-				//System.out.println("1");
-				return getDefaultPerm(flag);
+				if(EpicZones.permissions.hasPermission(player, "epiczones." + player.getWorld().getName() + "." + flag + ".deny"))
+				{
+					return false;
+				}
+				else if(EpicZones.permissions.hasPermission(player, "epiczones." + player.getWorld().getName() + "." + flag))
+				{
+					return true;
+				}
+				else
+				{
+					return getDefaultPerm(flag);
+				}
 			}
 			else if(EpicZones.permissions.hasPermission(player, "epiczones." + zone.getTag() + "." + flag + ".deny"))
 			{
-				//System.out.println("1.5");
 				return false;
 			}
 			else if(EpicZones.permissions.hasPermission(player, "epiczones." + zone.getTag() + "." + flag))
 			{
-				//System.out.println("2");
 				return true;
 			}
 			else if(zone.hasParent())
 			{
-				//System.out.println("3");
 				return hasPermissions(player, zone.getParent(), flag);
+			}
+			else if(EpicZones.permissions.hasPermission(player, "epiczones." + player.getWorld().getName() + "." + flag + ".deny"))
+			{
+				return false;
+			}
+			else if(EpicZones.permissions.hasPermission(player, "epiczones." + player.getWorld().getName() + "." + flag))
+			{
+				return true;
 			}
 			else
 			{
-				//System.out.println("4");
 				return getDefaultPerm(flag);	
 			}
 		}
