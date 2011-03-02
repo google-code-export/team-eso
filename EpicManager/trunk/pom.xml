@@ -58,9 +58,9 @@
       Change this to use a different version of Group, remember to change
       the checksums. (which can be commented out for initial download)
     -->
-    <groupManager.version>0.99c</groupManager.version>
-    <groupManager.url>http://www.mdn.fm/files/270340_vuz5z/GroupManager-${groupManager.version}.zip</groupManager.url>
-    <groupManager.sha1>5fcbaa997dcafbfe55839244b744c4af</groupManager.sha1>
+    <groupManager.version>0.99d</groupManager.version>
+    <groupManager.url>http://www.mdn.fm/files/271608_cfpn9/GroupManager-${groupManager.version}.zip</groupManager.url>
+    <groupManager.sha1>74c8a8b384b7ec656779784e117d8ac7</groupManager.sha1>
     <fakePermissions.sha1>28f2fc0546060a8d9ef222e1998742b6</fakePermissions.sha1>
   </properties>
 
@@ -79,7 +79,29 @@
 			<source>1.5</source>
 			<target>1.5</target>
 		</configuration>
-	</plugin>
+    </plugin>
+    
+    <plugin>
+      <artifactId>maven-shade-plugin</artifactId>
+      <version>1.4</version>
+      <executions>
+        <execution>
+          <phase>package</phase>
+          <goals>
+            <goal>shade</goal>
+          </goals>
+          <configuration>
+            <transformers>
+              <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                <manifestEntries>
+                  <Class-Path>GroupManager.jar</Class-Path>
+                </manifestEntries>
+              </transformer>
+            </transformers>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
 
     <plugin>
       <artifactId>maven-assembly-plugin</artifactId>

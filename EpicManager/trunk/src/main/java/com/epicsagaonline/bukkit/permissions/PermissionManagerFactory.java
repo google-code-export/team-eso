@@ -1,6 +1,8 @@
 package com.epicsagaonline.bukkit.permissions;
 
 import org.bukkit.Server;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 
 import com.epicsagaonline.bukkit.EnableError;
 
@@ -22,12 +24,18 @@ public final class PermissionManagerFactory {
 	 */
 	public static PermissionManager getPermissionManager(Server server) 
 			throws EnableError {
-		try {
+		PluginManager pm = server.getPluginManager();
+		Plugin plugin = pm.getPlugin("GroupManager");
+		if (plugin != null) {
 			return new GroupManagerPermissionManager(server);
 		}
-		catch (EnableError e) {
+		
+		plugin = pm.getPlugin("Permissions");
+		if (plugin != null) {
 			return new NijikoPermissionManager(server);
 		}
+		
+		throw new EnableError("Must have either Permissions or GroupManager");
 	}
 	
 }

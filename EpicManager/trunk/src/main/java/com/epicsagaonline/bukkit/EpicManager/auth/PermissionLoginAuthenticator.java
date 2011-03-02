@@ -137,7 +137,7 @@ public class PermissionLoginAuthenticator implements PlayerAuthenticator {
 		if (isBanned == null)
 			isBanned = false;
 		
-		return isBanned; 
+		return !isBanned; 
 	}
 
 	public String getBannedReason(String name) {

@@ -42,6 +42,7 @@ import java.util.Map;
 import org.bukkit.util.config.Configuration;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
@@ -70,7 +71,7 @@ public class WritableConfiguration extends Configuration {
 		// make config files look nicer
 		DumperOptions options = new DumperOptions();
 		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-		yaml = new Yaml(rep, options);
+		yaml = new Yaml(new SafeConstructor(), rep, options);
 
 	}
 	/**

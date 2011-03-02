@@ -121,11 +121,19 @@ public class GroupManagerPermissionManager implements PermissionManager {
 		}
 
 		public Double getDouble(String variable) {
-			return vars.getVarDouble(variable);
+			Double result = vars.getVarDouble(variable);
+			if (result == -1)
+				return null;
+			
+			return result;
 		}
 
 		public Integer getInteger(String variable) {
-			return vars.getVarInteger(variable);
+			Integer result = vars.getVarInteger(variable);
+			if (result == -1)
+				return null;
+			
+			return result;
 		}
 
 		public Object getObject(String variable) {
@@ -133,7 +141,11 @@ public class GroupManagerPermissionManager implements PermissionManager {
 		}
 
 		public String getString(String variable) {
-			return vars.getVarString(variable);
+			String result = vars.getVarString(variable);
+			if(result != null && result.isEmpty()) 
+				return null;
+			
+			return result;
 		}
 
 		public void set(String variable, Object val) {

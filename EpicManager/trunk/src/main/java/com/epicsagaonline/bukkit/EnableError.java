@@ -6,6 +6,7 @@ package com.epicsagaonline.bukkit;
  *
  */
 public class EnableError extends Exception {
+	private static final long serialVersionUID = 1L;
 
 	public EnableError() {
 		super();

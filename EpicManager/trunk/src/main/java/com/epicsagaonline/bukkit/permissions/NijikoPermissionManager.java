@@ -186,15 +186,18 @@ public class NijikoPermissionManager implements PermissionManager {
 	 */
 	public void addUser(String name, List<String> permissions) {
 		refreshSource();
-		name = name.toLowerCase();
 		
 		if(permissions != null && permissions.isEmpty())
 			permissions = null;
 		
-		String path = userPath(name);
+		// don't user UserPath here, the user doesn't exist in userCaseMap yet
+		String path = "users."+name;
 		
 		source.setProperty(path+".group", defaultGroup);
 		source.setProperty(path+".permissions", permissions);
+		source.setProperty(path+".info", null);
+		
+		userCaseMap.put(name.toLowerCase(), name);
 		
 		saveSource();
 	}
@@ -225,15 +228,12 @@ public class NijikoPermissionManager implements PermissionManager {
 			refreshSource();
 			if (source.getProperty(path) == null)
 				throw new NotFoundError("user or group doesn't exist: "+path);
+			
+			loadMap();
 		}
 
 		@SuppressWarnings("unchecked")
-		private void refreshMap() {
-			long lastDate = sourceModDate;
-			refreshSource();
-			if (lastDate == sourceModDate)
-				return;
-
+		private void loadMap() {
 			if (source.getProperty(path) == null)
 				throw new IllegalStateException("user or group no longer exists: "+path);
 			
@@ -251,6 +251,15 @@ public class NijikoPermissionManager implements PermissionManager {
 			}
 		}
 		
+		private void refreshMap() {
+			long lastDate = sourceModDate;
+			refreshSource();
+			if (lastDate == sourceModDate)
+				return;
+
+			loadMap();
+		}
+		
 		public void set(String variable, Object val) {
 			refreshMap();
 			map.put(variable, val);
@@ -259,17 +268,32 @@ public class NijikoPermissionManager implements PermissionManager {
 
 		public Boolean getBoolean(String variable) {
 			refreshMap();
-			return (Boolean)map.get(variable); 
+			try {
+				return (Boolean)map.get(variable);
+			}
+			catch (NullPointerException e) {
+				return (Boolean)null;
+			} 
 		}
 
 		public Double getDouble(String variable) {
 			refreshMap();
-			return (Double)map.get(variable); 
+			try {
+				return (Double)map.get(variable); 
+			}
+			catch (NullPointerException e) {
+				return null;
+			} 
 		}
 
 		public Integer getInteger(String variable) {
 			refreshMap();
-			return (Integer)map.get(variable); 
+			try {
+				return (Integer)map.get(variable); 
+			}
+			catch (NullPointerException e) {
+				return null;
+			} 
 		}
 
 		public Object getObject(String variable) {
@@ -281,6 +305,9 @@ public class NijikoPermissionManager implements PermissionManager {
 			refreshMap();
 			
 			Object result = map.get(variable);
+			if (result == null)
+				return null;
+			
 			if(result instanceof String)
 				return (String)result;
 			else
