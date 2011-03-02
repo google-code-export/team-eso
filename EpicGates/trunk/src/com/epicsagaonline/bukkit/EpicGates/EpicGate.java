@@ -1,3 +1,34 @@
+/*
+
+        This file is part of EpicGates
+
+        Copyright (C) 2011 by Team ESO
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in
+        all copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+        THE SOFTWARE.
+
+ */
+
+/**
+ * @author jblaske@gmail.com
+ * @license MIT License
+ */
+
 package com.epicsagaonline.bukkit.EpicGates;
 
 import org.bukkit.Location;
@@ -10,6 +41,14 @@ public class EpicGate {
 	private EpicGate target = null;
 	private Location landing = null;
 	private char direction = 'N';
+
+	public EpicGate(String tag, Location loc, float yaw)
+	{
+		this.tag = tag;
+		this.location = loc;
+		this.direction = getDirection(yaw);
+		setLanding();	
+	}
 
 	public EpicGate(String data)
 	{
@@ -40,13 +79,14 @@ public class EpicGate {
 			y =	Double.parseDouble(split[3].trim());
 			z =	Double.parseDouble(split[4].trim());
 
-			if(x > 0){x += 0.5;}else{x -= 0.5;}
-			if(z > 0){z += 0.5;}else{z -= 0.5;}
-
+			//if(x > 0){x += 0.5;}else{x -= 0.5;}
+			//if(z > 0){z += 0.5;}else{z -= 0.5;}
+			x += 0.5;
+			z += 0.5;
 			this.location = new Location(General.plugin.getServer().getWorld(split[1].trim()), x, y, z);
 		}
 
-		this.targetTag=split[5].trim();
+		this.targetTag = split[5].trim();
 
 		if(split.length > 6)
 		{
@@ -72,12 +112,78 @@ public class EpicGate {
 	public void setTarget(EpicGate value)
 	{
 		this.target = value;
+		if(value != null)
+		{
+			this.targetTag = value.getTag();
+		}
+		else
+		{
+			this.targetTag = "";
+		}
+	}
+
+	public void setLocation(Location value)
+	{
+		this.location = value;
+		setLanding();
+	}
+
+	public void setDirection(String value)
+	{
+
+		char dir;
+
+		if(value.equalsIgnoreCase("n") || value.equalsIgnoreCase("north"))
+		{
+			dir = 'N';
+		}
+		else if(value.equalsIgnoreCase("e") || value.equalsIgnoreCase("east"))
+		{
+			dir = 'E';
+		}
+		else if(value.equalsIgnoreCase("s") || value.equalsIgnoreCase("south"))
+		{
+			dir = 'S';
+		}
+		else if(value.equalsIgnoreCase("w") || value.equalsIgnoreCase("west"))
+		{
+			dir = 'W';
+		}
+		else
+		{
+			dir = 'N';
+		}
+
+		this.direction = dir;
+		setLanding();
 	}
 
 	private boolean IsNumeric(String data)
 	{
 		if (data.matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+")){return true;}
 		else {return false;} 
+	}
+
+	private char getDirection(float yaw)
+	{
+		yaw = Math.abs(yaw);
+		yaw = (float) (yaw - (360 * Math.abs(Math.floor(yaw / 360))));
+		if( yaw >= 45 && yaw <= 105)
+		{
+			return 'N';
+		}
+		else if( yaw >= 105 && yaw <= 195)
+		{
+			return 'E';
+		}
+		else if( yaw >= 195 && yaw <= 285)
+		{
+			return 'S';
+		}
+		else
+		{
+			return 'W';
+		}
 	}
 
 	private void setLanding()

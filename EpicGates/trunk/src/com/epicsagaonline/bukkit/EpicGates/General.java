@@ -1,3 +1,34 @@
+/*
+
+        This file is part of EpicGates
+
+        Copyright (C) 2011 by Team ESO
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in
+        all copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+        THE SOFTWARE.
+
+ */
+
+/**
+ * @author jblaske@gmail.com
+ * @license MIT License
+ */
+
 package com.epicsagaonline.bukkit.EpicGates;
 
 import java.io.BufferedWriter;
@@ -54,7 +85,7 @@ public class General {
 		}
 
 		LinkGates();
-
+		
 	}
 
 	private static void LinkGates()
@@ -65,7 +96,14 @@ public class General {
 			EpicGate gate = myGates.get(gateTag);
 			if(gate.getTargetTag().length() > 0)
 			{
-				myGates.get(gateTag).setTarget(myGates.get(gate.getTargetTag()));
+				if(myGates.get(gate.getTargetTag()) != null)
+				{
+					myGates.get(gateTag).setTarget(myGates.get(gate.getTargetTag()));
+				}
+				else
+				{
+					myGates.get(gateTag).setTarget(null);
+				}
 			}
 		}
 	}
@@ -96,11 +134,10 @@ public class General {
 	{
 		String result = "#Gate Tag|World|X|Y|Z|Target Tag\n";
 		String line = "";
-
+		
 		for(String gateTag: myGateTags)
 		{
 			EpicGate gate = myGates.get(gateTag);
-			
 			line = gate.getTag() + ",";
 			line = line + gate.getLocation().getWorld().getName() + ",";
 			line = line + gate.getLocation().getBlockX() + ",";

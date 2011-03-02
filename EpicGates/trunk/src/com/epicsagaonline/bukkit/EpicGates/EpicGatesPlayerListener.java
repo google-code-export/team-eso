@@ -1,8 +1,38 @@
+/*
+
+        This file is part of EpicGates
+
+        Copyright (C) 2011 by Team ESO
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in
+        all copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+        THE SOFTWARE.
+
+ */
+
+/**
+ * @author jblaske@gmail.com
+ * @license MIT License
+ */
+
 package com.epicsagaonline.bukkit.EpicGates;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -39,15 +69,6 @@ public class EpicGatesPlayerListener extends PlayerListener
 					egp.Teleported();
 				}
 			}
-		}
-	}
-
-	public @Override void onPlayerCommand(PlayerChatEvent event)
-	{
-		if(!event.isCancelled())
-		{
-			String[] split = event.getMessage().split("\\s");
-			if (split[0].equalsIgnoreCase("/epicgates")){}
 		}
 	}
 
@@ -88,13 +109,16 @@ public class EpicGatesPlayerListener extends PlayerListener
 		for(String gateTag: General.myGateTags)
 		{
 			EpicGate gate = General.myGates.get(gateTag);
-			if(gate.getLocation().getWorld().getName().equalsIgnoreCase(loc.getWorld().getName()))
+			if(gate != null)
 			{
-				if(gate.getTargetTag().length() > 0)
+				if(gate.getLocation().getWorld().getName().equalsIgnoreCase(loc.getWorld().getName()))
 				{
-					if(PlayerWithinGate(gate, loc))
+					if(gate.getTargetTag().length() > 0)
 					{
-						return gate;
+						if(PlayerWithinGate(gate, loc))
+						{
+							return gate;
+						}
 					}
 				}
 			}
@@ -106,7 +130,7 @@ public class EpicGatesPlayerListener extends PlayerListener
 	{
 
 		boolean result = false;
-		
+
 		if ((int)gate.getLocation().getBlockY() == (int)playerLoc.getBlockY())
 		{
 			if(playerLoc.getX() <= Math.ceil(gate.getLocation().getX()) && playerLoc.getX() >= Math.floor(gate.getLocation().getX()))

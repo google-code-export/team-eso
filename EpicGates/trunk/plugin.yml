@@ -1,3 +1,24 @@
 name: EpicGates
 main: com.epicsagaonline.bukkit.EpicGates.EpicGates
-version: 0.2
+version: 0.3
+website: http://code.google.com/p/team-eso/
+author: jblaske@gmail.com
+description: >
+             Provides in world static teleportation.
+commands:
+  gate:
+    description: Houses all of the commands for EpicGates gate modification.
+    usage: |
+           /<command> <subcommand> [Value] [Value] [Value]
+           Example: /<command> create [tag] - Creates a new gate with the provided tag.
+  reloadeg:
+    aliases: reload
+    description: Reloads all of EpicGates configuration settings.
+    usage: |
+           /<command>
+           Example: /<command> - Reloads EpicGates.
+  world:
+    description: Houses all of the commands for EpicGates world modification.
+    usage: |
+           /<command> <subcommand> [Value] [Value] [Value]
+           Example: /<command> create [name] - Creates a new world with the provided name.
