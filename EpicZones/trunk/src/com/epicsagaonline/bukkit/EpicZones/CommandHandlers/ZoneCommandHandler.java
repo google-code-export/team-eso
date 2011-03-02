@@ -547,14 +547,14 @@ public class ZoneCommandHandler implements CommandHandler {
 			{
 				String messageText;
 				Zone zone = General.myZones.get(zoneTag);
-				messageText = zone.getName() + " [" + zone.getTag() + "]";
+				messageText = ChatColor.GREEN + zone.getName() + ChatColor.GOLD + " [" + zone.getTag() + "]";
 				if(zone.hasChildren())
 				{
-					messageText = messageText + " | Children (" + zone.getChildren().size() + ")";
+					messageText = messageText + ChatColor.WHITE + " | " + ChatColor.GREEN + "Children " + ChatColor.GOLD + "(" + zone.getChildren().size() + ")";
 				}
 				if(zone.hasParent())
 				{
-					messageText = messageText + " | Parent Zone: " + zone.getParent().getTag();
+					messageText = messageText + ChatColor.WHITE + " | " + ChatColor.GREEN + "Parent " + ChatColor.GOLD + "[" + zone.getParent().getTag() + "]";
 				}
 				sender.sendMessage(messageText);
 			}

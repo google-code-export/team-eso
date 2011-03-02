@@ -73,16 +73,7 @@ public class PermissionsManager
 	}
 
 	public boolean hasPermission(Player player, String permission)
-	{
-		
-		System.out.print("Perms Null? " + (Permissions_Perms == null));
-		System.out.print("Perms Tested: " + permission);
-		System.out.print("Player Tested: " + player.getName());
-		if(Permissions_Perms != null)
-		{
-			System.out.print("Has Perms? " + Permissions_Perms.has(player, permission));
-		}
-		
+	{		
 		if(General.config.permissionSystem.equalsIgnoreCase("GroupManager"))
 		{
 			return (GroupManager_Perms != null && GroupManager_Perms.has(player, permission));	
