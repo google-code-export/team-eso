@@ -62,7 +62,6 @@ public class LBlock extends BlockListener {
 		{
 			if(!zone.getAllowFire())
 			{
-				//System.out.println("Cancel Ignite [" + zone.getTag() + "]");
 				event.setCancelled(true);
 			}
 		}
@@ -75,7 +74,6 @@ public class LBlock extends BlockListener {
 		{
 			if(!zone.getAllowFire())
 			{
-				//System.out.println("Cancel Burn [" + zone.getTag() + "]");
 				event.setCancelled(true);
 			}
 		}

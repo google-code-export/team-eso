@@ -22,12 +22,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-*/
+ */
 
 /**
-* @author jblaske@gmail.com
-* @license MIT License
-*/
+ * @author jblaske@gmail.com
+ * @license MIT License
+ */
 
 package com.epicsagaonline.bukkit.EpicZones;
 
@@ -44,17 +44,27 @@ public class HeroChatIntegration
 			if(EpicZones.heroChat != null)
 			{
 				Zone theZone = General.myZones.get(zoneTag);
-				while(EpicZones.heroChat.getChannel(theZone.getTag()) == null && theZone.hasParent())
+				if (theZone != null)
 				{
-					theZone = General.myZones.get(theZone.getParent().getTag());
-				}
-				if(!ezp.getPreviousZoneTag().equals(theZone.getTag()))
-				{
-					EpicZones.heroChat.getChannel(theZone.getTag()).addPlayer(player);
-					EpicZones.heroChat.setActiveChannel(player, EpicZones.heroChat.getChannel(zoneTag));
+					while(EpicZones.heroChat.getChannelManager().getChannel(theZone.getTag()) == null && theZone.hasParent())
+					{
+						theZone = General.myZones.get(theZone.getParent().getTag());
+					}
+					if(!ezp.getPreviousZoneTag().equals(theZone.getTag()))
+					{
+						if (EpicZones.heroChat.getChannelManager().getChannel(theZone.getTag()) != null)
+						{
+							EpicZones.heroChat.getChannelManager().getChannel(theZone.getTag()).addPlayer(player.getName());
+							if (ezp.getHasMoved())
+							{
+								EpicZones.heroChat.getChannelManager().setActiveChannel(player.getName(), zoneTag);
+							}
+						}
+					}
 				}
 			}
 		}
+
 	}
 
 	public static void leaveChat(String zoneTag, Player player)
@@ -63,9 +73,9 @@ public class HeroChatIntegration
 		{
 			if(EpicZones.heroChat != null)
 			{
-				if(EpicZones.heroChat.getChannel(zoneTag) != null)
+				if(EpicZones.heroChat.getChannelManager().getChannel(zoneTag) != null)
 				{
-					EpicZones.heroChat.getChannel(zoneTag).removePlayer(player);
+					EpicZones.heroChat.getChannelManager().getChannel(zoneTag).removePlayer(player.getName());
 				}
 			}
 		}

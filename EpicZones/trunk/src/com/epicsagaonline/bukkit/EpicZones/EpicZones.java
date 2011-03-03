@@ -42,12 +42,12 @@ import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
-import com.herocraftonline.dthielke.herochat.HeroChatPlugin;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.CommandHandler;
 import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.ReloadCommandHandler;
 import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.WhoCommandHandler;
 import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.ZoneCommandHandler;
+import com.herocraftonline.dthielke.herochat.HeroChat;
 
 import org.bukkit.plugin.Plugin;
 
@@ -72,10 +72,11 @@ public class EpicZones extends JavaPlugin
 	private static CommandHandler zoneCommandHandler = new ZoneCommandHandler();
 	private static CommandHandler whoCommandHandler = new WhoCommandHandler();
 
-	public static HeroChatPlugin heroChat = null;
+	public static HeroChat heroChat = null;
 	public static PermissionsManager permissions;
 
-	public void onEnable() {
+	public void onEnable() 
+	{
 
 		File file = new File(this.getDataFolder() + File.separator + CONFIG_FILE);
 		General.config = new Config(file);
@@ -112,13 +113,12 @@ public class EpicZones extends JavaPlugin
 			setupHeroChat();
 			setupPermissions();
 
-			System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled." );
+			Log.Write("version " + pdfFile.getVersion() + " is enabled.");
 
 		} 
 		catch (Throwable e) 
 		{
-			System.out.println( "["+pdfFile.getName()+"]" + " error starting: "+
-					e.getMessage() +" Disabling plugin" );
+			Log.Write(" error starting: " + e.getMessage() +" Disabling plugin");
 			this.getServer().getPluginManager().disablePlugin(this);
 		}
 	}
@@ -126,7 +126,7 @@ public class EpicZones extends JavaPlugin
 	public void onDisable() 
 	{
 		PluginDescriptionFile pdfFile = this.getDescription();	
-		System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is disabled." );
+		Log.Write("version " + pdfFile.getVersion() + " is disabled.");
 	}
 
 	public void registerCommand(String command, CommandHandler handler) {
@@ -171,7 +171,8 @@ public class EpicZones extends JavaPlugin
 			Plugin test = this.getServer().getPluginManager().getPlugin("HeroChat");
 			if (test != null)
 			{
-				heroChat = (HeroChatPlugin)test;
+				heroChat = (HeroChat)test;
+				Log.Write("HeroChat Integration Enabled.");
 			}
 		}
 	}

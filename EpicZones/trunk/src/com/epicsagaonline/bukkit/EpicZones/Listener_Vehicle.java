@@ -22,12 +22,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-*/
+ */
 
 /**
-* @author jblaske@gmail.com
-* @license MIT License
-*/
+ * @author jblaske@gmail.com
+ * @license MIT License
+ */
 
 package com.epicsagaonline.bukkit.EpicZones;
 
@@ -121,10 +121,18 @@ public class Listener_Vehicle extends VehicleListener
 			}
 			else
 			{
-				if (ezp.getCurrentZone() != null)
+				if(General.hasPermissions(player, null, "entry"))
 				{
-					if(ezp.getCurrentZone().getExitText().length() > 0){player.sendMessage(ezp.getCurrentZone().getExitText());}
-					ezp.setCurrentZone(null);
+					if (ezp.getCurrentZone() != null)
+					{
+						if(ezp.getCurrentZone().getExitText().length() > 0){player.sendMessage(ezp.getCurrentZone().getExitText());}
+						ezp.setCurrentZone(null);
+					}
+				}
+				else
+				{
+					General.WarnPlayer(player, ezp, General.NO_PERM_ENTER + player.getWorld().getName());
+					return false;
 				}
 			}
 		}

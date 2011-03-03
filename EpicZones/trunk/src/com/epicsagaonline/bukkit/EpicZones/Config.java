@@ -94,8 +94,6 @@ public class Config extends Configuration {
 		if(file == null)
 			throw new IllegalArgumentException("file cannot be null");
 
-		//System.out.println(file.toString());
-
 		if(!file.exists()) {
 			try {
 				file.createNewFile();

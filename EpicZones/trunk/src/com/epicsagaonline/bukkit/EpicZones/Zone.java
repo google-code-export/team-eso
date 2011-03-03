@@ -125,7 +125,7 @@ public class Zone {
 
 			rebuildBoundingBox();
 
-			System.out.println("Created Zone [" + this.name + "]");
+			Log.Write("Created Zone [" + this.name + "]");
 		}
 
 	}
@@ -561,7 +561,7 @@ public class Zone {
 	private void buildPolygon(String data)
 	{
 		String[] dataList = data.split("\\s");
-		//System.out.println("Data: " + data);
+
 		if (dataList.length > 2)
 		{
 			this.polygon = new Polygon();
@@ -577,9 +577,7 @@ public class Zone {
 			String[] split = dataList[0].split(":");
 			this.polygon = null;
 			this.center = new Point(Integer.valueOf(split[0]), Integer.valueOf(split[1]));
-			//System.out.println("Center: " + this.center.x + " " + this.center.y);
 			this.radius = Integer.valueOf(dataList[1]);
-			//System.out.println("Radius: " + this.radius);
 		}
 	}
 
@@ -659,8 +657,6 @@ public class Zone {
 		double xsquared = x * x;
 		double ysquared = y * y;
 		double distanceFromCenter = Math.sqrt(xsquared + ysquared);
-		//System.out.println(this.center);
-		//System.out.println(x + " " + y);
 		return distanceFromCenter <= this.radius;
 
 	}

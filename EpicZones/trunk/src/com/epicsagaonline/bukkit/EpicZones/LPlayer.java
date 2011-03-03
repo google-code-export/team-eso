@@ -22,12 +22,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-*/
+ */
 
 /**
-* @author jblaske@gmail.com
-* @license MIT License
-*/
+ * @author jblaske@gmail.com
+ * @license MIT License
+ */
 
 package com.epicsagaonline.bukkit.EpicZones;
 
@@ -52,7 +52,7 @@ import com.epicsagaonline.bukkit.EpicZones.EpicZonePlayer.EpicZoneMode;
  */
 public class LPlayer extends PlayerListener
 {
-	
+
 	private static final String NO_PERM_BUCKET = "You do not have permissions to do that in this zone.";
 	private static final int EMPTY_BUCKET = 325;
 	private Set<Integer> itemsOfDestruction = new HashSet<Integer>();
@@ -92,6 +92,7 @@ public class LPlayer extends PlayerListener
 			}
 			ezp.Check();
 		}
+		ezp.setHasMoved(true);
 	}
 
 	public @Override void onPlayerTeleport(PlayerMoveEvent event)
@@ -204,7 +205,7 @@ public class LPlayer extends PlayerListener
 			}
 		}
 	}
-	
+
 	private boolean PlayerWithinZoneLogic(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint)
 	{
 
@@ -213,7 +214,7 @@ public class LPlayer extends PlayerListener
 		if(General.pointWithinBorder(playerPoint, player))
 		{
 			foundZone = FindZone(player, ezp, playerHeight, playerPoint, worldName);
-			
+
 			if(foundZone != null)
 			{
 				if (ezp.getCurrentZone() == null || foundZone != ezp.getCurrentZone())
@@ -235,11 +236,19 @@ public class LPlayer extends PlayerListener
 			}
 			else
 			{
-				if (ezp.getCurrentZone() != null)
+				if(General.hasPermissions(player, null, "entry"))
 				{
-					if(ezp.getCurrentZone().getExitText().length() > 0){player.sendMessage(ezp.getCurrentZone().getExitText());}
-					HeroChatIntegration.leaveChat(ezp.getCurrentZone().getTag(), player);
-					ezp.setCurrentZone(null);
+					if (ezp.getCurrentZone() != null)
+					{
+						if(ezp.getCurrentZone().getExitText().length() > 0){player.sendMessage(ezp.getCurrentZone().getExitText());}
+						HeroChatIntegration.leaveChat(ezp.getCurrentZone().getTag(), player);
+						ezp.setCurrentZone(null);
+					}
+				}
+				else
+				{
+					General.WarnPlayer(player, ezp, General.NO_PERM_ENTER + player.getWorld().getName());
+					return false;
 				}
 			}
 		}

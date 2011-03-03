@@ -109,19 +109,6 @@ public class General {
 
 	public static boolean hasPermissions(Player player, Zone zone, String flag)
 	{
-
-		//				if(zone != null)
-		//				{
-		//				System.out.println("Zone Tag: " + zone.getTag());
-		//				System.out.println("Has Parent: " + zone.hasParent());
-		//				System.out.println("Permission Allow Check: " + "epiczones." + zone.getTag() + "." + flag);
-		//				System.out.println("Permission Deny Check: " + "epiczones." + zone.getTag() + "." + flag + ".deny");
-		//				System.out.println("Permission Allow Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag));
-		//				System.out.println("Permission Deny Result: " + EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny"));
-		//				System.out.println("Permission Composite Result: " + (EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag) && !EpicZones.permissions.has(player, "epiczones." + zone.getTag() + "." + flag + ".deny")));
-		//				System.out.println("Player Can Ignore Permissions: " + EpicZones.permissions.has(player, "epiczones.ignorepermissions"));
-		//				}
-
 		if(!EpicZones.permissions.hasPermission(player, "epiczones.ignorepermissions"))
 		{
 			if(zone == null)
@@ -166,7 +153,6 @@ public class General {
 		}
 		else
 		{
-			//System.out.println("6");
 			return true;
 		}
 	}
@@ -211,7 +197,7 @@ public class General {
 		}
 		catch(Exception e)
 		{
-			System.out.println(e.getMessage());
+			Log.Write(e.getMessage());
 		}
 
 		reconcileChildren();
@@ -228,7 +214,6 @@ public class General {
 			Zone zone = myZones.get(zoneTag);
 			if(zone.hasChildren())
 			{
-				//System.out.println("Attaching Child Zones To " + zone.getName() + "[" + zone.getTag() + "].");
 				for(String child: zone.getChildrenTags())
 				{
 
@@ -236,7 +221,6 @@ public class General {
 
 					if(childZone != null)
 					{
-						//System.out.println("\t" + childZone.getName() + "[" + childZone.getTag() + "] added as a child of " + zone.getName() + "[" + zone.getTag() + "].");
 						childZone.setParent(zone);
 						zone.addChild(childZone);
 
@@ -245,7 +229,7 @@ public class General {
 					}
 					else
 					{
-						System.out.println("[" + zoneTag + "] Invalid Child Zone Detected > [" + child + "]");
+						Log.Write("The zone [" + zoneTag + "] has an invalid child > [" + child + "]");
 						badChildren.add(child);
 					}
 				}
@@ -282,7 +266,7 @@ public class General {
 		}
 		catch(Exception e)
 		{
-			System.out.println(e.getMessage());
+			Log.Write(e.getMessage());
 		}
 	}
 

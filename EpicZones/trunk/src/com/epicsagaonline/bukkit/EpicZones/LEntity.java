@@ -58,7 +58,6 @@ public class LEntity extends EntityListener
 		{
 			if(!zone.getAllowExplode())
 			{
-				//System.out.println("Cancel Explosion [" + zone.getTag() + "]");
 				event.setCancelled(true);
 			}
 		}
@@ -115,7 +114,6 @@ public class LEntity extends EntityListener
 			{
 				if (zone.getAllowedMobs().contains("none") || !zone.getAllowedMobs().contains(mob.getClass().getName()))
 				{
-					//System.out.println("Creature Class:" + event.getEntity().getClass().getName() + " Not Allowed Within " + zone.getTag());
 					event.setCancelled(true);
 				}
 			}
