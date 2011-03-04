@@ -32,6 +32,7 @@ THE SOFTWARE.
 package com.epicsagaonline.bukkit.EpicZones;
 
 import org.anjocaido.groupmanager.GroupManager;
+import org.anjocaido.groupmanager.dataholder.worlds.WorldsHolder;
 import org.bukkit.plugin.Plugin;
 
 import org.bukkit.entity.Player;
@@ -47,7 +48,7 @@ import com.nijikokun.bukkit.Permissions.Permissions;
  */
 public class PermissionsManager
 {
-	private PermissionHandler GroupManager_Perms;
+	private WorldsHolder GroupManager_Perms;
 	private PermissionHandler Permissions_Perms;
 	private EpicZones plugin;
 
@@ -76,7 +77,7 @@ public class PermissionsManager
 	{		
 		if(General.config.permissionSystem.equalsIgnoreCase("GroupManager"))
 		{
-			return (GroupManager_Perms != null && GroupManager_Perms.has(player, permission));	
+			return (GroupManager_Perms != null && GroupManager_Perms.getWorldData(player).getPermissionsHandler().has(player, permission));	
 		}
 		else if (General.config.permissionSystem.equalsIgnoreCase("Permissions"))
 		{
@@ -94,8 +95,9 @@ public class PermissionsManager
 			{
 				plugin.getServer().getPluginManager().enablePlugin(p);
 			}
-			GroupManager_Perms = ((GroupManager) p).getPermissionHandler();
-			return true;
+			GroupManager gm = (GroupManager) p;
+			GroupManager_Perms = gm.getWorldsHolder();
+			return GroupManager_Perms != null;
 		}
 		return false;
 	}

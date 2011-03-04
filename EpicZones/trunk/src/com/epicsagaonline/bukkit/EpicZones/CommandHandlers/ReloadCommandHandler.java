@@ -42,9 +42,11 @@ public class ReloadCommandHandler implements CommandHandler {
 
 		if((sender instanceof Player && EpicZones.permissions.hasPermission((Player)sender, "epiczones.admin")) || !(sender instanceof Player))
 		{
+			General.plugin.setupEpicZones();
 			General.plugin.setupPermissions();
 			General.plugin.setupHeroChat();
-			General.plugin.setupEpicZones();
+			General.plugin.setupMultiWorld();
+			
 			sender.sendMessage("EpicZones Reloaded.");
 			return true;
 		}

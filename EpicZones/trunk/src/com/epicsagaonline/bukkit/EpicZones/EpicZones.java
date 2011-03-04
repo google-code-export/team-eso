@@ -109,9 +109,11 @@ public class EpicZones extends JavaPlugin
 			getServer().getScheduler().scheduleAsyncRepeatingTask(this, regen, 10, 10);
 
 			registerCommands();
+			
 			setupEpicZones();
-			setupHeroChat();
 			setupPermissions();
+			setupHeroChat();
+			setupMultiWorld();
 
 			Log.Write("version " + pdfFile.getVersion() + " is enabled.");
 
@@ -164,6 +166,26 @@ public class EpicZones extends JavaPlugin
 		EpicZones.permissions = new PermissionsManager(this);
 	}
 
+	public void setupMultiWorld()
+	{
+		EnablePlugin("EpicGates", "Multi World");
+		EnablePlugin("MultiVerse", "Multi World");
+	}
+	
+	private void EnablePlugin(String pluginName, String pluginType)
+	{
+		Plugin plg;
+		plg = this.getServer().getPluginManager().getPlugin(pluginName);
+		if (plg != null)
+		{
+			if (!plg.isEnabled())
+			{
+				Log.Write("Detected " + pluginType + " Plugin > " + pluginName + " > Enabling...");
+				this.getServer().getPluginManager().enablePlugin(plg);
+			}
+		}
+	}
+	
 	public void setupHeroChat()
 	{
 		if(General.config.enableHeroChat)

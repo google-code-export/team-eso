@@ -45,7 +45,7 @@ public class WhoCommandHandler implements CommandHandler {
 
 	public boolean onCommand(String command, CommandSender sender, String[] args) {
 
-		if((sender instanceof Player && EpicZones.permissions.hasPermission((Player)sender, "epiczones.admin")))
+		if((sender instanceof Player && EpicZones.permissions.hasPermission((Player)sender, "epiczones.who")))
 		{
 			Player player = (Player)sender;
 			int pageNumber = 1;
@@ -65,6 +65,7 @@ public class WhoCommandHandler implements CommandHandler {
 						}
 					}
 					buildWho(General.getPlayer(player.getName()), player, sender, pageNumber, true);
+					return true;
 				}
 				else
 				{

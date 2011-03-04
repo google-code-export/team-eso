@@ -41,37 +41,40 @@ public class HeroChatIntegration
 	{
 		if(General.config.enableHeroChat)
 		{
-			if(EpicZones.heroChat != null)
+			if(EpicZones.heroChat != null && EpicZones.heroChat.isEnabled())
 			{
 				Zone theZone = General.myZones.get(zoneTag);
 				if (theZone != null)
 				{
-					while(EpicZones.heroChat.getChannelManager().getChannel(theZone.getTag()) == null && theZone.hasParent())
+					if (EpicZones.heroChat.getChannelManager() != null)
 					{
-						theZone = General.myZones.get(theZone.getParent().getTag());
-					}
-					if(!ezp.getPreviousZoneTag().equals(theZone.getTag()))
-					{
-						if (EpicZones.heroChat.getChannelManager().getChannel(theZone.getTag()) != null)
+						while(EpicZones.heroChat.getChannelManager().getChannel(theZone.getTag()) == null && theZone.hasParent())
 						{
-							EpicZones.heroChat.getChannelManager().getChannel(theZone.getTag()).addPlayer(player.getName());
-							if (ezp.getHasMoved())
+							theZone = General.myZones.get(theZone.getParent().getTag());
+						}
+						if(!ezp.getPreviousZoneTag().equals(theZone.getTag()))
+						{
+							if (EpicZones.heroChat.getChannelManager().getChannel(theZone.getTag()) != null)
 							{
-								EpicZones.heroChat.getChannelManager().setActiveChannel(player.getName(), zoneTag);
+								EpicZones.heroChat.getChannelManager().getChannel(theZone.getTag()).addPlayer(player.getName());
+								if (ezp.getHasMoved())
+								{
+									EpicZones.heroChat.getChannelManager().setActiveChannel(player.getName(), zoneTag);
+								}
 							}
 						}
 					}
 				}
 			}
 		}
-
 	}
+
 
 	public static void leaveChat(String zoneTag, Player player)
 	{
 		if(General.config.enableHeroChat)
 		{
-			if(EpicZones.heroChat != null)
+			if(EpicZones.heroChat != null && EpicZones.heroChat.isEnabled())
 			{
 				if(EpicZones.heroChat.getChannelManager().getChannel(zoneTag) != null)
 				{
