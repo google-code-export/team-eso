@@ -29,15 +29,15 @@ THE SOFTWARE.
  * @license MIT License
  */
 
-package integration;
+package com.epicsagaonline.bukkit.EpicZones.integration;
 
-import objects.EpicZonePlayer;
-import objects.EpicZone;
 
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
 public class HeroChatIntegration 
 

@@ -1,8 +1,9 @@
 package com.epicsagaonline.bukkit.EpicZones;
 
-import objects.EpicZone;
 
 import org.bukkit.entity.Player;
+
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 
 public class ZonePermissionsHandler 
 {

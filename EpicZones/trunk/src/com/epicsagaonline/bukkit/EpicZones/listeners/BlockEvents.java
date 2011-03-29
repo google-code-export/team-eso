@@ -29,13 +29,11 @@ THE SOFTWARE.
  * @license MIT License
  */
 
-package listeners;
+package com.epicsagaonline.bukkit.EpicZones.listeners;
 
 import java.awt.Point;
 import java.util.Date;
 
-import objects.EpicZonePlayer;
-import objects.EpicZone;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -47,6 +45,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
 /**
  * EpicZones block listener

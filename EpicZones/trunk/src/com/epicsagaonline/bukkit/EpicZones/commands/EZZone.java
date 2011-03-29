@@ -31,9 +31,6 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import objects.EpicZonePlayer;
-import objects.EpicZone;
-import objects.EpicZonePlayer.EpicZoneMode;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -41,6 +38,9 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 
 public class EZZone implements CommandHandler {
 

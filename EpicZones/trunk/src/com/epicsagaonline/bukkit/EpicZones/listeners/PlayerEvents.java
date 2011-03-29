@@ -29,18 +29,14 @@ THE SOFTWARE.
  * @license MIT License
  */
 
-package listeners;
+package com.epicsagaonline.bukkit.EpicZones.listeners;
 
-import integration.HeroChatIntegration;
 
 import java.awt.Point;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import objects.EpicZonePlayer;
-import objects.EpicZone;
-import objects.EpicZonePlayer.EpicZoneMode;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -54,6 +50,10 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
+import com.epicsagaonline.bukkit.EpicZones.integration.HeroChatIntegration;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 
 
 /**

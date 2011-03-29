@@ -33,10 +33,11 @@ package com.epicsagaonline.bukkit.EpicZones;
 
 import java.util.ArrayList;
 
-import objects.EpicZonePlayer;
-import objects.EpicZone;
 
 import org.bukkit.entity.Player;
+
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
 public class Regen implements Runnable {
 

@@ -29,7 +29,7 @@ THE SOFTWARE.
 * @license MIT License
 */
 
-package objects;
+package com.epicsagaonline.bukkit.EpicZones.objects;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;

@@ -43,12 +43,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import objects.EpicZonePlayer;
-import objects.EpicZone;
 
 import org.bukkit.entity.Player;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
 public class General {
 

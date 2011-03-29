@@ -29,12 +29,10 @@ THE SOFTWARE.
  * @license MIT License
  */
 
-package listeners;
+package com.epicsagaonline.bukkit.EpicZones.listeners;
 
 import java.awt.Point;
 
-import objects.EpicZonePlayer;
-import objects.EpicZone;
 
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
@@ -48,6 +46,8 @@ import org.bukkit.event.entity.EntityListener;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
 public class EntityEvents extends EntityListener 
 {

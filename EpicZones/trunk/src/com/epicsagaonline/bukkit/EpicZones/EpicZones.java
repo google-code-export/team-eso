@@ -31,16 +31,11 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones;
 
-import integration.PermissionsManager;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import listeners.BlockEvents;
-import listeners.EntityEvents;
-import listeners.PlayerEvents;
-import listeners.VehicleEvents;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -54,6 +49,11 @@ import com.epicsagaonline.bukkit.EpicZones.commands.CommandHandler;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZReload;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZWho;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZone;
+import com.epicsagaonline.bukkit.EpicZones.integration.PermissionsManager;
+import com.epicsagaonline.bukkit.EpicZones.listeners.BlockEvents;
+import com.epicsagaonline.bukkit.EpicZones.listeners.EntityEvents;
+import com.epicsagaonline.bukkit.EpicZones.listeners.PlayerEvents;
+import com.epicsagaonline.bukkit.EpicZones.listeners.VehicleEvents;
 import com.herocraftonline.dthielke.herochat.HeroChat;
 
 import org.bukkit.plugin.Plugin;
