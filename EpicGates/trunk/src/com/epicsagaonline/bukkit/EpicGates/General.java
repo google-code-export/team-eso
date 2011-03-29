@@ -40,8 +40,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import objects.EpicGate;
-import objects.EpicGatesPlayer;
+import com.epicsagaonline.bukkit.EpicGates.objects.EpicGate;
+import com.epicsagaonline.bukkit.EpicGates.objects.EpicGatesPlayer;
+
 
 public class General {
 

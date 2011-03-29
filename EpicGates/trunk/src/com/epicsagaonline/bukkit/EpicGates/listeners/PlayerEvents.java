@@ -29,10 +29,8 @@
  * @license MIT License
  */
 
-package listeners;
+package com.epicsagaonline.bukkit.EpicGates.listeners;
 
-import objects.EpicGate;
-import objects.EpicGatesPlayer;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -44,6 +42,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.epicsagaonline.bukkit.EpicGates.EpicGates;
 import com.epicsagaonline.bukkit.EpicGates.General;
+import com.epicsagaonline.bukkit.EpicGates.objects.EpicGate;
+import com.epicsagaonline.bukkit.EpicGates.objects.EpicGatesPlayer;
 
 /**
  * Handle events for all Player related events

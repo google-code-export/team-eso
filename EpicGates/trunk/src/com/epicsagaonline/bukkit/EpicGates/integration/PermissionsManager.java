@@ -29,7 +29,7 @@ THE SOFTWARE.
  * @license MIT License
  */
 
-package integration;
+package com.epicsagaonline.bukkit.EpicGates.integration;
 
 import java.util.ArrayList;
 

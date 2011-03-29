@@ -29,9 +29,8 @@
  * @license MIT License
  */
 
-package commands;
+package com.epicsagaonline.bukkit.EpicGates.commands;
 
-import objects.EpicGate;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -42,6 +41,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicGates.EpicGates;
 import com.epicsagaonline.bukkit.EpicGates.General;
+import com.epicsagaonline.bukkit.EpicGates.objects.EpicGate;
 
 public class EGGate implements CommandHandler {
 

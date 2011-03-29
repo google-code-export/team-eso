@@ -29,7 +29,7 @@
  * @license MIT License
  */
 
-package objects;
+package com.epicsagaonline.bukkit.EpicGates.objects;
 
 import java.util.ArrayList;
 

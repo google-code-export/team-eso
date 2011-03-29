@@ -31,15 +31,10 @@
 
 package com.epicsagaonline.bukkit.EpicGates;
 
-import integration.PermissionsManager;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import listeners.PlayerEvents;
-
-import objects.EpicGatesWorld;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -49,11 +44,14 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 
+import com.epicsagaonline.bukkit.EpicGates.integration.PermissionsManager;
+import com.epicsagaonline.bukkit.EpicGates.listeners.PlayerEvents;
+import com.epicsagaonline.bukkit.EpicGates.objects.EpicGatesWorld;
 
-import commands.CommandHandler;
-import commands.EGGate;
-import commands.EGReload;
-import commands.EGWorld;
+import com.epicsagaonline.bukkit.EpicGates.commands.CommandHandler;
+import com.epicsagaonline.bukkit.EpicGates.commands.EGGate;
+import com.epicsagaonline.bukkit.EpicGates.commands.EGReload;
+import com.epicsagaonline.bukkit.EpicGates.commands.EGWorld;
 
 /**
  * EpicZones for Bukkit
