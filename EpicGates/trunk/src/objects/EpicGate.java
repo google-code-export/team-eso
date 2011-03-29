@@ -29,9 +29,15 @@
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicGates;
+package objects;
+
+import java.util.ArrayList;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
+
+import com.epicsagaonline.bukkit.EpicGates.EpicGates;
+import com.epicsagaonline.bukkit.EpicGates.General;
 
 public class EpicGate {
 
@@ -41,6 +47,8 @@ public class EpicGate {
 	private EpicGate target = null;
 	private Location landing = null;
 	private char direction = 'N';
+	private ArrayList<String> allowed = new ArrayList<String>();
+	private ArrayList<String> notAllowed = new ArrayList<String>();
 
 	public EpicGate(String tag, Location loc, float yaw)
 	{
@@ -94,6 +102,16 @@ public class EpicGate {
 			{
 				this.direction = split[6].toUpperCase().trim().charAt(0);
 			}
+
+			if(split.length > 7)
+			{
+				BuildAllowed(split[7]);
+			}
+
+			if(split.length > 8)
+			{
+				BuildNotAllowed(split[8]);
+			}
 		}
 
 		setLanding();
@@ -109,6 +127,44 @@ public class EpicGate {
 	public Location getLanding(){return landing;}
 	public char getDirection(){return direction;}
 
+	public boolean isAllowed(Player player)
+	{
+
+		boolean result = false;
+		String playerName = player.getName();
+		ArrayList<String> groupNames = EpicGates.permissions.getGroupNames(player);
+
+		if(!notAllowed.contains(playerName) && !groupMatch(notAllowed, groupNames))
+		{	
+			if(allowed.size() == 0)
+			{
+				result = true;
+			}
+			else if(allowed.contains(playerName) || groupMatch(allowed, groupNames))
+			{
+				result = true;
+			} 
+		}
+
+		return result;
+	}
+
+	public boolean groupMatch(ArrayList<String> list1, ArrayList<String> list2)
+	{
+		boolean result = false;
+		
+		for(String item2: list2)
+		{
+			if(list1.contains(item2))
+			{
+				result = true;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
 	public void setTarget(EpicGate value)
 	{
 		this.target = value;
@@ -156,6 +212,34 @@ public class EpicGate {
 
 		this.direction = dir;
 		setLanding();
+	}
+
+	private void BuildAllowed(String data)
+	{
+		String[] split = data.split(" ");
+		this.allowed = new ArrayList<String>();
+
+		if(split != null && split.length > 0)
+		{
+			for(String member: split)
+			{
+				this.allowed.add(member);
+			}
+		}
+	}
+
+	private void BuildNotAllowed(String data)
+	{
+		String[] split = data.split(" ");
+		this.notAllowed = new ArrayList<String>();
+
+		if(split != null && split.length > 0)
+		{
+			for(String member: split)
+			{
+				this.notAllowed.add(member);
+			}
+		}
 	}
 
 	private boolean IsNumeric(String data)

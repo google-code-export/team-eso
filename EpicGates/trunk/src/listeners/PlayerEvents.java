@@ -29,25 +29,31 @@
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicGates;
+package listeners;
+
+import objects.EpicGate;
+import objects.EpicGatesPlayer;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+import com.epicsagaonline.bukkit.EpicGates.EpicGates;
+import com.epicsagaonline.bukkit.EpicGates.General;
 
 /**
  * Handle events for all Player related events
  * @author jblaske
  */
-public class EpicGatesPlayerListener extends PlayerListener
+public class PlayerEvents extends PlayerListener
 {
 	//private final EpicGates plugin;
 
-	public EpicGatesPlayerListener(EpicGates instance)
+	public PlayerEvents(EpicGates instance)
 	{
 		//plugin = instance;
 	}
@@ -65,8 +71,11 @@ public class EpicGatesPlayerListener extends PlayerListener
 				EpicGate gate = GetGateForPlayerLocation(event.getTo());
 				if(gate != null)
 				{
-					Warp(event, gate, egp);
-					egp.Teleported();
+					if(gate.isAllowed(player))
+					{
+						Warp(event, gate, egp);
+						egp.Teleported();
+					}
 				}
 			}
 		}
@@ -80,27 +89,18 @@ public class EpicGatesPlayerListener extends PlayerListener
 		}
 	}
 
-	public @Override void onPlayerQuit(PlayerEvent event)
+	public @Override void onPlayerQuit(PlayerQuitEvent event)
 	{
 		General.removePlayer(event.getPlayer().getName());
 	}
-
 
 	private void Warp(PlayerMoveEvent event, EpicGate gate, EpicGatesPlayer egp)
 	{	
 		if(gate != null && gate.getTarget() != null)
 		{
-			if(gate.getTarget().getTargetTag().length() > 0 && !gate.getTag().equals(gate.getTarget().getTargetTag())  && egp.getLoopCount() < 8)
-			{
-				egp.Looped();
-				Warp(event, gate.getTarget(), egp);
-			}
-			else
-			{
-				event.getPlayer().teleportTo(gate.getTarget().getLanding());
-				event.setTo(gate.getTarget().getLanding());
-				egp.setLoopCount(0);
-			}
+			event.getPlayer().teleport(gate.getTarget().getLanding());
+			event.setTo(gate.getTarget().getLanding());
+			egp.setLoopCount(0);
 		}
 	}
 

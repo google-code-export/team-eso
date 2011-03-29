@@ -29,17 +29,26 @@
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicGates.CommandHandlers;
+package commands;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public interface CommandHandler {
-        /**
-         *
-         * @param command
-         * @param sender
-         * @param args
-         * @return true if arguments are not invalid, false if usage should be printed
-         */
-        boolean onCommand(String command, CommandSender sender, String[] args);
+import com.epicsagaonline.bukkit.EpicGates.EpicGates;
+import com.epicsagaonline.bukkit.EpicGates.General;
+
+public class EGReload implements CommandHandler {
+
+	public boolean onCommand(String command, CommandSender sender, String[] args) {
+
+		if((sender instanceof Player && EpicGates.permissions.hasPermission((Player)sender, "epiczones.admin")) || !(sender instanceof Player))
+		{
+			General.plugin.setupPermissions();
+			General.plugin.setupEpicGates();
+			sender.sendMessage("EpicGates Reloaded.");
+			return true;
+		}
+		return false;
+	}
+
 }

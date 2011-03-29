@@ -41,13 +41,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import objects.EpicGatesWorld;
+
 import org.bukkit.World.Environment;
 import org.bukkit.util.config.Configuration;
 import org.bukkit.util.config.ConfigurationNode;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
-public class EpicGatesConfig extends Configuration {
+public class Config extends Configuration {
 	private static final Yaml yaml;
 
 	static {
@@ -62,7 +64,7 @@ public class EpicGatesConfig extends Configuration {
 	public String permissionSystem;
 	public List<EpicGatesWorld> additionalWorlds = new ArrayList<EpicGatesWorld>();
 
-	public EpicGatesConfig(File file)
+	public Config(File file)
 	{
 		super(file);
 

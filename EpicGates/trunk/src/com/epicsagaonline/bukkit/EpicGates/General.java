@@ -40,13 +40,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import objects.EpicGate;
+import objects.EpicGatesPlayer;
+
 public class General {
 
 	public static Map<String, EpicGate> myGates = new HashMap<String, EpicGate>();
 	public static ArrayList<String> myGateTags = new ArrayList<String>();
 	public static Map<String, EpicGatesPlayer> myPlayers = new HashMap<String, EpicGatesPlayer>();
 	
-	public static EpicGatesConfig config;
+	public static Config config;
 	public static final String NO_PERM_ENTER = "You do not have permission to enter ";
 	public static final String NO_PERM_BORDER = "You have reached the border of the map.";
 	public static EpicGates plugin;

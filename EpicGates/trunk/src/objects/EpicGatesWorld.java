@@ -1,4 +1,4 @@
-package com.epicsagaonline.bukkit.EpicGates;
+package objects;
 
 import org.bukkit.World.Environment;
 

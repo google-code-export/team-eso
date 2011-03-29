@@ -29,26 +29,55 @@
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicGates.CommandHandlers;
+package objects;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import java.util.Calendar;
+import java.util.Date;
 
-import com.epicsagaonline.bukkit.EpicGates.EpicGates;
 import com.epicsagaonline.bukkit.EpicGates.General;
 
-public class ReloadCommandHandler implements CommandHandler {
+public class EpicGatesPlayer {
 
-	public boolean onCommand(String command, CommandSender sender, String[] args) {
-
-		if((sender instanceof Player && EpicGates.permissions.hasPermission((Player)sender, "epiczones.admin")) || !(sender instanceof Player))
+	private Date lastCheck = new Date();
+	private int loopCount = 0;
+	
+	public Date getLastCheck(){return lastCheck;}
+	public int getLoopCount(){return loopCount;}
+	
+	public void setLoopCount(int value)
+	{
+		this.loopCount = value;
+	}
+	
+	public void Check()
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MILLISECOND, 100);
+		this.lastCheck = cal.getTime();
+	}
+	
+	public void Looped()
+	{
+		loopCount++;
+	}
+	
+	public void Teleported()
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MILLISECOND, General.config.reteleportDelay * 1000);
+		this.lastCheck = cal.getTime();
+	}
+	
+	public boolean shouldCheck()
+	{
+		if (this.lastCheck.before(new Date()))
 		{
-			General.plugin.setupPermissions();
-			General.plugin.setupEpicGates();
-			sender.sendMessage("EpicGates Reloaded.");
 			return true;
 		}
-		return false;
+		else
+		{
+			return false;
+		}
 	}
-
+	
 }

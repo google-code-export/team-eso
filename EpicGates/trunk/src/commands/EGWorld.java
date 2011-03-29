@@ -29,7 +29,9 @@
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicGates.CommandHandlers;
+package commands;
+
+import objects.EpicGatesWorld;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -39,10 +41,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicGates.EpicGates;
-import com.epicsagaonline.bukkit.EpicGates.EpicGatesWorld;
 import com.epicsagaonline.bukkit.EpicGates.General;
 
-public class WorldCommandHandler implements CommandHandler {
+public class EGWorld implements CommandHandler {
 
 	@Override
 	public boolean onCommand(String command, CommandSender sender, String[] args)
@@ -102,7 +103,7 @@ public class WorldCommandHandler implements CommandHandler {
 			{
 				Location newLoc = player.getLocation().clone();
 				newLoc.setWorld(world);
-				player.teleportTo(newLoc);
+				player.teleport(newLoc);
 			}
 		}
 		else

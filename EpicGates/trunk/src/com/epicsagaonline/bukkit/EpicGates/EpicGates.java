@@ -31,9 +31,15 @@
 
 package com.epicsagaonline.bukkit.EpicGates;
 
+import integration.PermissionsManager;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import listeners.PlayerEvents;
+
+import objects.EpicGatesWorld;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -43,10 +49,11 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 
-import com.epicsagaonline.bukkit.EpicGates.CommandHandlers.CommandHandler;
-import com.epicsagaonline.bukkit.EpicGates.CommandHandlers.GateCommandHandler;
-import com.epicsagaonline.bukkit.EpicGates.CommandHandlers.ReloadCommandHandler;
-import com.epicsagaonline.bukkit.EpicGates.CommandHandlers.WorldCommandHandler;
+
+import commands.CommandHandler;
+import commands.EGGate;
+import commands.EGReload;
+import commands.EGWorld;
 
 /**
  * EpicZones for Bukkit
@@ -56,22 +63,22 @@ import com.epicsagaonline.bukkit.EpicGates.CommandHandlers.WorldCommandHandler;
 public class EpicGates extends JavaPlugin 
 {
 
-	private final EpicGatesPlayerListener playerListener = new EpicGatesPlayerListener(this);
+	private final PlayerEvents playerListener = new PlayerEvents(this);
 	private static final String CONFIG_FILE = "config.yml";
 	private Map<String, CommandHandler> handlers = new HashMap<String, CommandHandler>();
-	private static final String[] GATE_COMMANDS = {"gate"};
-	private static final String[] RELOAD_COMMANDS = {"reload", "reloadeg"};
-	private static final String[] WORLD_COMMANDS = {"world"};
-	private static CommandHandler gateCommandHandler = new GateCommandHandler();
-	private static CommandHandler reloadCommandHandler = new ReloadCommandHandler();
-	private static CommandHandler worldCommandHandler = new WorldCommandHandler();
+	private static final String[] GATE_COMMANDS = {"eggate", "gate"};
+	private static final String[] RELOAD_COMMANDS = {"egreload", "reload"};
+	private static final String[] WORLD_COMMANDS = {"egworld", "world"};
+	private static CommandHandler gateCommandHandler = new EGGate();
+	private static CommandHandler reloadCommandHandler = new EGReload();
+	private static CommandHandler worldCommandHandler = new EGWorld();
 	
 	public static PermissionsManager permissions;
 
 	public void onEnable() {
 
 		File file = new File(this.getDataFolder() + File.separator + CONFIG_FILE);
-		General.config = new EpicGatesConfig(file);
+		General.config = new Config(file);
 		
 		PluginDescriptionFile pdfFile = this.getDescription();
 

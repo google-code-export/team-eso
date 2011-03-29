@@ -22,20 +22,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-*/
+ */
 
 /**
-* @author jblaske@gmail.com
-* @license MIT License
-*/
+ * @author jblaske@gmail.com
+ * @license MIT License
+ */
 
-package com.epicsagaonline.bukkit.EpicGates;
+package integration;
+
+import java.util.ArrayList;
 
 import org.anjocaido.groupmanager.GroupManager;
+import org.anjocaido.groupmanager.dataholder.worlds.WorldsHolder;
 import org.bukkit.plugin.Plugin;
 
 import org.bukkit.entity.Player;
 
+import com.epicsagaonline.bukkit.EpicGates.EpicGates;
+import com.epicsagaonline.bukkit.EpicGates.General;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
@@ -47,7 +52,7 @@ import com.nijikokun.bukkit.Permissions.Permissions;
  */
 public class PermissionsManager
 {
-	private PermissionHandler GroupManager_Perms;
+	private WorldsHolder GroupManager_Perms;
 	private PermissionHandler Permissions_Perms;
 	private EpicGates plugin;
 
@@ -55,7 +60,7 @@ public class PermissionsManager
 	{
 		boolean permStart = false;
 		this.plugin = plugin;
-		
+
 		if(General.config.permissionSystem.equalsIgnoreCase("GroupManager"))
 		{
 			permStart = startGroupManager();	
@@ -64,7 +69,7 @@ public class PermissionsManager
 		{
 			permStart = startPermissions();
 		}
-		
+
 		if (!permStart)
 		{
 			System.out.println("[" + plugin.getDescription().getName() + "] Permission system [" + General.config.permissionSystem + "] not found. Disabling plugin.");
@@ -73,16 +78,44 @@ public class PermissionsManager
 	}
 
 	public boolean hasPermission(Player player, String permission)
-	{
+	{		
 		if(General.config.permissionSystem.equalsIgnoreCase("GroupManager"))
 		{
-			return (GroupManager_Perms != null && GroupManager_Perms.has(player, permission));	
+			return (GroupManager_Perms != null && GroupManager_Perms.getWorldData(player).getPermissionsHandler().has(player, permission));	
 		}
 		else if (General.config.permissionSystem.equalsIgnoreCase("Permissions"))
 		{
 			return (Permissions_Perms != null && Permissions_Perms.has(player, permission));
 		}
 		return false;
+	}
+
+	public ArrayList<String> getGroupNames(Player player)
+	{
+		ArrayList<String> result = new ArrayList<String>();
+
+		if(General.config.permissionSystem.equalsIgnoreCase("GroupManager"))
+		{
+			if(GroupManager_Perms != null)
+			{
+				for(org.anjocaido.groupmanager.data.Group grp: GroupManager_Perms.getWorldData(player).getGroupList())
+				{
+					result.add(grp.getName());
+				}
+			}
+		}
+		else if (General.config.permissionSystem.equalsIgnoreCase("Permissions"))
+		{
+			if(Permissions_Perms != null )
+			{
+				for(String grp: Permissions_Perms.getGroups(player.getWorld().getName(), player.getName()))
+				{
+					result.add(grp);	 
+				}
+			}
+		}
+
+		return result;
 	}
 
 	public boolean startGroupManager()
@@ -94,12 +127,13 @@ public class PermissionsManager
 			{
 				plugin.getServer().getPluginManager().enablePlugin(p);
 			}
-			GroupManager_Perms = ((GroupManager) p).getPermissionHandler();
+			GroupManager gm = (GroupManager) p;
+			GroupManager_Perms = gm.getWorldsHolder();
 			return true;
 		}
 		return false;
 	}
-	
+
 	public boolean startPermissions()
 	{
 		Plugin p = plugin.getServer().getPluginManager().getPlugin("Permissions");
