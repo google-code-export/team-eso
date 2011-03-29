@@ -50,11 +50,11 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.commands.CommandHandler;
+import com.epicsagaonline.bukkit.EpicZones.commands.EZReload;
+import com.epicsagaonline.bukkit.EpicZones.commands.EZWho;
+import com.epicsagaonline.bukkit.EpicZones.commands.EZZone;
 import com.herocraftonline.dthielke.herochat.HeroChat;
-import commands.CommandHandler;
-import commands.EZReload;
-import commands.EZWho;
-import commands.EZZone;
 
 import org.bukkit.plugin.Plugin;
 

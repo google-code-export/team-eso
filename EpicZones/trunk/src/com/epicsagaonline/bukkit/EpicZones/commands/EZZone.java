@@ -29,7 +29,7 @@ THE SOFTWARE.
  * @license MIT License
  */
 
-package commands;
+package com.epicsagaonline.bukkit.EpicZones.commands;
 
 import objects.EpicZonePlayer;
 import objects.EpicZone;
