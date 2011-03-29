@@ -42,15 +42,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+
+import objects.EpicZonePlayer;
+import objects.EpicZone;
+
 import org.bukkit.entity.Player;
-import com.epicsagaonline.bukkit.EpicZones.Zone;
-import com.epicsagaonline.bukkit.EpicZones.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 
 public class General {
 
-	public static Map<String, Zone> myZones = new HashMap<String, Zone>();
+	public static Map<String, EpicZone> myZones = new HashMap<String, EpicZone>();
 	public static ArrayList<String> myZoneTags = new ArrayList<String>();
 	public static ArrayList<EpicZonePlayer> myPlayers = new ArrayList<EpicZonePlayer>();
 	public static Config config;
@@ -124,10 +126,10 @@ public class General {
 			try {
 				while(scanner.hasNext())
 				{
-					Zone newZone;
+					EpicZone newZone;
 					line = scanner.nextLine().trim();
 					if(line.startsWith("#") || line.isEmpty()){continue;}
-					newZone = new Zone(line);;
+					newZone = new EpicZone(line);;
 					General.myZones.put(newZone.getTag(), newZone);
 					General.myZoneTags.add(newZone.getTag());
 				}
@@ -153,13 +155,13 @@ public class General {
 
 		for(String zoneTag: myZoneTags)
 		{
-			Zone zone = myZones.get(zoneTag);
+			EpicZone zone = myZones.get(zoneTag);
 			if(zone.hasChildren())
 			{
 				for(String child: zone.getChildrenTags())
 				{
 
-					Zone childZone = myZones.get(child);
+					EpicZone childZone = myZones.get(child);
 
 					if(childZone != null)
 					{
@@ -219,7 +221,7 @@ public class General {
 
 		for(String tag: myZoneTags)
 		{
-			Zone z = myZones.get(tag);
+			EpicZone z = myZones.get(tag);
 			line = z.getTag() + "|";
 			line = line + z.getWorld() + "|";
 			line = line + z.getName() + "|";
@@ -235,7 +237,7 @@ public class General {
 		return result;
 	}
 
-	private static String BuildFlags(Zone z)
+	private static String BuildFlags(EpicZone z)
 	{
 		String result = "";
 
@@ -289,7 +291,7 @@ public class General {
 		return result;
 	}
 
-	private static String BuildChildren(Zone z)
+	private static String BuildChildren(EpicZone z)
 	{
 		String result = "";
 
@@ -301,7 +303,7 @@ public class General {
 		return result;
 	}
 
-	private static String BuildPointList(Zone z)
+	private static String BuildPointList(EpicZone z)
 	{
 
 		String result = "";
@@ -322,14 +324,14 @@ public class General {
 		return result;
 	}
 
-	public static Zone getZoneForPoint(int elevation, Point location, String worldName)
+	public static EpicZone getZoneForPoint(int elevation, Point location, String worldName)
 	{
 
-		Zone result = null;
+		EpicZone result = null;
 		String resultTag = "";
 		for(String zoneTag: General.myZoneTags)
 		{
-			Zone zone = General.myZones.get(zoneTag);
+			EpicZone zone = General.myZones.get(zoneTag);
 			if(zone.getWorld().equalsIgnoreCase(worldName))
 			{
 				resultTag = General.isPointInZone(zone, elevation, location, worldName);
@@ -345,7 +347,7 @@ public class General {
 
 	}
 
-	public static String isPointInZone(Zone zone, int playerHeight, Point playerPoint, String worldName)
+	public static String isPointInZone(EpicZone zone, int playerHeight, Point playerPoint, String worldName)
 	{
 
 		String result = "";

@@ -1,5 +1,7 @@
 package com.epicsagaonline.bukkit.EpicZones;
 
+import objects.EpicZone;
+
 import org.bukkit.entity.Player;
 
 public class ZonePermissionsHandler 
@@ -8,7 +10,7 @@ public class ZonePermissionsHandler
 	private static final String PERMS_IGNORE = "epiczones.ignorepermissions";
 	private static final String PERMS_ROOT = "epiczones.";
 
-	public static boolean hasPermissions(Player player, Zone zone, String flag)
+	public static boolean hasPermissions(Player player, EpicZone zone, String flag)
 	{
 		if(!EpicZones.permissions.hasPermission(player, PERMS_IGNORE))
 		{
@@ -74,7 +76,7 @@ public class ZonePermissionsHandler
 		}
 	}
 
-	private static String getPermNode(Zone zone, String flag, Boolean deny)
+	private static String getPermNode(EpicZone zone, String flag, Boolean deny)
 	{
 		String result = "";
 		String perm = "";
@@ -112,7 +114,7 @@ public class ZonePermissionsHandler
 		return result;
 	}
 
-	private static String getZoneNode(Zone zone)
+	private static String getZoneNode(EpicZone zone)
 	{
 		if(zone.hasParent())
 		{

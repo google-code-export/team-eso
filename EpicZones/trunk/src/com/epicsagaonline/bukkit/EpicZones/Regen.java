@@ -32,6 +32,10 @@ THE SOFTWARE.
 package com.epicsagaonline.bukkit.EpicZones;
 
 import java.util.ArrayList;
+
+import objects.EpicZonePlayer;
+import objects.EpicZone;
+
 import org.bukkit.entity.Player;
 
 public class Regen implements Runnable {
@@ -56,7 +60,7 @@ public class Regen implements Runnable {
 				EpicZonePlayer ezp = General.getPlayer(player.getEntityId());
 				if(ezp != null)
 				{
-					Zone zone = ezp.getCurrentZone();
+					EpicZone zone = ezp.getCurrentZone();
 					if(zone != null)
 					{
 						if(zone.timeToRegen())

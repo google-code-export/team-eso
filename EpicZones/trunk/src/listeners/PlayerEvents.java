@@ -29,12 +29,18 @@ THE SOFTWARE.
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicZones;
+package listeners;
+
+import integration.HeroChatIntegration;
 
 import java.awt.Point;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import objects.EpicZonePlayer;
+import objects.EpicZone;
+import objects.EpicZonePlayer.EpicZoneMode;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -45,21 +51,23 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import com.epicsagaonline.bukkit.EpicZones.EpicZonePlayer.EpicZoneMode;
+import com.epicsagaonline.bukkit.EpicZones.EpicZones;
+import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
 
 
 /**
  * Handle events for all Player related events
  * @author jblaske
  */
-public class LPlayer extends PlayerListener
+public class PlayerEvents extends PlayerListener
 {
 
 	private static final String NO_PERM_BUCKET = "You do not have permissions to do that in this zone.";
 	private static final int EMPTY_BUCKET = 325;
 	private Set<Integer> itemsOfDestruction = new HashSet<Integer>();
 
-	public LPlayer(EpicZones instance)
+	public PlayerEvents(EpicZones instance)
 	{
 		itemsOfDestruction.add(259);
 		itemsOfDestruction.add(326);
@@ -157,7 +165,7 @@ public class LPlayer extends PlayerListener
 					int blockHeight = event.getClickedBlock().getLocation().getBlockY();
 					boolean hasPerms = false;
 
-					Zone currentZone = null;
+					EpicZone currentZone = null;
 					if(General.pointWithinBorder(blockPoint, player))
 					{
 						currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
@@ -183,7 +191,7 @@ public class LPlayer extends PlayerListener
 					int blockHeight = event.getClickedBlock().getLocation().getBlockY();
 					boolean hasPerms = false;
 
-					Zone currentZone = null;
+					EpicZone currentZone = null;
 					if(General.pointWithinBorder(blockPoint, player))
 					{
 						currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
@@ -216,7 +224,7 @@ public class LPlayer extends PlayerListener
 	private boolean PlayerWithinZoneLogic(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint)
 	{
 
-		Zone foundZone = null;
+		EpicZone foundZone = null;
 		String worldName = player.getWorld().getName();
 		if(General.pointWithinBorder(playerPoint, player))
 		{
@@ -269,10 +277,10 @@ public class LPlayer extends PlayerListener
 
 	}
 
-	private Zone FindZone(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint, String worldName)
+	private EpicZone FindZone(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint, String worldName)
 	{
 
-		Zone result = null;
+		EpicZone result = null;
 
 		if(ezp.getCurrentZone() != null)
 		{

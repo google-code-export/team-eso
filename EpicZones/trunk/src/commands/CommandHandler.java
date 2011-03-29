@@ -29,7 +29,7 @@
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicZones.CommandHandlers;
+package commands;
 
 import org.bukkit.command.CommandSender;
 

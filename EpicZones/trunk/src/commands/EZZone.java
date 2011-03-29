@@ -29,19 +29,20 @@ THE SOFTWARE.
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicZones.CommandHandlers;
+package commands;
+
+import objects.EpicZonePlayer;
+import objects.EpicZone;
+import objects.EpicZonePlayer.EpicZoneMode;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.epicsagaonline.bukkit.EpicZones.Zone;
-import com.epicsagaonline.bukkit.EpicZones.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
-import com.epicsagaonline.bukkit.EpicZones.EpicZonePlayer.EpicZoneMode;
 
-public class ZoneCommandHandler implements CommandHandler {
+public class EZZone implements CommandHandler {
 
 	public boolean onCommand(String command, CommandSender sender, String[] args) {
 
@@ -94,7 +95,7 @@ public class ZoneCommandHandler implements CommandHandler {
 		{
 			if(args[0].equalsIgnoreCase("edit"))
 			{
-				Zone zone = General.myZones.get(args[1]); 
+				EpicZone zone = General.myZones.get(args[1]); 
 				if(zone != null)
 				{
 					if(zone.isOwner(player.getName()))
@@ -121,7 +122,7 @@ public class ZoneCommandHandler implements CommandHandler {
 
 	private static void Set(int playerID, String propertyName, Object value)
 	{
-		if(propertyName.equals("editzone")){General.getPlayer(playerID).setEditZone((Zone)value);}
+		if(propertyName.equals("editzone")){General.getPlayer(playerID).setEditZone((EpicZone)value);}
 		else if(propertyName.equals("mode")){General.getPlayer(playerID).setMode((EpicZoneMode)value);}
 		else if(propertyName.equals("flag:pvp")){General.getPlayer(playerID).getEditZone().setPVP(Boolean.valueOf(((String)value).trim()));}
 		else if(propertyName.equals("flag:mobs")){General.getPlayer(playerID).getEditZone().SetMobs((String)value);}
@@ -134,7 +135,7 @@ public class ZoneCommandHandler implements CommandHandler {
 		else if(propertyName.equals("entermessage")){General.getPlayer(playerID).getEditZone().setEnterText((String)value);}
 		else if(propertyName.equals("exitmessage")){General.getPlayer(playerID).getEditZone().setExitText((String)value);}
 		else if(propertyName.equals("name")){General.getPlayer(playerID).getEditZone().setName((String)value);}
-		else if(propertyName.equals("addchild")){General.getPlayer(playerID).getEditZone().addChild((Zone)value);}
+		else if(propertyName.equals("addchild")){General.getPlayer(playerID).getEditZone().addChild((EpicZone)value);}
 		else if(propertyName.equals("addchildtag")){General.getPlayer(playerID).getEditZone().getChildrenTags().add((String)value);}
 		else if(propertyName.equals("removechild")){General.getPlayer(playerID).getEditZone().removeChild((String)value);}
 		else if(propertyName.equals("clearpoints")){General.getPlayer(playerID).getEditZone().clearPolyPoints();}
@@ -152,7 +153,7 @@ public class ZoneCommandHandler implements CommandHandler {
 				String tag = data[1].replaceAll("[^a-zA-Z0-9_]", "");
 				if(General.myZones.get(tag) == null)
 				{
-					Zone zone = new Zone();
+					EpicZone zone = new EpicZone();
 					zone.setTag(tag);
 					zone.setName(tag);
 					Set(playerID, "editzone", zone);
@@ -526,7 +527,7 @@ public class ZoneCommandHandler implements CommandHandler {
 					if(General.myZones.get(data[1]) != null)
 					{
 						String tag = data[1].replaceAll("[^a-zA-Z0-9_]", "");
-						Set(playerID, "editzone", new Zone(General.myZones.get(tag)));
+						Set(playerID, "editzone", new EpicZone(General.myZones.get(tag)));
 						Set(playerID, "mode", EpicZoneMode.ZoneEdit);
 						sender.sendMessage("Editing Zone: " + tag);
 					}
@@ -582,7 +583,7 @@ public class ZoneCommandHandler implements CommandHandler {
 			for(String zoneTag: General.myZoneTags)
 			{
 				String messageText;
-				Zone zone = General.myZones.get(zoneTag);
+				EpicZone zone = General.myZones.get(zoneTag);
 				messageText = ChatColor.GREEN + zone.getName() + ChatColor.GOLD + " [" + zone.getTag() + "]";
 				if(zone.hasChildren())
 				{
@@ -607,7 +608,7 @@ public class ZoneCommandHandler implements CommandHandler {
 		{
 			if(data.length > 1)
 			{
-				Zone zone = General.myZones.get(data[1].trim());
+				EpicZone zone = General.myZones.get(data[1].trim());
 				if (zone != null)
 				{
 					String messageText;

@@ -6,18 +6,19 @@ author: jblaske@gmail.com
 description: >
              Provides polygon based protection for your bukkit server.
 commands:
-  zone:
+  ezzone:
+    aliases: zone
     description: Houses all of the commands for EpicZones.
     usage: |
            /<command> <subcommand> [Value] [Value] [Value]
            Example: /<command> create [tag] - Creates a new zone with the provided tag.
-  reloadez:
+  ezreload:
     aliases: reload
     description: Reloads all of EpicZones configuration settings.
     usage: |
            /<command>
            Example: /<command> - Reloads EpicZones.
-  who:
+  ezwho:
     aliases: [who, online, whois]
     description: Provides a list of players that are on the server.
     usage: |

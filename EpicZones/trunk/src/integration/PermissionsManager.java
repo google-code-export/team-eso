@@ -29,7 +29,7 @@ THE SOFTWARE.
 * @license MIT License
 */
 
-package com.epicsagaonline.bukkit.EpicZones;
+package integration;
 
 import org.anjocaido.groupmanager.GroupManager;
 import org.anjocaido.groupmanager.dataholder.worlds.WorldsHolder;
@@ -37,6 +37,8 @@ import org.bukkit.plugin.Plugin;
 
 import org.bukkit.entity.Player;
 
+import com.epicsagaonline.bukkit.EpicZones.EpicZones;
+import com.epicsagaonline.bukkit.EpicZones.General;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 

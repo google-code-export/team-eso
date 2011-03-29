@@ -29,10 +29,12 @@ THE SOFTWARE.
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicZones;
+package listeners;
 
 import java.awt.Point;
-import java.awt.event.ItemEvent;
+
+import objects.EpicZonePlayer;
+import objects.EpicZone;
 
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
@@ -44,19 +46,22 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 
-public class LEntity extends EntityListener 
+import com.epicsagaonline.bukkit.EpicZones.EpicZones;
+import com.epicsagaonline.bukkit.EpicZones.General;
+
+public class EntityEvents extends EntityListener 
 {
 
 	//private final EpicZones plugin;
 
-	public LEntity(EpicZones instance)
+	public EntityEvents(EpicZones instance)
 	{
 		//plugin = instance;
 	}
 
 	public @Override void onEntityExplode(EntityExplodeEvent event)
 	{
-		Zone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
+		EpicZone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
 		if (zone != null)
 		{
 			if(!zone.getAllowExplode())
@@ -76,7 +81,7 @@ public class LEntity extends EntityListener
 				if(isPlayer(sub.getEntity()) && isPlayer(sub.getDamager()))
 				{
 					EpicZonePlayer ezp = General.getPlayer(sub.getEntity().getEntityId());
-					Zone zone = ezp.getCurrentZone();
+					EpicZone zone = ezp.getCurrentZone();
 					if(zone != null)
 					{
 						if(!zone.hasPVP())
@@ -99,7 +104,7 @@ public class LEntity extends EntityListener
 				if(isPlayer(sub.getEntity()) && isPlayer(sub.getDamager()))
 				{
 					EpicZonePlayer ezp = General.getPlayer(sub.getEntity().getEntityId());
-					Zone zone = ezp.getCurrentZone();
+					EpicZone zone = ezp.getCurrentZone();
 					if(zone != null)
 					{
 						if(!zone.hasPVP())
@@ -118,7 +123,7 @@ public class LEntity extends EntityListener
 		{
 
 			Entity mob = event.getEntity();
-			Zone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
+			EpicZone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
 
 			if(zone != null)
 			{

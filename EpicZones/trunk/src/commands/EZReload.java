@@ -29,14 +29,14 @@ THE SOFTWARE.
 * @license MIT License
 */
 
-package com.epicsagaonline.bukkit.EpicZones.CommandHandlers;
+package commands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 
-public class ReloadCommandHandler implements CommandHandler {
+public class EZReload implements CommandHandler {
 
 	public boolean onCommand(String command, CommandSender sender, String[] args) {
 

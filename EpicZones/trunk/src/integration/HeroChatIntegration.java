@@ -29,9 +29,15 @@ THE SOFTWARE.
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicZones;
+package integration;
+
+import objects.EpicZonePlayer;
+import objects.EpicZone;
 
 import org.bukkit.entity.Player;
+
+import com.epicsagaonline.bukkit.EpicZones.EpicZones;
+import com.epicsagaonline.bukkit.EpicZones.General;
 
 public class HeroChatIntegration 
 
@@ -43,7 +49,7 @@ public class HeroChatIntegration
 		{
 			if(EpicZones.heroChat != null && EpicZones.heroChat.isEnabled())
 			{
-				Zone theZone = General.myZones.get(zoneTag);
+				EpicZone theZone = General.myZones.get(zoneTag);
 				if (theZone != null)
 				{
 					if (EpicZones.heroChat.getChannelManager() != null)

@@ -29,19 +29,20 @@ THE SOFTWARE.
 * @license MIT License
 */
 
-package com.epicsagaonline.bukkit.EpicZones.CommandHandlers;
+package commands;
 
 import java.util.ArrayList;
+
+import objects.EpicZonePlayer;
+import objects.EpicZone;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.epicsagaonline.bukkit.EpicZones.Zone;
-import com.epicsagaonline.bukkit.EpicZones.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 
-public class WhoCommandHandler implements CommandHandler {
+public class EZWho implements CommandHandler {
 
 	public boolean onCommand(String command, CommandSender sender, String[] args) {
 
@@ -88,7 +89,7 @@ public class WhoCommandHandler implements CommandHandler {
 	private static void buildWho(EpicZonePlayer ezp, Player player, CommandSender sender, int pageNumber, boolean allZones)
 	{
 
-		Zone currentZone = General.getPlayer(player.getName()).getCurrentZone();
+		EpicZone currentZone = General.getPlayer(player.getName()).getCurrentZone();
 		if(currentZone == null){allZones = true;}
 		ArrayList<EpicZonePlayer> players = getPlayers(currentZone, allZones);
 		int playersPerPage = 8;
@@ -156,7 +157,7 @@ public class WhoCommandHandler implements CommandHandler {
 		return result;
 	}
 
-	private static ArrayList<EpicZonePlayer> getPlayers(Zone currentZone, boolean allZones)
+	private static ArrayList<EpicZonePlayer> getPlayers(EpicZone currentZone, boolean allZones)
 	{
 		if (allZones)
 		{

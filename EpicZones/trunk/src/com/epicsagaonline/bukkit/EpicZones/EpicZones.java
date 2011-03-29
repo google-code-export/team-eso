@@ -31,9 +31,16 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones;
 
+import integration.PermissionsManager;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import listeners.BlockEvents;
+import listeners.EntityEvents;
+import listeners.PlayerEvents;
+import listeners.VehicleEvents;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -43,34 +50,34 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 import com.epicsagaonline.bukkit.EpicZones.General;
-import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.CommandHandler;
-import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.ReloadCommandHandler;
-import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.WhoCommandHandler;
-import com.epicsagaonline.bukkit.EpicZones.CommandHandlers.ZoneCommandHandler;
 import com.herocraftonline.dthielke.herochat.HeroChat;
+import commands.CommandHandler;
+import commands.EZReload;
+import commands.EZWho;
+import commands.EZZone;
 
 import org.bukkit.plugin.Plugin;
 
 public class EpicZones extends JavaPlugin 
 {
 
-	private final LPlayer playerListener = new LPlayer(this);
-	private final LBlock blockListener = new LBlock(this);
-	private final LEntity entityListener = new LEntity(this);
-	private final Listener_Vehicle vehicleListener = new Listener_Vehicle(this);
+	private final PlayerEvents playerListener = new PlayerEvents(this);
+	private final BlockEvents blockListener = new BlockEvents(this);
+	private final EntityEvents entityListener = new EntityEvents(this);
+	private final VehicleEvents vehicleListener = new VehicleEvents(this);
 
 	private final Regen regen = new Regen(this);
 	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 	private Map<String, CommandHandler> handlers = new HashMap<String, CommandHandler>();
 
-	private static final String[] ZONE_COMMANDS = {"zone"};
-	private static final String[] WHO_COMMANDS = {"who", "online", "whois"};
-	private static final String[] RELOAD_COMMANDS = {"reload", "reloadez"};
+	private static final String[] ZONE_COMMANDS = {"ezzone", "zone"};
+	private static final String[] WHO_COMMANDS = {"ezwho", "who", "online", "whois"};
+	private static final String[] RELOAD_COMMANDS = {"ezreload", "reload"};
 	private static final String CONFIG_FILE = "config.yml";
 	
-	private static CommandHandler reloadCommandHandler = new ReloadCommandHandler();
-	private static CommandHandler zoneCommandHandler = new ZoneCommandHandler();
-	private static CommandHandler whoCommandHandler = new WhoCommandHandler();
+	private static CommandHandler reloadCommandHandler = new EZReload();
+	private static CommandHandler zoneCommandHandler = new EZZone();
+	private static CommandHandler whoCommandHandler = new EZWho();
 
 	public static HeroChat heroChat = null;
 	public static PermissionsManager permissions;

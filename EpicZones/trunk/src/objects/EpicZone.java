@@ -29,7 +29,7 @@ THE SOFTWARE.
 * @license MIT License
 */
 
-package com.epicsagaonline.bukkit.EpicZones;
+package objects;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -41,7 +41,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class Zone {
+import com.epicsagaonline.bukkit.EpicZones.Log;
+
+public class EpicZone {
 
 	private String tag = "";
 	private String name = "";
@@ -54,8 +56,8 @@ public class Zone {
 	private Rectangle boundingBox = new Rectangle(); 
 	private String enterText = "";
 	private String exitText = "";
-	private Zone parent = null;
-	private Map<String, Zone> children = new HashMap<String, Zone>();
+	private EpicZone parent = null;
+	private Map<String, EpicZone> children = new HashMap<String, EpicZone>();
 	private Set<String> childrenTags = new HashSet<String>();
 	private boolean hasChildrenFlag = false;
 	private boolean hasParentFlag = false;
@@ -71,9 +73,9 @@ public class Zone {
 	private boolean allowExplode = false;
 	private ArrayList<String> owners = new ArrayList<String>();
 
-	public Zone(){}
+	public EpicZone(){}
 
-	public Zone(Zone prime)
+	public EpicZone(EpicZone prime)
 	{
 		this.tag = prime.tag;
 		this.name = prime.name;
@@ -103,7 +105,7 @@ public class Zone {
 		this.owners = prime.owners;
 	}
 
-	public Zone(String zoneData)
+	public EpicZone(String zoneData)
 	{
 
 		String[] split = zoneData.split("\\|");
@@ -140,8 +142,8 @@ public class Zone {
 	public String getEnterText(){return enterText;}
 	public String getExitText(){return exitText;}
 	public String getWorld(){return world;}
-	public Zone getParent(){return parent;}
-	public Map<String, Zone> getChildren(){return children;}
+	public EpicZone getParent(){return parent;}
+	public Map<String, EpicZone> getChildren(){return children;}
 	public Set<String> getChildrenTags(){return childrenTags;}
 	public boolean hasChildren(){return hasChildrenFlag;}
 	public boolean hasParent(){return hasParentFlag;}
@@ -151,9 +153,9 @@ public class Zone {
 	public ArrayList<String> getAllowedMobs(){return allowedMobs;}
 	public boolean getAllowFire(){return allowFire;}
 	public boolean getAllowExplode(){return allowExplode;}
-	public void addChild(Zone childZone)
+	public void addChild(EpicZone childZone)
 	{
-		if(this.children == null){this.children = new HashMap<String, Zone>();}
+		if(this.children == null){this.children = new HashMap<String, EpicZone>();}
 		this.children.put(childZone.getTag(), childZone);
 	}
 
@@ -257,7 +259,7 @@ public class Zone {
 		this.center = value;
 	}
 
-	public void setParent(Zone parent)
+	public void setParent(EpicZone parent)
 	{
 		this.parent = parent;
 		this.hasParentFlag = true;

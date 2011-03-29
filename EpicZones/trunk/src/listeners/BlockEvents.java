@@ -29,10 +29,14 @@ THE SOFTWARE.
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicZones;
+package listeners;
 
 import java.awt.Point;
 import java.util.Date;
+
+import objects.EpicZonePlayer;
+import objects.EpicZone;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
@@ -40,18 +44,22 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+import com.epicsagaonline.bukkit.EpicZones.EpicZones;
+import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
+
 /**
  * EpicZones block listener
  * @author jblaske
  */
-public class LBlock extends BlockListener {
+public class BlockEvents extends BlockListener {
 	//private final EpicZones plugin;
 	private static final String NO_PERM_DESTROY = "You do not have permissions to destroy in this zone.";
 	private static final String NO_PERM_DESTROY_BORDER = "You do not have permissions to destroy outside the border of the map.";
 	private static final String NO_PERM_BUILD = "You do not have permissions to build in this zone.";
 	private static final String NO_PERM_BUILD_BORDER = "You do not have permissions to build outside the border of the map.";
 
-	public LBlock(final EpicZones plugin) {
+	public BlockEvents(final EpicZones plugin) {
 		//this.plugin = plugin;
 	}
 
@@ -59,7 +67,7 @@ public class LBlock extends BlockListener {
 	{
 		if(!event.isCancelled())
 		{
-			Zone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
+			EpicZone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
 			if (zone != null)
 			{
 				if(!zone.getAllowFire())
@@ -74,7 +82,7 @@ public class LBlock extends BlockListener {
 	{
 		if(!event.isCancelled())
 		{
-			Zone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
+			EpicZone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
 			if (zone != null)
 			{
 				if(!zone.getAllowFire())
@@ -95,7 +103,7 @@ public class LBlock extends BlockListener {
 			String worldName = player.getWorld().getName();
 			int blockHeight = event.getBlock().getLocation().getBlockY();
 			boolean hasPerms = false;
-			Zone currentZone = null;
+			EpicZone currentZone = null;
 
 			if(General.pointWithinBorder(blockPoint, player))
 			{
@@ -133,7 +141,7 @@ public class LBlock extends BlockListener {
 			int blockHeight = event.getBlock().getLocation().getBlockY();
 			boolean hasPerms = false;
 
-			Zone currentZone = null;
+			EpicZone currentZone = null;
 
 			if(General.pointWithinBorder(blockPoint, player))
 			{

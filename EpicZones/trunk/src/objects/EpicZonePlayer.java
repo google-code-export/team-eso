@@ -29,7 +29,8 @@ THE SOFTWARE.
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicZones;
+package objects;
+
 
 import org.bukkit.Location;
 import java.util.Calendar;
@@ -37,7 +38,7 @@ import java.util.Date;
 
 public class EpicZonePlayer {
 
-	private Zone currentZone;
+	private EpicZone currentZone;
 	private int entityID;
 	private String name;
 	private Location currentLocation;
@@ -46,13 +47,13 @@ public class EpicZonePlayer {
 	private boolean teleporting = false;
 	private Date lastCheck = new Date();
 	private EpicZoneMode mode = EpicZoneMode.None; 
-	private Zone editZone = null;
+	private EpicZone editZone = null;
 	private boolean pastBorder = false;
 	private Date enteredZone = new Date();
 	private String previousZoneTag = "";
 	private boolean hasMoved = false;
 
-	public Zone getCurrentZone(){return currentZone;}
+	public EpicZone getCurrentZone(){return currentZone;}
 	public int getEntityID(){return entityID;}
 	public String getName(){return name;}
 	public Location getCurrentLocation(){return currentLocation;}
@@ -61,7 +62,7 @@ public class EpicZonePlayer {
 	public int getDistanceFromCenter(){return distanceFromCenter;}
 	public boolean isTeleporting(){return teleporting;}
 	public EpicZoneMode getMode(){return mode;}
-	public Zone getEditZone(){return editZone;}
+	public EpicZone getEditZone(){return editZone;}
 	public boolean getPastBorder(){return pastBorder;}
 	public Date getEnteredZone(){return enteredZone;}
 	public String getPreviousZoneTag(){return previousZoneTag;}
@@ -94,7 +95,7 @@ public class EpicZonePlayer {
 		this.mode = value;
 	}
 
-	public void setEditZone(Zone value)
+	public void setEditZone(EpicZone value)
 	{
 		this.editZone = value;
 	}
@@ -105,7 +106,7 @@ public class EpicZonePlayer {
 		this.name = name;
 	}
 
-	public void setCurrentZone(Zone z)
+	public void setCurrentZone(EpicZone z)
 	{
 		this.currentZone = z;
 		this.enteredZone = new Date();

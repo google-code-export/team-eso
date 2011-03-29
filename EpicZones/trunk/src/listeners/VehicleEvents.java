@@ -29,9 +29,13 @@ THE SOFTWARE.
  * @license MIT License
  */
 
-package com.epicsagaonline.bukkit.EpicZones;
+package listeners;
 
 import java.awt.Point;
+
+import objects.EpicZonePlayer;
+import objects.EpicZone;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -39,13 +43,17 @@ import org.bukkit.event.vehicle.VehicleListener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
-public class Listener_Vehicle extends VehicleListener 
+import com.epicsagaonline.bukkit.EpicZones.EpicZones;
+import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
+
+public class VehicleEvents extends VehicleListener 
 {
 
 	//private final EpicZones plugin;
 	private final Vector zero = new Vector(0,0,0);
 
-	public Listener_Vehicle(EpicZones instance)
+	public VehicleEvents(EpicZones instance)
 	{
 		//plugin = instance;
 	}
@@ -93,7 +101,7 @@ public class Listener_Vehicle extends VehicleListener
 	public static boolean VehicleWithinZoneLogic(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint)
 	{
 
-		Zone foundZone = null;
+		EpicZone foundZone = null;
 		String worldName = player.getWorld().getName();
 
 		if(General.pointWithinBorder(playerPoint, player))
@@ -146,10 +154,10 @@ public class Listener_Vehicle extends VehicleListener
 
 	}
 
-	private static Zone FindZone(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint, String worldName)
+	private static EpicZone FindZone(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint, String worldName)
 	{
 
-		Zone result = null;
+		EpicZone result = null;
 
 		if(ezp.getCurrentZone() != null)
 		{
