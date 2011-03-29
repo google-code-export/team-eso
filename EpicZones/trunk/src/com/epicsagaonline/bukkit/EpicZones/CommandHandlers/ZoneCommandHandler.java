@@ -45,7 +45,7 @@ public class ZoneCommandHandler implements CommandHandler {
 
 	public boolean onCommand(String command, CommandSender sender, String[] args) {
 
-		if((sender instanceof Player && EpicZones.permissions.hasPermission((Player)sender, "epiczones.admin")))
+		if((sender instanceof Player && (EpicZones.permissions.hasPermission((Player)sender, "epiczones.admin")) || IsOwner(sender, args)))
 		{
 			Player player = (Player)sender;
 			EpicZonePlayer ezp = General.getPlayer(player.getEntityId());
@@ -83,6 +83,42 @@ public class ZoneCommandHandler implements CommandHandler {
 		return false;
 	}
 
+	private static boolean IsOwner( CommandSender sender, String[] args)
+	{
+		
+		boolean result = false;
+		Player player = (Player)sender;
+		EpicZonePlayer ezp = General.getPlayer(player.getName());
+		
+		if(args.length > 1)
+		{
+			if(args[0].equalsIgnoreCase("edit"))
+			{
+				Zone zone = General.myZones.get(args[1]); 
+				if(zone != null)
+				{
+					if(zone.isOwner(player.getName()))
+					{
+						result = true;
+					}
+				}
+			}
+			else
+			{
+				if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+				{
+					if(ezp.getEditZone().isOwner(player.getName()))
+					{
+						result = true;
+					}
+				}
+			}
+		}
+		
+		return result;
+		
+	}
+
 	private static void Set(int playerID, String propertyName, Object value)
 	{
 		if(propertyName.equals("editzone")){General.getPlayer(playerID).setEditZone((Zone)value);}
@@ -113,7 +149,7 @@ public class ZoneCommandHandler implements CommandHandler {
 		{
 			if(data.length > 1 && data[1].length() > 0)
 			{
-				String tag = data[1].replaceAll("[^a-zA-Z0-9]", "");
+				String tag = data[1].replaceAll("[^a-zA-Z0-9_]", "");
 				if(General.myZones.get(tag) == null)
 				{
 					Zone zone = new Zone();
@@ -293,7 +329,7 @@ public class ZoneCommandHandler implements CommandHandler {
 			{
 				for(int i = 1; i < data.length; i++)
 				{
-					String tag = data[i].replaceAll("[^a-zA-Z0-9]", "");
+					String tag = data[i].replaceAll("[^a-zA-Z0-9_]", "");
 					if(tag.length() > 0 && General.myZones.get(tag) != null)
 					{
 						Set(playerID, "addchildtag", tag);
@@ -317,7 +353,7 @@ public class ZoneCommandHandler implements CommandHandler {
 			{
 				for(int i = 1; i < data.length; i++)
 				{
-					String tag = data[i].replaceAll("[^a-zA-Z0-9]", "");
+					String tag = data[i].replaceAll("[^a-zA-Z0-9_]", "");
 					if(tag.length() > 0)
 					{
 						Set(playerID, "removechild", tag);
@@ -489,7 +525,7 @@ public class ZoneCommandHandler implements CommandHandler {
 				{
 					if(General.myZones.get(data[1]) != null)
 					{
-						String tag = data[1].replaceAll("[^a-zA-Z0-9]", "");
+						String tag = data[1].replaceAll("[^a-zA-Z0-9_]", "");
 						Set(playerID, "editzone", new Zone(General.myZones.get(tag)));
 						Set(playerID, "mode", EpicZoneMode.ZoneEdit);
 						sender.sendMessage("Editing Zone: " + tag);

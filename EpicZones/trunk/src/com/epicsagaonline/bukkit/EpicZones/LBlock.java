@@ -22,20 +22,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-*/
+ */
 
 /**
-* @author jblaske@gmail.com
-* @license MIT License
-*/
+ * @author jblaske@gmail.com
+ * @license MIT License
+ */
 
 package com.epicsagaonline.bukkit.EpicZones;
 
 import java.awt.Point;
 import java.util.Date;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -57,96 +57,106 @@ public class LBlock extends BlockListener {
 
 	public @Override void onBlockIgnite(BlockIgniteEvent event)
 	{
-		Zone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
-		if (zone != null)
+		if(!event.isCancelled())
 		{
-			if(!zone.getAllowFire())
+			Zone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
+			if (zone != null)
 			{
-				event.setCancelled(true);
+				if(!zone.getAllowFire())
+				{
+					event.setCancelled(true);
+				}
 			}
 		}
 	}
-	
+
 	public @Override void onBlockBurn(BlockBurnEvent event)
 	{
-		Zone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
-		if (zone != null)
+		if(!event.isCancelled())
 		{
-			if(!zone.getAllowFire())
+			Zone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
+			if (zone != null)
 			{
-				event.setCancelled(true);
+				if(!zone.getAllowFire())
+				{
+					event.setCancelled(true);
+				}
 			}
 		}
 	}
-	
-	public @Override void onBlockDamage(BlockDamageEvent event)
+
+	public @Override void onBlockBreak(BlockBreakEvent event)
 	{
-		
-		Player player = event.getPlayer();
-		EpicZonePlayer ezp = General.getPlayer(player.getName());
-		Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
-		String worldName = player.getWorld().getName();
-		int blockHeight = event.getBlock().getLocation().getBlockY();
-		boolean hasPerms = false;
-		Zone currentZone = null;
-
-		if(General.pointWithinBorder(blockPoint, player))
+		if(!event.isCancelled())
 		{
-			currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
-			hasPerms = General.hasPermissions(player, currentZone, "destroy");
+			Player player = event.getPlayer();
+			EpicZonePlayer ezp = General.getPlayer(player.getName());
+			Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
+			String worldName = player.getWorld().getName();
+			int blockHeight = event.getBlock().getLocation().getBlockY();
+			boolean hasPerms = false;
+			Zone currentZone = null;
 
-			if(!hasPerms)
+			if(General.pointWithinBorder(blockPoint, player))
+			{
+				currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
+				hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "destroy");
+
+				if(!hasPerms)
+				{
+					if (ezp.getLastWarned().before(new Date())){
+						player.sendMessage(NO_PERM_DESTROY);
+						ezp.Warn();
+					}
+					event.setCancelled(true);
+				}
+			}
+			else
 			{
 				if (ezp.getLastWarned().before(new Date())){
-					player.sendMessage(NO_PERM_DESTROY);
+					player.sendMessage(NO_PERM_DESTROY_BORDER);
 					ezp.Warn();
 				}
 				event.setCancelled(true);
 			}
-		}
-		else
-		{
-			if (ezp.getLastWarned().before(new Date())){
-				player.sendMessage(NO_PERM_DESTROY_BORDER);
-				ezp.Warn();
-			}
-			event.setCancelled(true);
 		}
 	}
 
 	public @Override void onBlockPlace(BlockPlaceEvent event)
 	{
-
-		Player player = event.getPlayer();
-		EpicZonePlayer ezp = General.getPlayer(player.getName());
-		Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
-		String worldName = player.getWorld().getName();
-		int blockHeight = event.getBlock().getLocation().getBlockY();
-		boolean hasPerms = false;
-
-		Zone currentZone = null;
-
-		if(General.pointWithinBorder(blockPoint, player))
+		if(!event.isCancelled())
 		{
-			currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
-			hasPerms = General.hasPermissions(player, currentZone, "build");
+			Player player = event.getPlayer();
+			EpicZonePlayer ezp = General.getPlayer(player.getName());
+			Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
+			String worldName = player.getWorld().getName();
+			int blockHeight = event.getBlock().getLocation().getBlockY();
+			boolean hasPerms = false;
 
-			if(!hasPerms)
+			Zone currentZone = null;
+
+			if(General.pointWithinBorder(blockPoint, player))
+			{
+				currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
+				hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "build");
+
+				if(!hasPerms)
+				{
+					if (ezp.getLastWarned().before(new Date())){
+						player.sendMessage(NO_PERM_BUILD);
+						ezp.Warn();
+					}
+					event.setCancelled(true);
+				}
+			}
+			else
 			{
 				if (ezp.getLastWarned().before(new Date())){
-					player.sendMessage(NO_PERM_BUILD);
+					player.sendMessage(NO_PERM_BUILD_BORDER);
 					ezp.Warn();
 				}
 				event.setCancelled(true);
 			}
-		}
-		else
-		{
-			if (ezp.getLastWarned().before(new Date())){
-				player.sendMessage(NO_PERM_BUILD_BORDER);
-				ezp.Warn();
-			}
-			event.setCancelled(true);
 		}
 	}
 

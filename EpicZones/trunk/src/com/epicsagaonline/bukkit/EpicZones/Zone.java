@@ -69,7 +69,7 @@ public class Zone {
 	private ArrayList<String> allowedMobs = new ArrayList<String>();
 	private boolean allowFire = false;
 	private boolean allowExplode = false;
-
+	private ArrayList<String> owners = new ArrayList<String>();
 
 	public Zone(){}
 
@@ -100,6 +100,7 @@ public class Zone {
 		this.allowedMobs = prime.allowedMobs;
 		this.allowFire = prime.allowFire;
 		this.allowExplode = prime.allowExplode;
+		this.owners = prime.owners;
 	}
 
 	public Zone(String zoneData)
@@ -310,6 +311,10 @@ public class Zone {
 				{
 					this.allowExplode = split[1].equalsIgnoreCase("true");
 				}
+				else if(flag.equals("owners"))
+				{
+					BuildOwnersFlag(split);
+				}
 					
 			}
 		}
@@ -503,6 +508,22 @@ public class Zone {
 		}
 	}
 
+	public void BuildOwnersFlag(String[] split)
+	{
+		
+		this.owners = new ArrayList<String>();
+		
+		if(split.length > 0)
+		{
+			this.owners = new ArrayList<String>();
+			for(String owner: split)
+			{
+				owners.add(owner.trim());
+			}
+		}
+		
+	}
+	
 	public void setPVP(boolean value)
 	{
 		this.hasPVP = value;
@@ -660,4 +681,10 @@ public class Zone {
 		return distanceFromCenter <= this.radius;
 
 	}
+	
+	public boolean isOwner(String playerName)
+	{
+		return owners.contains(playerName);
+	}
+	
 }

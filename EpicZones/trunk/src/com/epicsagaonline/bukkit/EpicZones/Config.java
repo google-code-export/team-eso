@@ -59,6 +59,7 @@ public class Config extends Configuration {
 	public boolean defaultEnter;
 	public boolean defaultBuild;
 	public boolean defaultDestroy;
+	public boolean defaultPVP;
 	public boolean enableRadius;
 	public boolean enableHeroChat;
 	public String permissionSystem;
@@ -80,6 +81,7 @@ public class Config extends Configuration {
 		defaultEnter = true;
 		defaultBuild = true;
 		defaultDestroy = true;
+		defaultPVP = false;
 		enableRadius = true;
 		enableHeroChat = false;
 		zoneTool = 280;
@@ -111,6 +113,7 @@ public class Config extends Configuration {
 			defaultEnter = getBoolean("defaultEnter", true);
 			defaultBuild = getBoolean("defaultBuild", true);
 			defaultDestroy = getBoolean("defaultDestroy", true);
+			defaultPVP = getBoolean("defaultPVP", false);
 			enableRadius = getBoolean("enableRadius", true);
 			enableHeroChat = getBoolean("enableHeroChat", false);
 			zoneTool = getInt("zoneTool", zoneTool);
@@ -137,14 +140,21 @@ public class Config extends Configuration {
 		FileOutputStream stream;
 		BufferedWriter writer;
 
-		root.put("mapRadius", getMapRadius());
+		root.put("#The default flags are used when no zone can be found for a given event.", "");
+		root.put("#Defaults are NOT applied to zones on creation.", "");
 		root.put("defaultEnter", defaultEnter);
 		root.put("defaultBuild", defaultBuild);
 		root.put("defaultDestroy", defaultDestroy);
+		root.put("defaultPVP", defaultPVP);
+		root.put("#The map radius is set as a block radius from 0,0 of your world.", "");
 		root.put("enableRadius", enableRadius);
-		root.put("enableHeroChat", enableHeroChat);
+		root.put("mapRadius", getMapRadius());
+		root.put("#zoneTool is the tool used to draw zones with.", "");
 		root.put("zoneTool", zoneTool);
+		root.put("#Defines what permissions system you use, valid values are Permissions or GroupManager.", "");
 		root.put("permissionSystem", permissionSystem);
+		root.put("#Enables or disables HeroChat integration.", "");
+		root.put("enableHeroChat", enableHeroChat);
 
 		try 
 		{

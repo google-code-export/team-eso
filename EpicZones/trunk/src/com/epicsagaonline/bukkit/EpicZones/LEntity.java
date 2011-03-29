@@ -22,16 +22,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-*/
+ */
 
 /**
-* @author jblaske@gmail.com
-* @license MIT License
-*/
+ * @author jblaske@gmail.com
+ * @license MIT License
+ */
 
 package com.epicsagaonline.bukkit.EpicZones;
 
 import java.awt.Point;
+import java.awt.event.ItemEvent;
+
+import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -62,7 +65,7 @@ public class LEntity extends EntityListener
 			}
 		}
 	}
-	
+
 	public @Override void onEntityDamage(EntityDamageEvent event)
 	{
 		if(event.getCause() == DamageCause.ENTITY_ATTACK)
@@ -77,6 +80,13 @@ public class LEntity extends EntityListener
 					if(zone != null)
 					{
 						if(!zone.hasPVP())
+						{
+							event.setCancelled(true);
+						}
+					}
+					else
+					{
+						if(!General.config.defaultPVP)
 						{
 							event.setCancelled(true);
 						}
@@ -104,22 +114,77 @@ public class LEntity extends EntityListener
 
 	public @Override void onCreatureSpawn(CreatureSpawnEvent event)
 	{
-
-		Entity mob = event.getEntity();
-		Zone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
-
-		if(zone != null)
+		if(!event.isCancelled() && isCreature(event.getCreatureType()))
 		{
-			if(!zone.getAllowedMobs().contains("all"))
+
+			Entity mob = event.getEntity();
+			Zone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
+
+			if(zone != null)
 			{
-				if (zone.getAllowedMobs().contains("none") || !zone.getAllowedMobs().contains(mob.getClass().getName()))
+				if(!zone.getAllowedMobs().contains("all"))
 				{
-					event.setCancelled(true);
+					if (zone.getAllowedMobs().contains("none") || !zone.getAllowedMobs().contains(mob.getClass().getName()))
+					{
+						event.setCancelled(true);
+					}
 				}
 			}
 		}
 	}
 
+	private boolean isCreature(CreatureType ct)
+	{
+		boolean result = false;
+
+		if(ct != null)
+		{
+			switch(ct)
+			{
+			case CHICKEN:
+				result = true;
+				break;
+			case COW:
+				result = true;
+				break;
+			case CREEPER:
+				result = true;
+				break;
+			case GHAST:
+				result = true;
+				break;
+			case GIANT:
+				result = true;
+				break;
+			case PIG:
+				result = true;
+				break;
+			case PIG_ZOMBIE:
+				result = true;
+				break;
+			case SHEEP:
+				result = true;
+				break;
+			case SKELETON:
+				result = true;
+				break;
+			case SLIME:
+				result = true;
+				break;
+			case SPIDER:
+				result = true;
+				break;
+			case SQUID:
+				result = true;
+				break;
+			case ZOMBIE:
+				result = true;
+				break;
+			}
+		}
+
+		return result;
+	}
 	private boolean isPlayer(Entity entity)
 	{
 

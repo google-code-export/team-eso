@@ -75,15 +75,22 @@ public class PermissionsManager
 
 	public boolean hasPermission(Player player, String permission)
 	{		
+		
+		boolean result = false;
+		
 		if(General.config.permissionSystem.equalsIgnoreCase("GroupManager"))
 		{
-			return (GroupManager_Perms != null && GroupManager_Perms.getWorldData(player).getPermissionsHandler().has(player, permission));	
+			result = (GroupManager_Perms != null && GroupManager_Perms.getWorldData(player).getPermissionsHandler().has(player, permission));	
 		}
 		else if (General.config.permissionSystem.equalsIgnoreCase("Permissions"))
 		{
-			return (Permissions_Perms != null && Permissions_Perms.has(player, permission));
+			result = (Permissions_Perms != null && Permissions_Perms.has(player, permission));
 		}
-		return false;
+		
+		//Log.Write("PERM CHECK: " + permission + " RESULT: " + Boolean.toString(result));
+		
+		return result;
+		
 	}
 
 	public boolean startGroupManager()

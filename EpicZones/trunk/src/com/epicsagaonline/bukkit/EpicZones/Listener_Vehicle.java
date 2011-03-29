@@ -73,7 +73,7 @@ public class Listener_Vehicle extends VehicleListener
 						if(!VehicleWithinZoneLogic((Player)passenger, ezp, playerHeight, playerPoint))
 						{
 							ezp.setIsTeleporting(true);
-							vehicle.teleportTo(ezp.getCurrentLocation());
+							vehicle.teleport(ezp.getCurrentLocation());
 							vehicle.setVelocity(zero);
 							ezp.setIsTeleporting(false);
 							//event.setTo(ezp.getCurrentLocation());
@@ -106,7 +106,7 @@ public class Listener_Vehicle extends VehicleListener
 
 				if (ezp.getCurrentZone() == null || foundZone != ezp.getCurrentZone())
 				{
-					if(General.hasPermissions(player, foundZone, "entry"))
+					if(ZonePermissionsHandler.hasPermissions(player, foundZone, "entry"))
 					{
 						ezp.setCurrentZone(foundZone);
 						if(foundZone.getEnterText().length() > 0){player.sendMessage(foundZone.getEnterText());}
@@ -121,7 +121,7 @@ public class Listener_Vehicle extends VehicleListener
 			}
 			else
 			{
-				if(General.hasPermissions(player, null, "entry"))
+				if(ZonePermissionsHandler.hasPermissions(player, null, "entry"))
 				{
 					if (ezp.getCurrentZone() != null)
 					{

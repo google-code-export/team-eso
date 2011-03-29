@@ -107,67 +107,9 @@ public class General {
 
 	}
 
-	public static boolean hasPermissions(Player player, Zone zone, String flag)
-	{
-		if(!EpicZones.permissions.hasPermission(player, "epiczones.ignorepermissions"))
-		{
-			if(zone == null)
-			{
-				if(EpicZones.permissions.hasPermission(player, "epiczones." + player.getWorld().getName() + "." + flag + ".deny"))
-				{
-					return false;
-				}
-				else if(EpicZones.permissions.hasPermission(player, "epiczones." + player.getWorld().getName() + "." + flag))
-				{
-					return true;
-				}
-				else
-				{
-					return getDefaultPerm(flag);
-				}
-			}
-			else if(EpicZones.permissions.hasPermission(player, "epiczones." + zone.getTag() + "." + flag + ".deny"))
-			{
-				return false;
-			}
-			else if(EpicZones.permissions.hasPermission(player, "epiczones." + zone.getTag() + "." + flag))
-			{
-				return true;
-			}
-			else if(zone.hasParent())
-			{
-				return hasPermissions(player, zone.getParent(), flag);
-			}
-			else if(EpicZones.permissions.hasPermission(player, "epiczones." + player.getWorld().getName() + "." + flag + ".deny"))
-			{
-				return false;
-			}
-			else if(EpicZones.permissions.hasPermission(player, "epiczones." + player.getWorld().getName() + "." + flag))
-			{
-				return true;
-			}
-			else
-			{
-				return getDefaultPerm(flag);	
-			}
-		}
-		else
-		{
-			return true;
-		}
-	}
+	
 
-	private static boolean getDefaultPerm(String flag)
-	{
-		if(flag.equals("entry"))
-			return config.defaultEnter;
-		if(flag.equals("destroy"))
-			return config.defaultDestroy;
-		if(flag.equals("build"))
-			return config.defaultBuild;
-
-		return false;
-	}
+	
 
 	public static void loadZones()
 	{
@@ -388,11 +330,14 @@ public class General {
 		for(String zoneTag: General.myZoneTags)
 		{
 			Zone zone = General.myZones.get(zoneTag);
-			resultTag = General.isPointInZone(zone, elevation, location, worldName);
-			if(resultTag.length() > 0)
+			if(zone.getWorld().equalsIgnoreCase(worldName))
 			{
-				result = General.myZones.get(resultTag);
-				break;
+				resultTag = General.isPointInZone(zone, elevation, location, worldName);
+				if(resultTag.length() > 0)
+				{
+					result = General.myZones.get(resultTag);
+					break;
+				}
 			}
 		}
 

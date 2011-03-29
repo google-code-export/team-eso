@@ -87,33 +87,33 @@ public class EpicZones extends JavaPlugin
 		{
 
 			PluginManager pm = getServer().getPluginManager();
-
+			
 			pm.registerEvent(Event.Type.PLAYER_MOVE, this.playerListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_TELEPORT, this.playerListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_LOGIN, this.playerListener, Event.Priority.Monitor, this);
 			pm.registerEvent(Event.Type.PLAYER_QUIT, this.playerListener, Event.Priority.Monitor, this);
-			pm.registerEvent(Event.Type.PLAYER_ITEM , this.playerListener, Event.Priority.Normal, this);
-
-			pm.registerEvent(Event.Type.BLOCK_DAMAGED, this.blockListener, Event.Priority.Normal, this);
-			pm.registerEvent(Event.Type.BLOCK_PLACED, this.blockListener, Event.Priority.Normal, this);
+			pm.registerEvent(Event.Type.PLAYER_INTERACT , this.playerListener, Event.Priority.Normal, this);
+			
+			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Event.Priority.Normal, this);
+			pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_IGNITE, this.blockListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_BURN, this.blockListener, Event.Priority.Normal, this);
-
-			pm.registerEvent(Event.Type.ENTITY_DAMAGED, this.entityListener, Event.Priority.Normal, this);
-			pm.registerEvent(Event.Type.CREATURE_SPAWN, this.entityListener, Event.Priority.Normal, this);
+			
+			pm.registerEvent(Event.Type.ENTITY_DAMAGE, this.entityListener, Event.Priority.Normal, this);
+			pm.registerEvent(Event.Type.CREATURE_SPAWN, this.entityListener, Event.Priority.Normal, this); //Causing Wierd Isues!
 			pm.registerEvent(Event.Type.ENTITY_EXPLODE, this.entityListener, Event.Priority.Normal, this);
-
+			
 			pm.registerEvent(Event.Type.VEHICLE_MOVE, this.vehicleListener, Event.Priority.Normal, this);
-
+			
 			
 			getServer().getScheduler().scheduleAsyncRepeatingTask(this, regen, 10, 10);
 
 			registerCommands();
 			
+			setupMultiWorld();
 			setupEpicZones();
 			setupPermissions();
 			setupHeroChat();
-			setupMultiWorld();
 
 			Log.Write("version " + pdfFile.getVersion() + " is enabled.");
 
