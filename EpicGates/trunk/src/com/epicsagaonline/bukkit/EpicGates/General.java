@@ -148,10 +148,42 @@ public class General {
 			line = line + gate.getLocation().getBlockY() + ",";
 			line = line + gate.getLocation().getBlockZ() + ",";
 			line = line + gate.getTargetTag() + ",";
-			line = line + gate.getDirection() + "\n";
+			line = line + gate.getDirection() + ",";
+			line = line + BuildAllowed(gate) + ",";
+			line = line + BuildNotAllowed(gate) + "\n";
 			result = result + line;
 		}
 		return result;
+	}
+	
+	private static String BuildAllowed(EpicGate gate)
+	{
+		String result = "";
+		
+		if(gate.getAllowed().size() > 0)
+		{
+			for(String value: gate.getAllowed())
+			{
+				result = result + value + " ";
+			}
+		}
+		
+		return result.trim();
+	}
+	
+	private static String BuildNotAllowed(EpicGate gate)
+	{
+		String result = "";
+		
+		if(gate.getNotAllowed().size() > 0)
+		{
+			for(String value: gate.getNotAllowed())
+			{
+				result = result + value + " ";
+			}
+		}
+		
+		return result.trim();
 	}
 	
 	public static void addPlayer(String name)

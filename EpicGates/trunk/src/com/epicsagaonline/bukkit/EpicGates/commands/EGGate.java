@@ -52,23 +52,56 @@ public class EGGate implements CommandHandler {
 			Player player = (Player) sender;
 
 			if (args.length > 0) {
-				if (args[0].equalsIgnoreCase("create")) {
+				if (args[0].equalsIgnoreCase("create")) 
+				{
 					Create(args, sender, player);
-				} else if (args[0].equalsIgnoreCase("link")) {
+				} 
+				else if (args[0].equalsIgnoreCase("link")) 
+				{
 					Link(args, sender, player);
-				} else if (args[0].equalsIgnoreCase("unlink")) {
+				} 
+				else if (args[0].equalsIgnoreCase("unlink")) 
+				{
 					Unlink(args, sender, player);
-				} else if (args[0].equalsIgnoreCase("move")) {
+				} 
+				else if (args[0].equalsIgnoreCase("move")) 
+				{
 					Move(args, sender, player);
-				} else if (args[0].equalsIgnoreCase("direction")) {
+				} 
+				else if (args[0].equalsIgnoreCase("direction")) 
+				{
 					Direction(args, sender, player);
-				} else if (args[0].equalsIgnoreCase("delete")) {
+				} 
+				else if (args[0].equalsIgnoreCase("delete")) 
+				{
 					Delete(args, sender, player);
-				} else if (args[0].equalsIgnoreCase("info")) {
+				} 
+				else if (args[0].equalsIgnoreCase("info")) 
+				{
 					Info(args, sender, player);
-				} else if (args[0].equalsIgnoreCase("list")) {
+				}
+				else if (args[0].equalsIgnoreCase("list")) 
+				{
 					List(args, sender, player);
-				} else {
+				} 
+				else if (args[0].equalsIgnoreCase("addallowed")) 
+				{
+					AddAllowed(args, sender, player);
+				} 
+				else if (args[0].equalsIgnoreCase("removeallowed")) 
+				{
+					RemoveAllowed(args, sender, player);
+				}
+				else if (args[0].equalsIgnoreCase("addnotallowed")) 
+				{
+					AddNotAllowed(args, sender, player);
+				}
+				else if (args[0].equalsIgnoreCase("removenotallowed")) 
+				{
+					RemoveNotAllowed(args, sender, player);
+				}
+				else 
+				{
 					Help(sender, "");
 				}
 			} else {
@@ -115,14 +148,14 @@ public class EGGate implements CommandHandler {
 						General.saveGates();
 						General.loadGates();
 						sender.sendMessage("[" + args[1]
-								+ "] Now teleports to [" + args[2] + "]");
+						                              + "] Now teleports to [" + args[2] + "]");
 					} else {
 						sender.sendMessage("The target gate [" + args[2]
-								+ "] does not exist.");
+						                                              + "] does not exist.");
 					}
 				} else {
 					sender.sendMessage("The source gate [" + args[1]
-							+ "] does not exist.");
+					                                              + "] does not exist.");
 				}
 			} else {
 				Help(sender, "link");
@@ -150,11 +183,14 @@ public class EGGate implements CommandHandler {
 		}
 	}
 
-	private void Move(String[] args, CommandSender sender, Player player) {
-		if (args.length > 1 && !args[1].equalsIgnoreCase("?")) {
+	private void Move(String[] args, CommandSender sender, Player player) 
+	{
+		if (args.length > 1 && !args[1].equalsIgnoreCase("?")) 
+		{
 
 			EpicGate gate = General.myGates.get(args[1]);
-			if (gate != null) {
+			if (gate != null) 
+			{
 
 				clearGate(gate);
 				clearLanding(gate);
@@ -168,16 +204,140 @@ public class EGGate implements CommandHandler {
 				General.saveGates();
 				General.loadGates();
 
-			} else {
+			} 
+			else 
+			{
 				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
 			}
 
-		} else {
+		} 
+		else 
+		{
 			Help(sender, "move");
 		}
 
 	}
 
+	private void AddAllowed(String[] args, CommandSender sender, Player player) 
+	{
+		if (args.length > 2 && !args[2].equalsIgnoreCase("?")) 
+		{
+
+			EpicGate gate = General.myGates.get(args[1]);
+			if (gate != null) 
+			{
+
+				for(int i = 2; i < args.length; i++)
+				{
+					gate.addAllowed(args[i]);
+				}
+				
+				General.myGates.put(args[1], gate);
+				General.saveGates();
+				General.loadGates();
+				
+			} 
+			else 
+			{
+				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+			}
+		} 
+		else 
+		{
+			Help(sender, "addallowed");
+		}
+	}
+	
+	private void RemoveAllowed(String[] args, CommandSender sender, Player player) 
+	{
+		if (args.length > 2 && !args[2].equalsIgnoreCase("?")) 
+		{
+
+			EpicGate gate = General.myGates.get(args[1]);
+			if (gate != null) 
+			{
+
+				for(int i = 2; i < args.length; i++)
+				{
+					gate.removeAllowed(args[i]);
+				}
+				
+				General.myGates.put(args[1], gate);
+				General.saveGates();
+				General.loadGates();
+				
+			} 
+			else 
+			{
+				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+			}
+		} 
+		else 
+		{
+			Help(sender, "removeallowed");
+		}
+	}
+	
+	private void AddNotAllowed(String[] args, CommandSender sender, Player player) 
+	{
+		if (args.length > 2 && !args[2].equalsIgnoreCase("?")) 
+		{
+
+			EpicGate gate = General.myGates.get(args[1]);
+			if (gate != null) 
+			{
+
+				for(int i = 2; i < args.length; i++)
+				{
+					gate.addNotAllowed(args[i]);
+				}
+				
+				General.myGates.put(args[1], gate);
+				General.saveGates();
+				General.loadGates();
+				
+			} 
+			else 
+			{
+				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+			}
+		} 
+		else 
+		{
+			Help(sender, "addnotallowed");
+		}
+	}
+	
+	private void RemoveNotAllowed(String[] args, CommandSender sender, Player player) 
+	{
+		if (args.length > 2 && !args[2].equalsIgnoreCase("?")) 
+		{
+
+			EpicGate gate = General.myGates.get(args[1]);
+			if (gate != null) 
+			{
+
+				for(int i = 2; i < args.length; i++)
+				{
+					gate.removeNotAllowed(args[i]);
+				}
+				
+				General.myGates.put(args[1], gate);
+				General.saveGates();
+				General.loadGates();
+				
+			} 
+			else 
+			{
+				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+			}
+		} 
+		else 
+		{
+			Help(sender, "addnotallowed");
+		}
+	}
+	
 	private void Delete(String[] args, CommandSender sender, Player player) {
 		if (args.length > 1 && !args[1].equalsIgnoreCase("?")) {
 			EpicGate gate = General.myGates.get(args[1]);
@@ -206,15 +366,15 @@ public class EGGate implements CommandHandler {
 			if (gate != null) {
 				String message = "";
 				message = ChatColor.GOLD + "[" + gate.getTag() + "]"
-						+ ChatColor.GREEN + " in " + ChatColor.GOLD + "["
-						+ gate.getLocation().getWorld().getName() + "]"
-						+ ChatColor.GREEN + " at " + ChatColor.GOLD + "["
-						+ gate.getLocation().getBlockX() + ","
-						+ gate.getLocation().getBlockY() + ","
-						+ gate.getLocation().getBlockZ() + "]";
+				+ ChatColor.GREEN + " in " + ChatColor.GOLD + "["
+				+ gate.getLocation().getWorld().getName() + "]"
+				+ ChatColor.GREEN + " at " + ChatColor.GOLD + "["
+				+ gate.getLocation().getBlockX() + ","
+				+ gate.getLocation().getBlockY() + ","
+				+ gate.getLocation().getBlockZ() + "]";
 				if (gate.getTarget() != null) {
 					message = message + ChatColor.GREEN + " linked to "
-							+ ChatColor.GOLD + "[" + gate.getTargetTag() + "].";
+					+ ChatColor.GOLD + "[" + gate.getTargetTag() + "].";
 				} else {
 					message = message + ChatColor.GREEN + ".";
 				}
@@ -232,15 +392,15 @@ public class EGGate implements CommandHandler {
 			EpicGate gate = General.myGates.get(gateTag);
 			if (gate != null) {
 				message = ChatColor.GOLD + "[" + gate.getTag() + "]"
-						+ ChatColor.GREEN + " in " + ChatColor.GOLD + "["
-						+ gate.getLocation().getWorld().getName() + "]"
-						+ ChatColor.GREEN + " at " + ChatColor.GOLD + "["
-						+ gate.getLocation().getBlockX() + ","
-						+ gate.getLocation().getBlockY() + ","
-						+ gate.getLocation().getBlockZ() + "]";
+				+ ChatColor.GREEN + " in " + ChatColor.GOLD + "["
+				+ gate.getLocation().getWorld().getName() + "]"
+				+ ChatColor.GREEN + " at " + ChatColor.GOLD + "["
+				+ gate.getLocation().getBlockX() + ","
+				+ gate.getLocation().getBlockY() + ","
+				+ gate.getLocation().getBlockZ() + "]";
 				if (gate.getTarget() != null) {
 					message = message + ChatColor.GREEN + " linked to "
-							+ ChatColor.GOLD + "[" + gate.getTargetTag() + "].";
+					+ ChatColor.GOLD + "[" + gate.getTargetTag() + "].";
 				} else {
 					message = message + ChatColor.GREEN + ".";
 				}
@@ -260,7 +420,7 @@ public class EGGate implements CommandHandler {
 				General.saveGates();
 				General.loadGates();
 				sender.sendMessage("The direction of [" + args[1]
-						+ "] has been set to [" + gate.getDirection() + "]");
+				                                               + "] has been set to [" + gate.getDirection() + "]");
 			} else {
 				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
 			}
@@ -273,72 +433,73 @@ public class EGGate implements CommandHandler {
 	private void Help(CommandSender sender, String mode) {
 
 		System.out.println(mode);
-		if (mode.equalsIgnoreCase("create")) {
-			sender.sendMessage(ChatColor.GOLD + "/gate create "
-					+ ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| "
-					+ ChatColor.AQUA + "[1]" + ChatColor.GREEN
-					+ " = New Gate Name.");
+		if (mode.equalsIgnoreCase("create")) 
+		{
+			sender.sendMessage(ChatColor.GOLD + "/gate create " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Gate Name.");
 			sender.sendMessage(ChatColor.GREEN + "Used to create new gates.");
-		} else if (mode.equalsIgnoreCase("link")) {
-			sender.sendMessage(ChatColor.GOLD + "/gate link " + ChatColor.AQUA
-					+ "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA
-					+ "[1]" + ChatColor.GREEN + " = Source Gate, "
-					+ ChatColor.AQUA + "[2]" + ChatColor.GREEN
-					+ " = Target Gate");
+		} 
+		else if (mode.equalsIgnoreCase("link")) 
+		{
+			sender.sendMessage(ChatColor.GOLD + "/gate link " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Source Gate, " + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Target Gate");
 			sender.sendMessage(ChatColor.GREEN + "Used to link two gates.");
-		} else if (mode.equalsIgnoreCase("unlink")) {
-			sender.sendMessage(ChatColor.GOLD + "/gate unlink "
-					+ ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| "
-					+ ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
-			sender.sendMessage(ChatColor.GREEN
-					+ "Used to remove the supplied gate's target.)");
-		} else if (mode.equalsIgnoreCase("direction")) {
-			sender.sendMessage(ChatColor.GOLD + "/gate direction "
-					+ ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| "
-					+ ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag."
-					+ ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Direction");
-			sender.sendMessage(ChatColor.GREEN
-					+ "Used to change the direction of the landing pad for a gate.");
-		} else if (mode.equalsIgnoreCase("move")) {
-			sender.sendMessage(ChatColor.GOLD + "/gate move " + ChatColor.AQUA
-					+ "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]"
-					+ ChatColor.GREEN + " = Gate Tag.");
-			sender.sendMessage(ChatColor.GREEN
-					+ "Used to change the location of a gate to where you are currently standing. (Works across worlds)");
-		} else if (mode.equalsIgnoreCase("delete")) {
-			sender.sendMessage(ChatColor.GOLD + "/gate delete "
-					+ ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| "
-					+ ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
+		} 
+		else if (mode.equalsIgnoreCase("unlink")) 
+		{
+			sender.sendMessage(ChatColor.GOLD + "/gate unlink " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
+			sender.sendMessage(ChatColor.GREEN + "Used to remove the supplied gate's target.)");
+		} 
+		else if (mode.equalsIgnoreCase("direction")) 
+		{
+			sender.sendMessage(ChatColor.GOLD + "/gate direction " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag." + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Direction");
+			sender.sendMessage(ChatColor.GREEN + "Used to change the direction of the landing pad for a gate.");
+		} 
+		else if (mode.equalsIgnoreCase("move")) 
+		{
+			sender.sendMessage(ChatColor.GOLD + "/gate move " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
+			sender.sendMessage(ChatColor.GREEN + "Used to change the location of a gate to where you are currently standing. (Works across worlds)");
+		} 
+		else if (mode.equalsIgnoreCase("addallowed"))
+		{
+			sender.sendMessage(ChatColor.GOLD + "/gate addallowed " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag" + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Player/Group Names.");
+			sender.sendMessage(ChatColor.GREEN + "Used to add who is allowed to jump thru the gate, multiple can be specified");
+		}
+		else if (mode.equalsIgnoreCase("removeallowed"))
+		{
+			sender.sendMessage(ChatColor.GOLD + "/gate removeallowed " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag" + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Player/Group Names.");
+			sender.sendMessage(ChatColor.GREEN + "Used to remove who is allowed to jump thru the gate, multiple can be specified");
+		}
+		else if (mode.equalsIgnoreCase("addnotallowed"))
+		{
+			sender.sendMessage(ChatColor.GOLD + "/gate addnotallowed " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag" + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Player/Group Names.");
+			sender.sendMessage(ChatColor.GREEN + "Used to add who not is allowed to jump thru the gate, multiple can be specified");
+		}
+		else if (mode.equalsIgnoreCase("removenotallowed"))
+		{
+			sender.sendMessage(ChatColor.GOLD + "/gate removenotallowed " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag" + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Player/Group Names.");
+			sender.sendMessage(ChatColor.GREEN + "Used to remove who is not allowed to jump thru the gate, multiple can be specified");
+		}
+		else if (mode.equalsIgnoreCase("delete")) 
+		{
+			sender.sendMessage(ChatColor.GOLD + "/gate delete " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
 			sender.sendMessage(ChatColor.GREEN + "Used to remove a gate.");
-		} else if (mode.equalsIgnoreCase("info")) {
-			sender.sendMessage(ChatColor.GOLD + "/gate info " + ChatColor.WHITE
-					+ "| " + ChatColor.GREEN + " Get gate info.");
-			sender.sendMessage(ChatColor.GREEN
-					+ "Stand on a gate's landing pad and issue this command for info on that gate.");
-		} else {
+		} 
+		else if (mode.equalsIgnoreCase("info")) 
+		{
+			sender.sendMessage(ChatColor.GOLD + "/gate info " + ChatColor.WHITE + "| " + ChatColor.GREEN + " Get gate info.");
+			sender.sendMessage(ChatColor.GREEN + "Stand on a gate's landing pad and issue this command for info on that gate.");
+		} 
+		else 
+		{
 			sender.sendMessage(ChatColor.GOLD + "EpicGates help");
-			sender.sendMessage(ChatColor.GOLD + "/gate create "
-					+ ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| "
-					+ ChatColor.AQUA + "[1]" + ChatColor.GREEN
-					+ " = New Gate Name.");
-			sender.sendMessage(ChatColor.GOLD + "/gate link " + ChatColor.AQUA
-					+ "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA
-					+ "[1]" + ChatColor.GREEN + " = Source Gate, "
-					+ ChatColor.AQUA + "[2]" + ChatColor.GREEN
-					+ " = Target Gate");
-			sender.sendMessage(ChatColor.GOLD + "/gate unlink "
-					+ ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| "
-					+ ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
-			sender.sendMessage(ChatColor.GOLD + "/gate direction "
-					+ ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| "
-					+ ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag."
-					+ ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Direction");
-			sender.sendMessage(ChatColor.GOLD + "/gate move " + ChatColor.AQUA
-					+ "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]"
-					+ ChatColor.GREEN + " = Gate Tag.");
-			sender.sendMessage(ChatColor.GOLD + "/gate delete "
-					+ ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| "
-					+ ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
+			sender.sendMessage(ChatColor.GOLD + "/gate create " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Gate Name.");
+			sender.sendMessage(ChatColor.GOLD + "/gate link " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Source Gate, " + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Target Gate");
+			sender.sendMessage(ChatColor.GOLD + "/gate unlink " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
+			sender.sendMessage(ChatColor.GOLD + "/gate direction " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag." + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Direction");
+			sender.sendMessage(ChatColor.GOLD + "/gate move " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag."); sender.sendMessage(ChatColor.GOLD + "/gate delete " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
+			sender.sendMessage(ChatColor.GOLD + "/gate addallowed " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag" + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Player/Group Names.");
+			sender.sendMessage(ChatColor.GOLD + "/gate removeallowed " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag" + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Player/Group Names.");
+			sender.sendMessage(ChatColor.GOLD + "/gate addnotallowed " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag" + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Player/Group Names.");
+			sender.sendMessage(ChatColor.GOLD + "/gate removenotallowed " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag" + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Player/Group Names.");
 		}
 	}
 

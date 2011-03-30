@@ -126,7 +126,9 @@ public class EpicGate {
 	public EpicGate getTarget(){return target;}
 	public Location getLanding(){return landing;}
 	public char getDirection(){return direction;}
-
+	public ArrayList<String> getAllowed(){return allowed;}
+	public ArrayList<String> getNotAllowed(){return notAllowed;}
+	
 	public boolean isAllowed(Player player)
 	{
 
@@ -149,22 +151,42 @@ public class EpicGate {
 		return result;
 	}
 
+	public void addAllowed(String value)
+	{
+		allowed.add(value.toLowerCase());
+	}
+
+	public void removeAllowed(String value)
+	{
+		allowed.remove(value.toLowerCase());	
+	}
+
+	public void addNotAllowed(String value)
+	{
+		notAllowed.add(value.toLowerCase());
+	}
+
+	public void removeNotAllowed(String value)
+	{
+		notAllowed.remove(value.toLowerCase());
+	}
+
 	public boolean groupMatch(ArrayList<String> list1, ArrayList<String> list2)
 	{
 		boolean result = false;
-		
+
 		for(String item2: list2)
 		{
-			if(list1.contains(item2))
+			if(list1.contains(item2.toLowerCase()))
 			{
 				result = true;
 				break;
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	public void setTarget(EpicGate value)
 	{
 		this.target = value;
@@ -223,7 +245,7 @@ public class EpicGate {
 		{
 			for(String member: split)
 			{
-				this.allowed.add(member);
+				this.allowed.add(member.toLowerCase());
 			}
 		}
 	}
@@ -237,7 +259,7 @@ public class EpicGate {
 		{
 			for(String member: split)
 			{
-				this.notAllowed.add(member);
+				this.notAllowed.add(member.toLowerCase());
 			}
 		}
 	}
