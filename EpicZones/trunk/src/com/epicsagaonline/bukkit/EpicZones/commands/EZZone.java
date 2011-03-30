@@ -62,6 +62,8 @@ public class EZZone implements CommandHandler {
 				else if(args[0].equalsIgnoreCase("ceiling")){Ceiling(args, sender, ezp, playerID);}
 				else if(args[0].equalsIgnoreCase("addchildren")){AddChildren(args, sender, ezp, playerID);}
 				else if(args[0].equalsIgnoreCase("removechildren")){RemoveChildren(args, sender, ezp, playerID);}
+				else if(args[0].equalsIgnoreCase("addowners")){AddOwners(args, sender, ezp, playerID);}
+				else if(args[0].equalsIgnoreCase("removeowners")){RemoveOwners(args, sender, ezp, playerID);}
 				else if(args[0].equalsIgnoreCase("name")){Name(args, sender, ezp, playerID);}
 				else if(args[0].equalsIgnoreCase("enter")){EnterMessage(args, sender, ezp, playerID);}
 				else if(args[0].equalsIgnoreCase("exit")){LeaveMessage(args, sender, ezp, playerID);}
@@ -86,11 +88,11 @@ public class EZZone implements CommandHandler {
 
 	private static boolean IsOwner( CommandSender sender, String[] args)
 	{
-		
+
 		boolean result = false;
 		Player player = (Player)sender;
 		EpicZonePlayer ezp = General.getPlayer(player.getName());
-		
+
 		if(args.length > 1)
 		{
 			if(args[0].equalsIgnoreCase("edit"))
@@ -115,9 +117,9 @@ public class EZZone implements CommandHandler {
 				}
 			}
 		}
-		
+
 		return result;
-		
+
 	}
 
 	private static void Set(int playerID, String propertyName, Object value)
@@ -129,6 +131,7 @@ public class EZZone implements CommandHandler {
 		else if(propertyName.equals("flag:regen")){General.getPlayer(playerID).getEditZone().setRegen((String)value);}
 		else if(propertyName.equals("flag:fire")){General.getPlayer(playerID).getEditZone().setAllowFire(Boolean.valueOf(((String)value).trim()));}
 		else if(propertyName.equals("flag:explode")){General.getPlayer(playerID).getEditZone().setAllowExplode(Boolean.valueOf(((String)value).trim()));}
+		else if(propertyName.equals("flag:sanctuary")){General.getPlayer(playerID).getEditZone().setSanctuary(Boolean.valueOf(((String)value).trim()));}
 		else if(propertyName.equals("floor")){General.getPlayer(playerID).getEditZone().setFloor((Integer)value);}
 		else if(propertyName.equals("radius")){General.getPlayer(playerID).getEditZone().setRadius((Integer)value);}
 		else if(propertyName.equals("ceiling")){General.getPlayer(playerID).getEditZone().setCeiling((Integer)value);}
@@ -138,6 +141,8 @@ public class EZZone implements CommandHandler {
 		else if(propertyName.equals("addchild")){General.getPlayer(playerID).getEditZone().addChild((EpicZone)value);}
 		else if(propertyName.equals("addchildtag")){General.getPlayer(playerID).getEditZone().getChildrenTags().add((String)value);}
 		else if(propertyName.equals("removechild")){General.getPlayer(playerID).getEditZone().removeChild((String)value);}
+		else if(propertyName.equals("addowner")){General.getPlayer(playerID).getEditZone().addOwner((String)value);}
+		else if(propertyName.equals("removeowner")){General.getPlayer(playerID).getEditZone().removeOwner((String)value);}
 		else if(propertyName.equals("clearpoints")){General.getPlayer(playerID).getEditZone().clearPolyPoints();}
 		else if(propertyName.equals("boundingbox")){General.getPlayer(playerID).getEditZone().rebuildBoundingBox();}
 		else if(propertyName.equals("world")){General.getPlayer(playerID).getEditZone().setWorld((String)value);}
@@ -242,7 +247,7 @@ public class EZZone implements CommandHandler {
 				else
 				{
 					sender.sendMessage("The flag [" + flag + "] is not a valid flag.");
-					sender.sendMessage("Valid flags are: pvp, mobs, regen, fire, explode");
+					sender.sendMessage("Valid flags are: pvp, mobs, regen, fire, explode, sanctuary");
 				}
 			}
 		}
@@ -361,6 +366,50 @@ public class EZZone implements CommandHandler {
 					}
 				}
 				sender.sendMessage("Zone Children Updated.");
+			}
+		}
+		else
+		{
+			Help(sender, ezp, playerID);
+		}
+	}
+
+	private static void AddOwners(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
+	{
+		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		{
+			if(data.length > 1)
+			{
+				for(int i = 1; i < data.length; i++)
+				{
+					if(data[i].length() > 0)
+					{
+						Set(playerID, "addowner", data[i]);
+					}
+				}
+				sender.sendMessage("Zone Owners Updated.");
+			}
+		}
+		else
+		{
+			Help(sender, ezp, playerID);
+		}
+	}
+
+	private static void RemoveOwners(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
+	{
+		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		{
+			if(data.length > 1)
+			{
+				for(int i = 1; i < data.length; i++)
+				{
+					if(data[i].length() > 0)
+					{
+						Set(playerID, "removeowner", data[i]);
+					}
+				}
+				sender.sendMessage("Zone Owners Updated.");
 			}
 		}
 		else
@@ -637,6 +686,12 @@ public class EZZone implements CommandHandler {
 					{
 						sender.sendMessage(ChatColor.GOLD + "Parent Zone: " + ChatColor.GREEN + zone.getParent().getName() + ChatColor.GOLD + " Tag: " + ChatColor.GREEN + zone.getParent().getTag());
 					}
+					if(zone.getOwners().size() > 0)
+					{
+						messageText = ChatColor.GOLD + "Owners:" + ChatColor.GREEN + "";
+						messageText = messageText + " " + zone.getOwners().toString();
+						sender.sendMessage(messageText);
+					}
 					sender.sendMessage(ChatColor.GOLD + "Zone Flags: ");
 					messageText = "";
 					if(zone.hasPVP())
@@ -662,6 +717,14 @@ public class EZZone implements CommandHandler {
 					else
 					{
 						messageText = messageText + ChatColor.AQUA + "EXPLODE: " + ChatColor.RED + "OFF ";
+					}
+					if(zone.isSanctuary())
+					{
+						messageText = messageText + ChatColor.AQUA + "SANCTUARY: " + ChatColor.GREEN + "ON  ";
+					}
+					else
+					{
+						messageText = messageText + ChatColor.AQUA + "SANCTUARY: " + ChatColor.RED + "OFF ";
 					}
 					if(zone.hasRegen())
 					{
@@ -747,6 +810,7 @@ public class EZZone implements CommandHandler {
 		else if(flag.equals("regen")){return true;}
 		else if(flag.equals("fire")){return true;}
 		else if(flag.equals("explode")){return true;}
+		else if(flag.equals("sanctuary")){return true;}
 		else {return false;}
 	}
 }

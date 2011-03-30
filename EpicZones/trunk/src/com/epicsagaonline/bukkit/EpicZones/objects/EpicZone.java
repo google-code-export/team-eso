@@ -22,12 +22,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-*/
+ */
 
 /**
-* @author jblaske@gmail.com
-* @license MIT License
-*/
+ * @author jblaske@gmail.com
+ * @license MIT License
+ */
 
 package com.epicsagaonline.bukkit.EpicZones.objects;
 import java.awt.Point;
@@ -72,6 +72,7 @@ public class EpicZone {
 	private boolean allowFire = false;
 	private boolean allowExplode = false;
 	private ArrayList<String> owners = new ArrayList<String>();
+	private boolean sanctuary = false;
 
 	public EpicZone(){}
 
@@ -103,6 +104,7 @@ public class EpicZone {
 		this.allowFire = prime.allowFire;
 		this.allowExplode = prime.allowExplode;
 		this.owners = prime.owners;
+		this.sanctuary = prime.sanctuary;
 	}
 
 	public EpicZone(String zoneData)
@@ -153,23 +155,29 @@ public class EpicZone {
 	public ArrayList<String> getAllowedMobs(){return allowedMobs;}
 	public boolean getAllowFire(){return allowFire;}
 	public boolean getAllowExplode(){return allowExplode;}
+	public boolean isSanctuary(){return sanctuary;}
+	public ArrayList<String> getOwners(){return owners;} 
 	public void addChild(EpicZone childZone)
 	{
 		if(this.children == null){this.children = new HashMap<String, EpicZone>();}
 		this.children.put(childZone.getTag(), childZone);
 	}
 
+	public void setSanctuary(Boolean value)
+	{
+		this.sanctuary = value;
+	}
+
 	public void setAllowFire(Boolean value)
 	{
 		this.allowFire = value;
 	}
-	
+
 	public void setAllowExplode(Boolean value)
 	{
 		this.allowExplode = value;
 	}
-			
-	
+
 	public void removeChild(String tag)
 	{
 		if(this.childrenTags != null)
@@ -317,7 +325,11 @@ public class EpicZone {
 				{
 					BuildOwnersFlag(split);
 				}
-					
+				else if(flag.equals("sanctuary"))
+				{
+					this.sanctuary = split[1].equalsIgnoreCase("true");
+				}
+
 			}
 		}
 	}
@@ -512,20 +524,27 @@ public class EpicZone {
 
 	public void BuildOwnersFlag(String[] split)
 	{
-		
+
+		boolean skip = true;
 		this.owners = new ArrayList<String>();
-		
+
 		if(split.length > 0)
 		{
 			this.owners = new ArrayList<String>();
 			for(String owner: split)
 			{
-				owners.add(owner.trim());
+				if(!skip)
+				{
+					owners.add(owner.trim());
+				}
+				else
+				{
+					skip = false;
+				}
 			}
 		}
-		
 	}
-	
+
 	public void setPVP(boolean value)
 	{
 		this.hasPVP = value;
@@ -683,10 +702,20 @@ public class EpicZone {
 		return distanceFromCenter <= this.radius;
 
 	}
-	
+
 	public boolean isOwner(String playerName)
 	{
 		return owners.contains(playerName);
 	}
-	
+
+	public void addOwner(String playerName)
+	{
+		owners.add(playerName);
+	}
+
+	public void removeOwner(String playerName)
+	{
+		owners.remove(playerName);
+	}
+
 }

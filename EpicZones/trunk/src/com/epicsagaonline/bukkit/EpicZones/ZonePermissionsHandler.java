@@ -84,14 +84,14 @@ public class ZonePermissionsHandler
 
 		if(deny)
 		{
-			perm = ".deny.";
+			perm = ".deny";
 		}
 		else
 		{
-			perm = ".allow.";
+			perm = ".allow";
 		}
 
-		result = PERMS_ROOT + flag + perm + getZoneNode(zone);
+		result = PERMS_ROOT + zone.getTag() + "." + flag + perm;
 
 		return result;
 	}
@@ -110,23 +110,23 @@ public class ZonePermissionsHandler
 			perm = ".allow.";
 		}
 
-		result = PERMS_ROOT + flag + perm + worldName;
+		result = PERMS_ROOT + worldName + "." + flag + perm;
 
 		return result;
 	}
 
-	private static String getZoneNode(EpicZone zone)
-	{
-		if(zone.hasParent())
-		{
-			return getZoneNode(zone.getParent()) + "." + zone.getTag();
-		}
-		else
-		{
-			return zone.getTag();
-		}
-
-	}
+//	private static String getZoneNode(EpicZone zone)
+//	{
+//		if(zone.hasParent())
+//		{
+//			return getZoneNode(zone.getParent()) + "." + zone.getTag();
+//		}
+//		else
+//		{
+//			return zone.getTag();
+//		}
+//
+//	}
 
 	private static boolean getDefaultPerm(String flag)
 	{

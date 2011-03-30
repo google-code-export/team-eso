@@ -37,6 +37,7 @@ import java.awt.Point;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -71,47 +72,105 @@ public class EntityEvents extends EntityListener
 		}
 	}
 
+	public @Override void onEntityCombust(EntityCombustEvent event) 
+	{
+		if(!event.isCancelled())
+		{
+			Entity e = event.getEntity();
+			EpicZone zone = General.getZoneForPoint(e.getLocation().getBlockY(),new Point(e.getLocation().getBlockX(),e.getLocation().getBlockZ()), e.getLocation().getWorld().getName());
+			if(zone != null)
+			{
+				if(!zone.getAllowFire())
+				{
+					e.setFireTicks(0);
+					event.setCancelled(true);
+				}
+			}
+		}
+	}
+
 	public @Override void onEntityDamage(EntityDamageEvent event)
 	{
-		if(event.getCause() == DamageCause.ENTITY_ATTACK)
+		if(!event.isCancelled())
 		{
-			if (event instanceof EntityDamageByEntityEvent) 
+			Entity e = event.getEntity();
+			EpicZone sancZone = General.getZoneForPoint(e.getLocation().getBlockY(),new Point(e.getLocation().getBlockX(),e.getLocation().getBlockZ()), e.getLocation().getWorld().getName());
+			if((sancZone != null && !sancZone.isSanctuary()) || sancZone == null)
 			{
-				EntityDamageByEntityEvent sub = (EntityDamageByEntityEvent)event;
-				if(isPlayer(sub.getEntity()) && isPlayer(sub.getDamager()))
+				if(event.getCause() == DamageCause.ENTITY_ATTACK)
 				{
-					EpicZonePlayer ezp = General.getPlayer(sub.getEntity().getEntityId());
-					EpicZone zone = ezp.getCurrentZone();
-					if(zone != null)
+					if (event instanceof EntityDamageByEntityEvent) 
 					{
-						if(!zone.hasPVP())
+						EntityDamageByEntityEvent sub = (EntityDamageByEntityEvent)event;
+						if(isPlayer(sub.getEntity()) && isPlayer(sub.getDamager()))
 						{
-							event.setCancelled(true);
+							EpicZonePlayer ezp = General.getPlayer(sub.getEntity().getEntityId());
+							EpicZone zone = ezp.getCurrentZone();
+							if(zone != null)
+							{
+								if(!zone.hasPVP())
+								{
+									event.setCancelled(true);
+								}
+							}
+							else
+							{
+								if(!General.config.defaultPVP)
+								{
+									event.setCancelled(true);
+								}
+							}
 						}
 					}
-					else
+					else if (event instanceof EntityDamageByProjectileEvent)
 					{
-						if(!General.config.defaultPVP)
+						EntityDamageByEntityEvent sub = (EntityDamageByEntityEvent)event;
+						if(isPlayer(sub.getEntity()) && isPlayer(sub.getDamager()))
+						{
+							EpicZonePlayer ezp = General.getPlayer(sub.getEntity().getEntityId());
+							EpicZone zone = ezp.getCurrentZone();
+							if(zone != null)
+							{
+								if(!zone.hasPVP())
+								{
+									event.setCancelled(true);
+								}
+							}
+						}
+					}
+				}
+				else if(event.getCause() == DamageCause.BLOCK_EXPLOSION || event.getCause() == DamageCause.ENTITY_EXPLOSION)
+				{
+					if(sancZone != null)
+					{
+						if(!sancZone.getAllowExplode())
 						{
 							event.setCancelled(true);
 						}
 					}
 				}
-			}
-			else if (event instanceof EntityDamageByProjectileEvent)
-			{
-				EntityDamageByEntityEvent sub = (EntityDamageByEntityEvent)event;
-				if(isPlayer(sub.getEntity()) && isPlayer(sub.getDamager()))
+				else if(event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK)
 				{
-					EpicZonePlayer ezp = General.getPlayer(sub.getEntity().getEntityId());
-					EpicZone zone = ezp.getCurrentZone();
-					if(zone != null)
+					if(sancZone != null)
 					{
-						if(!zone.hasPVP())
+						if(!sancZone.getAllowFire())
 						{
+							e.setFireTicks(0);
 							event.setCancelled(true);
 						}
 					}
+				}
+			}
+			else //This is a sanctuary zone, no damage allowed to players.
+			{
+				if(isPlayer(e))
+				{
+					e.setFireTicks(0);
+					event.setCancelled(true);
+				}
+				else if(!sancZone.getAllowFire())
+				{
+					e.setFireTicks(0);
 				}
 			}
 		}

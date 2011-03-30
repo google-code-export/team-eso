@@ -109,10 +109,6 @@ public class General {
 
 	}
 
-	
-
-	
-
 	public static void loadZones()
 	{
 		String line;
@@ -288,6 +284,21 @@ public class General {
 		else
 		{result = result + "explode:false ";}
 
+		if(z.isSanctuary())
+		{result = result + "sanctuary:true ";}
+		else
+		{result = result + "sanctuary:false ";}
+
+		if(z.getOwners().size() > 0)
+		{
+			result = result + "owners";
+			for(String owner: z.getOwners())
+			{
+				result = result + ":" + owner;
+			}
+			result = result + " ";
+		}
+		
 		return result;
 	}
 
@@ -390,32 +401,38 @@ public class General {
 
 			ezp.setDistanceFromCenter((int)distanceFromCenter);
 
-			if(distanceFromCenter <= General.config.mapRadius.get(player.getWorld().getName()))
+			if(General.config.mapRadius.get(player.getWorld().getName()) != null)
 			{
-				if(ezp.getPastBorder())
+				if(distanceFromCenter <= General.config.mapRadius.get(player.getWorld().getName()))
 				{
-					WarnPlayer(player, ezp, "You are inside the map radius border.");
-					ezp.setPastBorder(false);
-				}
-				return true;
-			}
-			else
-			{
-				if(EpicZones.permissions.hasPermission(player, "epiczones.ignoremapradius"))
-				{
-					if(!ezp.getPastBorder())
+					if(ezp.getPastBorder())
 					{
-						WarnPlayer(player, ezp, "You are outside the map radius border.");
-						ezp.setPastBorder(true);
+						WarnPlayer(player, ezp, "You are inside the map radius border.");
+						ezp.setPastBorder(false);
 					}
 					return true;
 				}
 				else
 				{
-					return false;	
+					if(EpicZones.permissions.hasPermission(player, "epiczones.ignoremapradius"))
+					{
+						if(!ezp.getPastBorder())
+						{
+							WarnPlayer(player, ezp, "You are outside the map radius border.");
+							ezp.setPastBorder(true);
+						}
+						return true;
+					}
+					else
+					{
+						return false;	
+					}
 				}
 			}
-
+			else //No border defined for the world in config.
+			{
+				return true;
+			}
 		}
 		else
 		{
