@@ -296,7 +296,7 @@ All commands can be accessed with the ez prefix, to circumnavigate command confl
 }}}
 
 ----
-= HeroChat =
+= Hero Chat Integration =
  Enable hero chat in your EpicZones config file.
  Make sure you have a channel in your HeroChat config that has the same name as your zone's tag.
  That's it! EpicZones will auto leave or join any channels that match up to your zones. Enter a child zone that doesn't have a channel? no worries, EpicZones checks for parent channels.
