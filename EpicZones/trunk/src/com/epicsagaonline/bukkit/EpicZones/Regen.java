@@ -68,26 +68,63 @@ public class Regen implements Runnable {
 						{
 							if(ezp.getEnteredZone().before(zone.getAdjustedRegenDelay()))
 							{
-								if(zone.getRegenAmount() > 0)
+								if(zone.getRegen().getRestDelay() == 0 || (zone.getRegen().getRestDelay() > 0 && ezp.getLastMoved().before(zone.getAdjustedRestDelay())))
 								{
-									if(player.getHealth() + zone.getRegenAmount() > MAX_HEALTH)
+									if(zone.getRegen().getAmount() >= 0)
 									{
-										player.setHealth(MAX_HEALTH);
-									}	
-									else
-									{
-										player.setHealth(((player.getHealth() + zone.getRegenAmount())));
+										int bonus = 0;
+										if(player.isSleeping())
+										{
+											bonus = zone.getRegen().getBedBonus();
+										}
+										
+										if(zone.getRegen().getMaxRegen() > 0)
+										{
+											if(player.getHealth() + zone.getRegen().getAmount() + bonus > zone.getRegen().getMaxRegen())
+											{
+												player.setHealth(zone.getRegen().getMaxRegen());
+											}	
+											else
+											{
+												player.setHealth(((player.getHealth() + zone.getRegen().getAmount() + bonus)));
+											}	
+										}
+										else
+										{
+											if(player.getHealth() + zone.getRegen().getAmount() + bonus > MAX_HEALTH)
+											{
+												player.setHealth(MAX_HEALTH);
+											}	
+											else
+											{
+												player.setHealth(((player.getHealth() + zone.getRegen().getAmount() + bonus)));
+											}
+										}
 									}
-								}
-								else
-								{
-									if(player.getHealth() + zone.getRegenAmount() < MIN_HEALTH)
-									{
-										player.setHealth(MIN_HEALTH);
-									}	
 									else
 									{
-										player.setHealth(((player.getHealth() + zone.getRegenAmount())));
+										if(zone.getRegen().getMinDegen() > 0)
+										{
+											if(player.getHealth() + zone.getRegen().getAmount() < zone.getRegen().getMinDegen())
+											{
+												player.setHealth(zone.getRegen().getMinDegen());
+											}	
+											else
+											{
+												player.setHealth(((player.getHealth() + zone.getRegen().getAmount())));
+											}
+										}
+										else
+										{
+											if(player.getHealth() + zone.getRegen().getAmount() < MIN_HEALTH)
+											{
+												player.setHealth(MIN_HEALTH);
+											}	
+											else
+											{
+												player.setHealth(((player.getHealth() + zone.getRegen().getAmount())));
+											}
+										}
 									}
 								}
 							}

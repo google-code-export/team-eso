@@ -52,6 +52,7 @@ public class EpicZonePlayer {
 	private Date enteredZone = new Date();
 	private String previousZoneTag = "";
 	private boolean hasMoved = false;
+	private Date lastMoved = new Date();
 
 	public EpicZone getCurrentZone(){return currentZone;}
 	public int getEntityID(){return entityID;}
@@ -67,6 +68,7 @@ public class EpicZonePlayer {
 	public Date getEnteredZone(){return enteredZone;}
 	public String getPreviousZoneTag(){return previousZoneTag;}
 	public boolean getHasMoved(){return hasMoved;}
+	public Date getLastMoved(){return lastMoved;}
 
 	public enum EpicZoneMode{None, ZoneDraw, ZoneEdit, ZoneDrawConfirm, ZoneDeleteConfirm}
 
@@ -134,6 +136,7 @@ public class EpicZonePlayer {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MILLISECOND, 500);
 		this.lastCheck = cal.getTime();
+		this.lastMoved = cal.getTime();
 	}
 
 	public void setIsTeleporting(boolean value)

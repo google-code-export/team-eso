@@ -86,6 +86,11 @@ public class EpicZones extends JavaPlugin
 	{
 
 		File file = new File(this.getDataFolder() + File.separator + CONFIG_FILE);
+		if(!this.getDataFolder().exists())
+		{
+			this.getDataFolder().mkdir();
+		}
+		
 		General.config = new Config(file);
 
 		PluginDescriptionFile pdfFile = this.getDescription();
@@ -107,7 +112,7 @@ public class EpicZones extends JavaPlugin
 			pm.registerEvent(Event.Type.BLOCK_BURN, this.blockListener, Event.Priority.Normal, this);
 			
 			pm.registerEvent(Event.Type.ENTITY_DAMAGE, this.entityListener, Event.Priority.Normal, this);
-			pm.registerEvent(Event.Type.CREATURE_SPAWN, this.entityListener, Event.Priority.Normal, this); //Causing Wierd Isues!
+			pm.registerEvent(Event.Type.CREATURE_SPAWN, this.entityListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.ENTITY_EXPLODE, this.entityListener, Event.Priority.Normal, this);
 			
 			pm.registerEvent(Event.Type.VEHICLE_MOVE, this.vehicleListener, Event.Priority.Normal, this);
@@ -232,7 +237,7 @@ public class EpicZones extends JavaPlugin
 		General.myPlayers.clear();
 		General.config.load();
 		General.config.save();
-		General.loadZones();
+		General.LoadZones();
 		for(Player p:getServer().getOnlinePlayers())
 		{
 			General.addPlayer(p.getEntityId(), p.getName());

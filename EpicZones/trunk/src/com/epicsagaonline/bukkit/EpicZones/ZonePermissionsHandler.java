@@ -4,12 +4,12 @@ package com.epicsagaonline.bukkit.EpicZones;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission.PermType;
 
 public class ZonePermissionsHandler 
 {
 
 	private static final String PERMS_IGNORE = "epiczones.ignorepermissions";
-	private static final String PERMS_ROOT = "epiczones.";
 
 	public static boolean hasPermissions(Player player, EpicZone zone, String flag)
 	{
@@ -17,49 +17,22 @@ public class ZonePermissionsHandler
 		{
 			if(zone == null)
 			{
-				if(EpicZones.permissions.hasPermission(player, getPermNode(player.getWorld().getName(), flag, true)))
-				{
-					return false;
-				}
-				else if(EpicZones.permissions.hasPermission(player, getPermNode(player.getWorld().getName(), flag, false)))
-				{
-					return true;
-				}
-				else
-				{
-					return getDefaultPerm(flag);
-				}
+				return getDefaultPerm(flag);
 			}
 
 			if(!zone.isOwner(player.getName()))
 			{
-				if(EpicZones.permissions.hasPermission(player, getPermNode(zone, flag, true)))
+				if(zone.hasPermission(player, flag, PermType.DENY)) //  EpicZones.permissions.hasPermission(player, getPermNode(zone, flag, true)))
 				{
-					//Has Deny Permission, Now Check For Specific Grant, and Global Deny (*)
-					if(EpicZones.permissions.hasPermission(player, getPermNode(zone, flag, false)) && EpicZones.permissions.hasPermission(player, getPermNode("*", flag, true)))
-					{
-						return true; //Has Deny Global, But Child Grant, So Override.
-					}
-					else
-					{
-						return false; //Does Not Have Child Grant.
-					}
+					return false;
 				}
-				else if(EpicZones.permissions.hasPermission(player, getPermNode(zone, flag, false)))
+				if(zone.hasPermission(player, flag, PermType.ALLOW)) //  EpicZones.permissions.hasPermission(player, getPermNode(zone, flag, true)))
 				{
 					return true;
 				}
 				else if(zone.hasParent())
 				{
 					return hasPermissions(player, zone.getParent(), flag);
-				}
-				else if(EpicZones.permissions.hasPermission(player, getPermNode(player.getWorld().getName(), flag, true)))
-				{
-					return false;
-				}
-				else if(EpicZones.permissions.hasPermission(player, getPermNode(player.getWorld().getName(), flag, false)))
-				{
-					return true;
 				}
 				else
 				{
@@ -76,57 +49,6 @@ public class ZonePermissionsHandler
 			return true;
 		}
 	}
-
-	private static String getPermNode(EpicZone zone, String flag, Boolean deny)
-	{
-		String result = "";
-		String perm = "";
-
-		if(deny)
-		{
-			perm = ".deny";
-		}
-		else
-		{
-			perm = ".allow";
-		}
-
-		result = PERMS_ROOT + zone.getTag() + "." + flag + perm;
-
-		return result;
-	}
-
-	private static String getPermNode(String worldName, String flag, Boolean deny)
-	{
-		String result = "";
-		String perm = "";
-
-		if(deny)
-		{
-			perm = ".deny.";
-		}
-		else
-		{
-			perm = ".allow.";
-		}
-
-		result = PERMS_ROOT + worldName + "." + flag + perm;
-
-		return result;
-	}
-
-//	private static String getZoneNode(EpicZone zone)
-//	{
-//		if(zone.hasParent())
-//		{
-//			return getZoneNode(zone.getParent()) + "." + zone.getTag();
-//		}
-//		else
-//		{
-//			return zone.getTag();
-//		}
-//
-//	}
 
 	private static boolean getDefaultPerm(String flag)
 	{

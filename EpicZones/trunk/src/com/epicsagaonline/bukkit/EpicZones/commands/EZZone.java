@@ -39,6 +39,7 @@ import org.bukkit.entity.Player;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 
@@ -46,11 +47,41 @@ public class EZZone implements CommandHandler {
 
 	public boolean onCommand(String command, CommandSender sender, String[] args) {
 
-		if((sender instanceof Player && (EpicZones.permissions.hasPermission((Player)sender, "epiczones.admin")) || IsOwner(sender, args)))
+		boolean allow = false;
+		Player player = null;
+
+		if(sender instanceof Player)
 		{
-			Player player = (Player)sender;
-			EpicZonePlayer ezp = General.getPlayer(player.getEntityId());
-			int playerID = ezp.getEntityID();
+			if(EpicZones.permissions.hasPermission((Player)sender, "epiczones.admin"))
+			{
+				allow = true;
+			}
+			else if(IsOwner(sender, args))
+			{
+				allow = true;
+			}
+			else
+			{
+				allow = false;
+			}
+			player = (Player)sender;
+		}
+		else
+		{
+			allow = true;
+		}
+
+		if(allow)
+		{
+
+			EpicZonePlayer ezp = null; 
+			int playerID = -1;
+
+			if(player != null)
+			{
+				ezp = General.getPlayer(player.getEntityId());
+				playerID = ezp.getEntityID();
+			}
 
 			if(args.length > 0)
 			{
@@ -75,6 +106,7 @@ public class EZZone implements CommandHandler {
 				else if(args[0].equalsIgnoreCase("delete")){Delete(args, sender, ezp, playerID);}
 				else if(args[0].equalsIgnoreCase("list")){List(args, sender, ezp, playerID);}
 				else if(args[0].equalsIgnoreCase("info")){Info(args, sender, ezp, playerID);}
+				else if(args[0].equalsIgnoreCase("perm")){Perm(args, sender, ezp, playerID);}
 				else {Help(sender, ezp, playerID);}
 			}
 			else 
@@ -93,9 +125,9 @@ public class EZZone implements CommandHandler {
 		Player player = (Player)sender;
 		EpicZonePlayer ezp = General.getPlayer(player.getName());
 
-		if(args.length > 1)
+		if(args.length >= 1)
 		{
-			if(args[0].equalsIgnoreCase("edit"))
+			if(args[0].equalsIgnoreCase("edit") || args[0].equalsIgnoreCase("info"))
 			{
 				EpicZone zone = General.myZones.get(args[1]); 
 				if(zone != null)
@@ -115,6 +147,10 @@ public class EZZone implements CommandHandler {
 						result = true;
 					}
 				}
+				else if (args[0].equalsIgnoreCase("list"))
+				{
+					result = true;
+				}
 			}
 		}
 
@@ -127,11 +163,12 @@ public class EZZone implements CommandHandler {
 		if(propertyName.equals("editzone")){General.getPlayer(playerID).setEditZone((EpicZone)value);}
 		else if(propertyName.equals("mode")){General.getPlayer(playerID).setMode((EpicZoneMode)value);}
 		else if(propertyName.equals("flag:pvp")){General.getPlayer(playerID).getEditZone().setPVP(Boolean.valueOf(((String)value).trim()));}
-		else if(propertyName.equals("flag:mobs")){General.getPlayer(playerID).getEditZone().SetMobs((String)value);}
+		else if(propertyName.equals("flag:mobs")){General.getPlayer(playerID).getEditZone().setMobs((String)value);}
 		else if(propertyName.equals("flag:regen")){General.getPlayer(playerID).getEditZone().setRegen((String)value);}
 		else if(propertyName.equals("flag:fire")){General.getPlayer(playerID).getEditZone().setAllowFire(Boolean.valueOf(((String)value).trim()));}
 		else if(propertyName.equals("flag:explode")){General.getPlayer(playerID).getEditZone().setAllowExplode(Boolean.valueOf(((String)value).trim()));}
 		else if(propertyName.equals("flag:sanctuary")){General.getPlayer(playerID).getEditZone().setSanctuary(Boolean.valueOf(((String)value).trim()));}
+		else if(propertyName.equals("flag:fireburnsmobs")){General.getPlayer(playerID).getEditZone().setFireBurnsMobs(Boolean.valueOf(((String)value).trim()));}
 		else if(propertyName.equals("floor")){General.getPlayer(playerID).getEditZone().setFloor((Integer)value);}
 		else if(propertyName.equals("radius")){General.getPlayer(playerID).getEditZone().setRadius((Integer)value);}
 		else if(propertyName.equals("ceiling")){General.getPlayer(playerID).getEditZone().setCeiling((Integer)value);}
@@ -150,25 +187,31 @@ public class EZZone implements CommandHandler {
 
 	private static void Create(String[] data, CommandSender sender, Player player, EpicZonePlayer ezp, int playerID)
 	{
-
-		if(ezp.getMode() == EpicZoneMode.None)
+		if(ezp != null)
 		{
-			if(data.length > 1 && data[1].length() > 0)
+			if(ezp.getMode() == EpicZoneMode.None)
 			{
-				String tag = data[1].replaceAll("[^a-zA-Z0-9_]", "");
-				if(General.myZones.get(tag) == null)
+				if(data.length > 1 && data[1].length() > 0)
 				{
-					EpicZone zone = new EpicZone();
-					zone.setTag(tag);
-					zone.setName(tag);
-					Set(playerID, "editzone", zone);
-					Set(playerID, "mode", EpicZoneMode.ZoneDraw);
-					Set(playerID, "world", player.getWorld().getName());
-					sender.sendMessage("Zone Created. Start drawing your zone with the zone edit tool. Type /zone save when you are done drawing.");
+					String tag = data[1].replaceAll("[^a-zA-Z0-9_]", "");
+					if(General.myZones.get(tag) == null)
+					{
+						EpicZone zone = new EpicZone();
+						zone.setTag(tag);
+						zone.setName(tag);
+						Set(playerID, "editzone", zone);
+						Set(playerID, "mode", EpicZoneMode.ZoneDraw);
+						Set(playerID, "world", player.getWorld().getName());
+						sender.sendMessage("Zone Created. Start drawing your zone with the zone edit tool. Type /zone save when you are done drawing.");
+					}
+					else
+					{
+						sender.sendMessage("A zone already exists with the tag [" + tag + "]");
+					}
 				}
 				else
 				{
-					sender.sendMessage("A zone already exists with the tag [" + tag + "]");
+					Help(sender, ezp, playerID);
 				}
 			}
 			else
@@ -176,473 +219,585 @@ public class EZZone implements CommandHandler {
 				Help(sender, ezp, playerID);
 			}
 		}
-		else
-		{
-			Help(sender, ezp, playerID);
-		}
 	}
 
 	private static void Save(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneDraw)
+		if(ezp != null)
 		{
-			if(ezp.getEditZone().getPolygon().npoints > 2)
+			if(ezp.getMode() == EpicZoneMode.ZoneDraw)
 			{
-				Set(playerID, "mode", EpicZoneMode.ZoneEdit);
-				Set(playerID, "boundingbox", "");
-				sender.sendMessage("Drawing Complete. It's reccomended you set the name of your zone now with /zone name [value], or type /zone for more options.");
+				if(ezp.getEditZone().getPolygon().npoints > 2)
+				{
+					Set(playerID, "mode", EpicZoneMode.ZoneEdit);
+					Set(playerID, "boundingbox", "");
+					sender.sendMessage("Drawing Complete. It's reccomended you set the name of your zone now with /zone name [value], or type /zone for more options.");
+				}
+				else if(ezp.getEditZone().getPolygon().npoints == 1 && ezp.getEditZone().getRadius() > 0)
+				{
+					Set(playerID, "mode", EpicZoneMode.ZoneEdit);
+					Set(playerID, "boundingbox", "");
+					sender.sendMessage("Drawing Complete. It's reccomended you set the name of your zone now with /zone name [value], or type /zone for more options.");
+				}
+				else
+				{
+					sender.sendMessage("You must draw at least 3 points or 1 point and set a radius, before you can move on.");
+				}
 			}
-			else if(ezp.getEditZone().getPolygon().npoints == 1 && ezp.getEditZone().getRadius() > 0)
+			else if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				Set(playerID, "mode", EpicZoneMode.ZoneEdit);
-				Set(playerID, "boundingbox", "");
-				sender.sendMessage("Drawing Complete. It's reccomended you set the name of your zone now with /zone name [value], or type /zone for more options.");
+
+				if(General.myZones.get(ezp.getEditZone().getTag()) == null)
+				{
+					General.myZones.put(ezp.getEditZone().getTag(), ezp.getEditZone());
+					General.myZoneTags.add(ezp.getEditZone().getTag());
+				}
+				else
+				{
+					General.myZones.remove(ezp.getEditZone().getTag());
+					General.myZones.put(ezp.getEditZone().getTag(), ezp.getEditZone());
+				}
+				General.SaveZones();
+				Set(playerID, "mode", EpicZoneMode.None);
+				sender.sendMessage("Zone Saved.");
 			}
 			else
 			{
-				sender.sendMessage("You must draw at least 3 points or 1 point and set a radius, before you can move on.");
+				Help(sender, ezp, playerID);
 			}
 		}
-		else if(ezp.getMode() == EpicZoneMode.ZoneEdit)
-		{
-
-			if(General.myZones.get(ezp.getEditZone().getTag()) == null)
-			{
-				General.myZones.put(ezp.getEditZone().getTag(), ezp.getEditZone());
-				General.myZoneTags.add(ezp.getEditZone().getTag());
-			}
-			else
-			{
-				General.myZones.remove(ezp.getEditZone().getTag());
-				General.myZones.put(ezp.getEditZone().getTag(), ezp.getEditZone());
-			}
-			General.saveZones();
-			Set(playerID, "mode", EpicZoneMode.None);
-			sender.sendMessage("Zone Saved.");
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
-		}
-
 	}
 
 	private static void Flag(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			if(data.length > 2 && data[1].length() > 0 && data[2].length() > 0)
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				String flag = data[1];
-				String value = "";
-				for(int i = 2; i < data.length; i++)
+				if(data.length > 2 && data[1].length() > 0 && data[2].length() > 0)
 				{
-					value = value + data[i] + " ";
-				}			
-				if(ValidFlag(flag))
-				{
-					Set(playerID, "flag:" + flag.toLowerCase(), value);
-					sender.sendMessage("Zone Updated. Flag:" + flag + " set to: " + value);
-				}
-				else
-				{
-					sender.sendMessage("The flag [" + flag + "] is not a valid flag.");
-					sender.sendMessage("Valid flags are: pvp, mobs, regen, fire, explode, sanctuary");
+					String flag = data[1];
+					String value = "";
+					for(int i = 2; i < data.length; i++)
+					{
+						value = value + data[i] + " ";
+					}			
+					if(ValidFlag(flag))
+					{
+						Set(playerID, "flag:" + flag.toLowerCase(), value);
+						sender.sendMessage("Zone Updated. Flag:" + flag + " set to: " + value);
+					}
+					else
+					{
+						sender.sendMessage("The flag [" + flag + "] is not a valid flag.");
+						sender.sendMessage("Valid flags are: pvp, mobs, regen, fire, explode, sanctuary");
+					}
 				}
 			}
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void Radius(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneDraw || ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			if (ezp.getEditZone().getPolygon().npoints == 1)
+			if(ezp.getMode() == EpicZoneMode.ZoneDraw || ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				if(data.length > 1 && General.IsNumeric(data[1]))
+				if (ezp.getEditZone().getPolygon().npoints == 1)
 				{
-					Integer value = Integer.parseInt(data[1]);
-					Set(playerID, "radius", value);
-					sender.sendMessage("Zone Updated. Radius set to: " + value);
+					if(data.length > 1 && General.IsNumeric(data[1]))
+					{
+						Integer value = Integer.parseInt(data[1]);
+						Set(playerID, "radius", value);
+						sender.sendMessage("Zone Updated. Radius set to: " + value);
+					}
+					else
+					{
+						sender.sendMessage("[" + data[1] + "] is not a valid value for radius.");
+					}
 				}
 				else
 				{
-					sender.sendMessage("[" + data[1] + "] is not a valid value for radius.");
+					sender.sendMessage("You must specify a single center point, before setting the radius.");
 				}
 			}
 			else
 			{
-				sender.sendMessage("You must specify a single center point, before setting the radius.");
+				Help(sender, ezp, playerID);
 			}
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
 		}
 	}
 
 	private static void Floor(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			if(data.length > 1 && General.IsNumeric(data[1]))
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				Integer value = Integer.parseInt(data[1]);
-				Set(playerID, "floor", value);
-				sender.sendMessage("Zone Updated. Floor to: " + value);
+				if(data.length > 1 && General.IsNumeric(data[1]))
+				{
+					Integer value = Integer.parseInt(data[1]);
+					Set(playerID, "floor", value);
+					sender.sendMessage("Zone Updated. Floor to: " + value);
+				}
+				else
+				{
+					sender.sendMessage("[" + data[1] + "] is not a valid value for floor.");
+				}
 			}
 			else
 			{
-				sender.sendMessage("[" + data[1] + "] is not a valid value for floor.");
+				Help(sender, ezp, playerID);
 			}
 		}
-		else
+	}
+
+	private static void Perm(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
+	{
+		if(ezp != null)
 		{
-			Help(sender, ezp, playerID);
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+			{
+				if(data.length > 3)
+				{
+
+					String member = data[1];
+					String node = data[2];
+					String perm = data[3];
+
+					if(ValidNode(node))
+					{
+						if(ValidPerm(perm))
+						{
+							ezp.getEditZone().addPermission(member, node, perm);
+							sender.sendMessage("Permission Added: " + member + ">" + node + ":" + perm);
+						}
+						else
+						{
+							sender.sendMessage("[" + perm + "] is not a valid permission type.");	
+						}
+					}
+					else
+					{
+						sender.sendMessage("[" + node + "] is not a valid permission node.");
+					}
+				}
+				else
+				{
+					Help(sender, ezp, playerID);
+				}
+			}
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void Ceiling(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			if(data.length > 1 && General.IsNumeric(data[1]))
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				Integer value = Integer.parseInt(data[1]);
-				Set(playerID, "ceiling", value);
-				sender.sendMessage("Zone Updated. Ceiling to: " + value);
+				if(data.length > 1 && General.IsNumeric(data[1]))
+				{
+					Integer value = Integer.parseInt(data[1]);
+					Set(playerID, "ceiling", value);
+					sender.sendMessage("Zone Updated. Ceiling to: " + value);
+				}
+				else
+				{
+					sender.sendMessage("[" + data[1] + "] is not a valid value for ceiling.");
+				}
 			}
 			else
 			{
-				sender.sendMessage("[" + data[1] + "] is not a valid value for ceiling.");
+				Help(sender, ezp, playerID);
 			}
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
-		}
-	}
+		}}
 
 	private static void AddChildren(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			if(data.length > 1)
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				for(int i = 1; i < data.length; i++)
+				if(data.length > 1)
 				{
-					String tag = data[i].replaceAll("[^a-zA-Z0-9_]", "");
-					if(tag.length() > 0 && General.myZones.get(tag) != null)
+					for(int i = 1; i < data.length; i++)
 					{
-						Set(playerID, "addchildtag", tag);
-						Set(playerID, "addchild", General.myZones.get(tag));
+						String tag = data[i].replaceAll("[^a-zA-Z0-9_]", "");
+						if(tag.length() > 0 && General.myZones.get(tag) != null)
+						{
+							Set(playerID, "addchildtag", tag);
+							Set(playerID, "addchild", General.myZones.get(tag));
+						}
 					}
+					sender.sendMessage("Zone Children Updated.");
 				}
-				sender.sendMessage("Zone Children Updated.");
 			}
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void RemoveChildren(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			if(data.length > 1)
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				for(int i = 1; i < data.length; i++)
+				if(data.length > 1)
 				{
-					String tag = data[i].replaceAll("[^a-zA-Z0-9_]", "");
-					if(tag.length() > 0)
+					for(int i = 1; i < data.length; i++)
 					{
-						Set(playerID, "removechild", tag);
+						String tag = data[i].replaceAll("[^a-zA-Z0-9_]", "");
+						if(tag.length() > 0)
+						{
+							Set(playerID, "removechild", tag);
+						}
 					}
+					sender.sendMessage("Zone Children Updated.");
 				}
-				sender.sendMessage("Zone Children Updated.");
 			}
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void AddOwners(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			if(data.length > 1)
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				for(int i = 1; i < data.length; i++)
+				if(data.length > 1)
 				{
-					if(data[i].length() > 0)
+					for(int i = 1; i < data.length; i++)
 					{
-						Set(playerID, "addowner", data[i]);
+						if(data[i].length() > 0)
+						{
+							Set(playerID, "addowner", data[i]);
+						}
 					}
+					sender.sendMessage("Zone Owners Updated.");
 				}
-				sender.sendMessage("Zone Owners Updated.");
 			}
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void RemoveOwners(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			if(data.length > 1)
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				for(int i = 1; i < data.length; i++)
+				if(data.length > 1)
 				{
-					if(data[i].length() > 0)
+					for(int i = 1; i < data.length; i++)
 					{
-						Set(playerID, "removeowner", data[i]);
+						if(data[i].length() > 0)
+						{
+							Set(playerID, "removeowner", data[i]);
+						}
 					}
+					sender.sendMessage("Zone Owners Updated.");
 				}
-				sender.sendMessage("Zone Owners Updated.");
 			}
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void Name(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			if(data.length > 1)
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				String message = "";
-				for(int i = 1; i < data.length; i++)
+				if(data.length > 1)
 				{
-					message = message + data[i] + " ";
-				}
-				if(message.length() > 0)
-				{
-					Set(playerID, "name", message.trim());
-					sender.sendMessage("Zone Updated. Name set to: " + message);
+					String message = "";
+					for(int i = 1; i < data.length; i++)
+					{
+						message = message + data[i] + " ";
+					}
+					if(message.length() > 0)
+					{
+						Set(playerID, "name", message.trim());
+						sender.sendMessage("Zone Updated. Name set to: " + message);
+					}
 				}
 			}
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void EnterMessage(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			if(data.length > 1)
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				String message = "";
-				for(int i = 1; i < data.length; i++)
+				if(data.length > 1)
 				{
-					message = message + data[i] + " ";
-				}
-				if(message.length() > 0)
-				{
-					Set(playerID, "entermessage", message.trim());
-					sender.sendMessage("Zone Updated. Enter message set to: " + message);
+					String message = "";
+					for(int i = 1; i < data.length; i++)
+					{
+						message = message + data[i] + " ";
+					}
+					if(message.length() > 0)
+					{
+						Set(playerID, "entermessage", message.trim());
+						sender.sendMessage("Zone Updated. Enter message set to: " + message);
+					}
 				}
 			}
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void LeaveMessage(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			if(data.length > 1)
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				String message = "";
-				for(int i = 1; i < data.length; i++)
+				if(data.length > 1)
 				{
-					message = message + data[i] + " ";
-				}
-				if(message.length() > 0)
-				{
-					Set(playerID, "exitmessage", message.trim());
-					sender.sendMessage("Zone Updated. Exit message set to: " + message);
+					String message = "";
+					for(int i = 1; i < data.length; i++)
+					{
+						message = message + data[i] + " ";
+					}
+					if(message.length() > 0)
+					{
+						Set(playerID, "exitmessage", message.trim());
+						sender.sendMessage("Zone Updated. Exit message set to: " + message);
+					}
 				}
 			}
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void Draw(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			Set(playerID, "mode", EpicZoneMode.ZoneDrawConfirm);
-			sender.sendMessage("WARNING! Entering draw mode will erase all points for the zone! type /zone draw confirm or /zone draw deny.");
-		}
-		else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
-		{
-			if(data.length > 1)
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				if(data[1].equalsIgnoreCase("confirm"))
+				Set(playerID, "mode", EpicZoneMode.ZoneDrawConfirm);
+				sender.sendMessage("WARNING! Entering draw mode will erase all points for the zone! type /zone draw confirm or /zone draw deny.");
+			}
+			else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
+			{
+				if(data.length > 1)
 				{
-					Set(playerID, "mode", EpicZoneMode.ZoneDraw);
-					sender.sendMessage("Start drawing your zone with the zone edit tool. Type /zone save when you are done drawing.");
-				}
-				else if(data[1].equalsIgnoreCase("deny"))
-				{
-					Set(playerID, "mode", EpicZoneMode.ZoneEdit);
-					sender.sendMessage("Draw Mode canceled, back in Edit Mode. type /zone for more options.");
+					if(data[1].equalsIgnoreCase("confirm"))
+					{
+						Set(playerID, "mode", EpicZoneMode.ZoneDraw);
+						sender.sendMessage("Start drawing your zone with the zone edit tool. Type /zone save when you are done drawing.");
+					}
+					else if(data[1].equalsIgnoreCase("deny"))
+					{
+						Set(playerID, "mode", EpicZoneMode.ZoneEdit);
+						sender.sendMessage("Draw Mode canceled, back in Edit Mode. type /zone for more options.");
+					}
 				}
 			}
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void World(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			if(data.length > 1)
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				if(data[1].length() > 0)
+				if(data.length > 1)
 				{
-					Set(playerID, "world", data[1]);
-					sender.sendMessage("Zone Updated. World set to: " + data[1]);
+					if(data[1].length() > 0)
+					{
+						Set(playerID, "world", data[1]);
+						sender.sendMessage("Zone Updated. World set to: " + data[1]);
+					}
 				}
 			}
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void Confirm(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneDeleteConfirm)
+		if(ezp != null)
 		{
-			if(ezp.getEditZone().hasParent())
+			if(ezp.getMode() == EpicZoneMode.ZoneDeleteConfirm)
 			{
-				General.myZones.get(ezp.getEditZone().getParent().getTag()).removeChild(ezp.getEditZone().getTag());
+				if(ezp.getEditZone().hasParent())
+				{
+					General.myZones.get(ezp.getEditZone().getParent().getTag()).removeChild(ezp.getEditZone().getTag());
+				}
+				General.myZoneTags.remove(ezp.getEditZone().getTag());
+				General.SaveZones();
+				General.plugin.setupEpicZones();
+				sender.sendMessage("Zone [" + ezp.getEditZone().getTag() + "] has been deleted.");
+				Set(playerID, "mode", EpicZoneMode.None);
+				Set(playerID, "editzone", null);
 			}
-			General.myZoneTags.remove(ezp.getEditZone().getTag());
-			General.saveZones();
-			General.plugin.setupEpicZones();
-			sender.sendMessage("Zone [" + ezp.getEditZone().getTag() + "] has been deleted.");
-			Set(playerID, "mode", EpicZoneMode.None);
-			Set(playerID, "editzone", null);
-		}
-		else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
-		{
-			Set(playerID, "mode", EpicZoneMode.ZoneDraw);
-			Set(playerID, "clearpoints", "");
-			sender.sendMessage("Start drawing your zone with the zone edit tool. Type /zone save when you are done drawing.");
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
+			{
+				Set(playerID, "mode", EpicZoneMode.ZoneDraw);
+				Set(playerID, "clearpoints", "");
+				sender.sendMessage("Start drawing your zone with the zone edit tool. Type /zone save when you are done drawing.");
+			}
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void Edit(String[] data, CommandSender sender, Player player, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.None)
+		if(ezp != null)
 		{
-			if(data.length > 1)
+			if(ezp.getMode() == EpicZoneMode.None)
 			{
-				if(data[1].length() > 0)
+				if(data.length > 1)
 				{
-					if(General.myZones.get(data[1]) != null)
+					if(data[1].length() > 0)
 					{
-						String tag = data[1].replaceAll("[^a-zA-Z0-9_]", "");
-						Set(playerID, "editzone", new EpicZone(General.myZones.get(tag)));
-						Set(playerID, "mode", EpicZoneMode.ZoneEdit);
-						sender.sendMessage("Editing Zone: " + tag);
-					}
-					else
-					{
-						Create(data, sender, player, ezp, playerID);
+						if(General.myZones.get(data[1]) != null)
+						{
+							String tag = data[1].replaceAll("[^a-zA-Z0-9_]", "");
+							Set(playerID, "editzone", new EpicZone(General.myZones.get(tag)));
+							Set(playerID, "mode", EpicZoneMode.ZoneEdit);
+							sender.sendMessage("Editing Zone: " + tag);
+						}
+						else
+						{
+							Create(data, sender, player, ezp, playerID);
+						}
 					}
 				}
 			}
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void Cancel(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit || ezp.getMode() == EpicZoneMode.ZoneDraw)
+		if(ezp != null)
 		{
-			Set(playerID, "mode", EpicZoneMode.None);
-			Set(playerID, "editzone", null);
-			sender.sendMessage("Zone modification cancelled, no changes were saved.");
-		}
-		else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm || ezp.getMode() == EpicZoneMode.ZoneDeleteConfirm)
-		{
-			Set(playerID, "mode", EpicZoneMode.ZoneEdit);
-			sender.sendMessage("Draw Mode canceled, back in Edit Mode. type /zone for more options.");
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit || ezp.getMode() == EpicZoneMode.ZoneDraw)
+			{
+				Set(playerID, "mode", EpicZoneMode.None);
+				Set(playerID, "editzone", null);
+				sender.sendMessage("Zone modification cancelled, no changes were saved.");
+			}
+			else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm || ezp.getMode() == EpicZoneMode.ZoneDeleteConfirm)
+			{
+				Set(playerID, "mode", EpicZoneMode.ZoneEdit);
+				sender.sendMessage("Draw Mode canceled, back in Edit Mode. type /zone for more options.");
+			}
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void Delete(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			Set(playerID, "mode", EpicZoneMode.ZoneDeleteConfirm);
-			sender.sendMessage("To continue deleting the zone [" + ezp.getEditZone().getTag() + "] type /zone confirm.");
-		}
-		else
-		{
-			Help(sender, ezp, playerID);
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+			{
+				Set(playerID, "mode", EpicZoneMode.ZoneDeleteConfirm);
+				sender.sendMessage("To continue deleting the zone [" + ezp.getEditZone().getTag() + "] type /zone confirm.");
+			}
+			else
+			{
+				Help(sender, ezp, playerID);
+			}
 		}
 	}
 
 	private static void List(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.None)
+		if(ezp == null || ezp.getMode() == EpicZoneMode.None)
 		{
+			
+			boolean admin = EpicZones.permissions.hasPermission((Player)sender, "epiczones.admin");
+			boolean sentMessage = false;
+			
 			for(String zoneTag: General.myZoneTags)
 			{
-				String messageText;
 				EpicZone zone = General.myZones.get(zoneTag);
-				messageText = ChatColor.GREEN + zone.getName() + ChatColor.GOLD + " [" + zone.getTag() + "]";
-				if(zone.hasChildren())
+				String messageText = "";
+				if(admin || zone.isOwner(ezp.getName()))
 				{
-					messageText = messageText + ChatColor.WHITE + " | " + ChatColor.GREEN + "Children " + ChatColor.GOLD + "(" + zone.getChildren().size() + ")";
+					messageText = ChatColor.GREEN + zone.getName() + ChatColor.GOLD + " [" + zone.getTag() + "]";
+					if(zone.hasChildren())
+					{
+						messageText = messageText + ChatColor.WHITE + " | " + ChatColor.GREEN + "Children " + ChatColor.GOLD + "(" + zone.getChildren().size() + ")";
+					}
+					if(zone.hasParent())
+					{
+						messageText = messageText + ChatColor.WHITE + " | " + ChatColor.GREEN + "Parent " + ChatColor.GOLD + "[" + zone.getParent().getTag() + "]";
+					}
 				}
-				if(zone.hasParent())
+				if(messageText.length() > 0)
 				{
-					messageText = messageText + ChatColor.WHITE + " | " + ChatColor.GREEN + "Parent " + ChatColor.GOLD + "[" + zone.getParent().getTag() + "]";
+					sender.sendMessage(messageText);
+					sentMessage = true;
 				}
-				sender.sendMessage(messageText);
+			}
+			if (!sentMessage)
+			{
+				if(admin)
+				{
+					sender.sendMessage("No zones to list.");
+				}
+				else
+				{
+					sender.sendMessage("You don't own any zones.");
+				}
 			}
 		}
 		else
@@ -653,7 +808,7 @@ public class EZZone implements CommandHandler {
 
 	private static void Info(String[] data, CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.None)
+		if(ezp == null || ezp.getMode() == EpicZoneMode.None)
 		{
 			if(data.length > 1)
 			{
@@ -694,7 +849,7 @@ public class EZZone implements CommandHandler {
 					}
 					sender.sendMessage(ChatColor.GOLD + "Zone Flags: ");
 					messageText = "";
-					if(zone.hasPVP())
+					if(zone.getPVP())
 					{
 						messageText = messageText + ChatColor.AQUA + "PVP: " + ChatColor.GREEN + "ON ";
 					}
@@ -702,7 +857,7 @@ public class EZZone implements CommandHandler {
 					{
 						messageText = messageText + ChatColor.AQUA + "PVP: " + ChatColor.RED + "OFF ";
 					}
-					if(zone.getAllowFire())
+					if(zone.getFire())
 					{
 						messageText = messageText + ChatColor.AQUA + "FIRE: " + ChatColor.GREEN + "ON  ";
 					}
@@ -710,7 +865,7 @@ public class EZZone implements CommandHandler {
 					{
 						messageText = messageText + ChatColor.AQUA + "FIRE: " + ChatColor.RED + "OFF ";
 					}
-					if(zone.getAllowExplode())
+					if(zone.getExplode())
 					{
 						messageText = messageText + ChatColor.AQUA + "EXPLODE: " + ChatColor.GREEN + "ON  ";
 					}
@@ -718,7 +873,7 @@ public class EZZone implements CommandHandler {
 					{
 						messageText = messageText + ChatColor.AQUA + "EXPLODE: " + ChatColor.RED + "OFF ";
 					}
-					if(zone.isSanctuary())
+					if(zone.getSanctuary())
 					{
 						messageText = messageText + ChatColor.AQUA + "SANCTUARY: " + ChatColor.GREEN + "ON  ";
 					}
@@ -726,29 +881,42 @@ public class EZZone implements CommandHandler {
 					{
 						messageText = messageText + ChatColor.AQUA + "SANCTUARY: " + ChatColor.RED + "OFF ";
 					}
+					sender.sendMessage(messageText);
+					messageText = "";
+					if(zone.getFireBurnsMobs())
+					{
+						messageText = messageText + ChatColor.AQUA + "FIREBURNSMOBS: " + ChatColor.GREEN + "ON  ";
+					}
+					else
+					{
+						messageText = messageText + ChatColor.AQUA + "FIREBURNSMOBS: " + ChatColor.RED + "OFF ";
+					}
 					if(zone.hasRegen())
 					{
-						sender.sendMessage(messageText);
-						sender.sendMessage(ChatColor.AQUA + "REGEN: " + ChatColor.GREEN + "Delay [" + zone.getRegenDelay() + "] Amount[" + zone.getRegenAmount() + "] Interval[" + zone.getRegenInterval() + "]");
+						messageText = messageText + ChatColor.AQUA + "REGEN: " + ChatColor.GREEN + "Delay [" + zone.getRegen().getDelay() + "] Amount[" + zone.getRegen().getAmount() + "] Interval[" + zone.getRegen().getInterval() + "]";
 					}
 					else
 					{
 						messageText = messageText + ChatColor.AQUA + "REGEN: " + ChatColor.RED + "OFF ";
-						sender.sendMessage(messageText);
 					}
+					sender.sendMessage(messageText);
 					messageText = ChatColor.AQUA + "MOBS:" + ChatColor.GREEN + "";
-					for(String mobType: zone.getAllowedMobs())
+					for(String mobType: zone.getMobs())
 					{
 						messageText = messageText + " " + mobType.replace("org.bukkit.craftbukkit.entity.Craft", "");
 					}
-					sender.sendMessage(messageText);					
+					sender.sendMessage(messageText);
+					sender.sendMessage("Permissions:");
+					for(EpicZonePermission perm : zone.getPermissions())
+					{
+						sender.sendMessage(perm.getMember() + " > " + perm.getNode().toString() + ":" + perm.getPermission().toString());
+					}
 				}
 				else
 				{
 					sender.sendMessage("No zone with the tag [" + data[1] + "] exists.");
 				}
 			}
-
 		}
 		else
 		{
@@ -758,48 +926,57 @@ public class EZZone implements CommandHandler {
 
 	private static void Help(CommandSender sender, EpicZonePlayer ezp, int playerID)
 	{
-		if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+		if(ezp != null)
 		{
-			sender.sendMessage(ChatColor.GOLD + "You are currently in Edit mode.");
-			sender.sendMessage(ChatColor.GOLD + "/zone name " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Name.");
-			sender.sendMessage(ChatColor.GOLD + "/zone flag " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Flag, " + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Value");
-			sender.sendMessage(ChatColor.GOLD + "/zone floor " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Floor.");
-			sender.sendMessage(ChatColor.GOLD + "/zone ceiling " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Ceiling.");
-			sender.sendMessage(ChatColor.GOLD + "/zone addchildren " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Zone Tag, multiples allowed.");
-			sender.sendMessage(ChatColor.GOLD + "/zone removechildren " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Zone Tag, multiples allowed.");
-			sender.sendMessage(ChatColor.GOLD + "/zone enter " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Enter Message");
-			sender.sendMessage(ChatColor.GOLD + "/zone exit " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Exit Message");
-			sender.sendMessage(ChatColor.GOLD + "/zone world " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = World Name");
-			sender.sendMessage(ChatColor.GOLD + "/zone draw " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Prompts you to go into Draw mode.");
-			sender.sendMessage(ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Discards all current changes.");
-			sender.sendMessage(ChatColor.GOLD + "/zone delete " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Deletes the zone you are currently editing.");
-			sender.sendMessage(ChatColor.GOLD + "/zone save " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Saves all current changes.");
-		}
-		else if(ezp.getMode() == EpicZoneMode.ZoneDraw)
-		{
-			sender.sendMessage(ChatColor.GOLD + "You are currently in Draw mode.");
-			sender.sendMessage(ChatColor.GOLD + "/zone save " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Saves the point data you have drawn.");
-			sender.sendMessage(ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Discards all current changes.");
-		}
-		else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
-		{
-			sender.sendMessage(ChatColor.GOLD + "You are currently in Draw Confirm mode.");
-			sender.sendMessage(ChatColor.GOLD + "/zone confirm " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Clears point data and puts you into Draw mode.");
-			sender.sendMessage(ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Puts you back into EditMode.");
-		}
-		else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
-		{
-			sender.sendMessage(ChatColor.GOLD + "You are currently in Delete Confirm mode.");
-			sender.sendMessage(ChatColor.GOLD + "/zone confirm " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Deletes the zone you are currently editing.");
-			sender.sendMessage(ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Puts you back into EditMode.");
+			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
+			{
+				sender.sendMessage(ChatColor.GOLD + "You are currently in Edit mode.");
+				sender.sendMessage(ChatColor.GOLD + "/zone name " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Name.");
+				sender.sendMessage(ChatColor.GOLD + "/zone flag " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Flag, " + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Value");
+				sender.sendMessage(ChatColor.GOLD + "/zone floor " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Floor.");
+				sender.sendMessage(ChatColor.GOLD + "/zone ceiling " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Ceiling.");
+				sender.sendMessage(ChatColor.GOLD + "/zone addchildren " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Zone Tag, multiples allowed.");
+				sender.sendMessage(ChatColor.GOLD + "/zone removechildren " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Zone Tag, multiples allowed.");
+				sender.sendMessage(ChatColor.GOLD + "/zone enter " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Enter Message");
+				sender.sendMessage(ChatColor.GOLD + "/zone exit " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Exit Message");
+				sender.sendMessage(ChatColor.GOLD + "/zone world " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = World Name");
+				sender.sendMessage(ChatColor.GOLD + "/zone draw " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Prompts you to go into Draw mode.");
+				sender.sendMessage(ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Discards all current changes.");
+				sender.sendMessage(ChatColor.GOLD + "/zone delete " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Deletes the zone you are currently editing.");
+				sender.sendMessage(ChatColor.GOLD + "/zone save " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Saves all current changes.");
+			}
+			else if(ezp.getMode() == EpicZoneMode.ZoneDraw)
+			{
+				sender.sendMessage(ChatColor.GOLD + "You are currently in Draw mode.");
+				sender.sendMessage(ChatColor.GOLD + "/zone save " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Saves the point data you have drawn.");
+				sender.sendMessage(ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Discards all current changes.");
+			}
+			else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
+			{
+				sender.sendMessage(ChatColor.GOLD + "You are currently in Draw Confirm mode.");
+				sender.sendMessage(ChatColor.GOLD + "/zone confirm " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Clears point data and puts you into Draw mode.");
+				sender.sendMessage(ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Puts you back into EditMode.");
+			}
+			else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
+			{
+				sender.sendMessage(ChatColor.GOLD + "You are currently in Delete Confirm mode.");
+				sender.sendMessage(ChatColor.GOLD + "/zone confirm " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Deletes the zone you are currently editing.");
+				sender.sendMessage(ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Puts you back into EditMode.");
+			}
+			else
+			{
+				sender.sendMessage(ChatColor.GOLD + "Help for /zone command.");
+				sender.sendMessage(ChatColor.GOLD + "/zone edit " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Begin editing specified zone.");
+				sender.sendMessage(ChatColor.GOLD + "/zone create " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Create new zone.");
+				sender.sendMessage(ChatColor.GOLD + "/zone list " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Lists existing zones.");
+				sender.sendMessage(ChatColor.GOLD + "/zone info " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Detailed info for specified zone.");
+			}
 		}
 		else
 		{
-			sender.sendMessage(ChatColor.GOLD + "Help for /zone command.");
-			sender.sendMessage(ChatColor.GOLD + "/zone edit " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Begin editing specified zone.");
-			sender.sendMessage(ChatColor.GOLD + "/zone create " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Create new zone.");
-			sender.sendMessage(ChatColor.GOLD + "/zone list " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Lists existing zones.");
-			sender.sendMessage(ChatColor.GOLD + "/zone info " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Detailed info for specified zone.");
+			sender.sendMessage(ChatColor.GOLD + "Help for zone command.");
+			sender.sendMessage(ChatColor.GOLD + "zone list " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Lists existing zones.");
+			sender.sendMessage(ChatColor.GOLD + "zone info " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Detailed info for specified zone.");
 		}
 	}
 
@@ -811,6 +988,23 @@ public class EZZone implements CommandHandler {
 		else if(flag.equals("fire")){return true;}
 		else if(flag.equals("explode")){return true;}
 		else if(flag.equals("sanctuary")){return true;}
+		else if(flag.equals("fireburnsmobs")){return true;}
 		else {return false;}
 	}
+
+	private static boolean ValidNode(String node)
+	{
+		if(node.equals("build")){return true;}
+		else if(node.equals("destroy")){return true;}
+		else if(node.equals("entry")){return true;}
+		else {return false;}
+	}
+
+	private static boolean ValidPerm(String perm)
+	{
+		if(perm.equals("allow")){return true;}
+		else if(perm.equals("deny")){return true;}
+		else {return false;}
+	}
+
 }

@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.integration;
 
-
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
@@ -40,9 +39,7 @@ import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
 public class HeroChatIntegration 
-
 {
-
 	public static void joinChat(String zoneTag, EpicZonePlayer ezp, Player player)
 	{
 		if(General.config.enableHeroChat)
@@ -75,7 +72,6 @@ public class HeroChatIntegration
 		}
 	}
 
-
 	public static void leaveChat(String zoneTag, Player player)
 	{
 		if(General.config.enableHeroChat)
@@ -85,6 +81,7 @@ public class HeroChatIntegration
 				if(EpicZones.heroChat.getChannelManager().getChannel(zoneTag) != null)
 				{
 					EpicZones.heroChat.getChannelManager().getChannel(zoneTag).removePlayer(player.getName());
+					EpicZones.heroChat.getChannelManager().setActiveChannel(player.getName(), EpicZones.heroChat.getChannelManager().getDefaultChannel().getName());
 				}
 			}
 		}

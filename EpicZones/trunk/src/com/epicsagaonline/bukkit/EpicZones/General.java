@@ -32,22 +32,20 @@ THE SOFTWARE.
 package com.epicsagaonline.bukkit.EpicZones;
 
 import java.awt.Point;
-import java.awt.Polygon;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
-
 
 import org.bukkit.entity.Player;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZoneDAL;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
 public class General {
@@ -109,39 +107,97 @@ public class General {
 
 	}
 
-	public static void loadZones()
+	public static void LoadZones()
 	{
-		String line;
-		File file = new File(plugin.getDataFolder() + File.separator + ZONE_FILE);
 
+		myZones.clear();
+
+		if (loadZonesFromText())
+		{
+			Log.Write("Converting Zones.txt into new zone format...");
+			SaveZones();
+			File file = new File(plugin.getDataFolder() + File.separator + ZONE_FILE);
+			file.renameTo(new File(plugin.getDataFolder() + File.separator + ZONE_FILE + ".old"));
+			myZones.clear();
+		}
+
+		myZones = EpicZoneDAL.Load();
+		
+		reconsileZoneTags();
+		reconcileChildren();
+		
+	}
+
+	public static boolean loadZonesFromText()
+	{
 		try
 		{
-			Scanner scanner = new Scanner(file);
-			myZones.clear();
-			myZoneTags.clear();
-			try {
-				while(scanner.hasNext())
+
+			String line;
+			File file = new File(plugin.getDataFolder() + File.separator + ZONE_FILE);
+
+			if(file.exists())
+			{
+				try
 				{
-					EpicZone newZone;
-					line = scanner.nextLine().trim();
-					if(line.startsWith("#") || line.isEmpty()){continue;}
-					newZone = new EpicZone(line);;
-					General.myZones.put(newZone.getTag(), newZone);
-					General.myZoneTags.add(newZone.getTag());
+
+					Scanner scanner = new Scanner(file);
+					myZones.clear();
+					myZoneTags.clear();
+
+					try {
+						while(scanner.hasNext())
+						{
+							EpicZone newZone;
+							line = scanner.nextLine().trim();
+							if(line.startsWith("#") || line.isEmpty()){continue;}
+							newZone = new EpicZone(line);;
+							General.myZones.put(newZone.getTag(), newZone);
+							General.myZoneTags.add(newZone.getTag());
+						}
+
+					}
+					finally {
+						scanner.close();
+					}
+				}
+				catch(Exception e)
+				{
+					Log.Write(e.getMessage());
 				}
 
+				reconcileChildren();
+
+				return true;
+
 			}
-			finally {
-				scanner.close();
-			}
+
 		}
 		catch(Exception e)
 		{
 			Log.Write(e.getMessage());
 		}
+		return false;
 
-		reconcileChildren();
+	}
 
+	public static void SaveZones()
+	{
+		for(String zoneTag : myZoneTags)
+		{
+			EpicZoneDAL.Save(myZones.get(zoneTag));
+		}
+	}
+
+	private static void reconsileZoneTags()
+	{
+		myZoneTags.clear();
+		Iterator<Entry<String, EpicZone>> it = myZones.entrySet().iterator();
+		while(it.hasNext())
+		{
+			Entry<String, EpicZone> pairs = (Entry<String, EpicZone>)it.next();
+			myZoneTags.add(pairs.getKey());
+		}
 	}
 
 	private static void reconcileChildren()
@@ -149,190 +205,49 @@ public class General {
 
 		ArrayList<String> badChildren = new ArrayList<String>();
 
-		for(String zoneTag: myZoneTags)
+		try
 		{
-			EpicZone zone = myZones.get(zoneTag);
-			if(zone.hasChildren())
+			for(String zoneTag: myZoneTags)
 			{
-				for(String child: zone.getChildrenTags())
-				{
-
-					EpicZone childZone = myZones.get(child);
-
-					if(childZone != null)
+				EpicZone zone = myZones.get(zoneTag);
+				if(zone.hasChildren())
+				{					
+					for(String child: zone.getChildrenTags())
 					{
-						childZone.setParent(zone);
-						zone.addChild(childZone);
+						EpicZone childZone = myZones.get(child);
 
-						myZones.remove(child);
-						myZones.put(child, childZone);
+						if(childZone != null)
+						{
+							childZone.setParent(zone);
+							zone.addChild(childZone);
+
+							myZones.remove(child);
+							myZones.put(child, childZone);
+						}
+						else
+						{
+							Log.Write("The zone [" + zoneTag + "] has an invalid child > [" + child + "]");
+							badChildren.add(child);
+						}
 					}
-					else
+					if (badChildren.size() > 0)
 					{
-						Log.Write("The zone [" + zoneTag + "] has an invalid child > [" + child + "]");
-						badChildren.add(child);
+						for(String badChild: badChildren)
+						{
+							zone.removeChild(badChild);
+						}
+						badChildren = new ArrayList<String>();
 					}
 				}
-				if (badChildren.size() > 0)
-				{
-					for(String badChild: badChildren)
-					{
-						zone.removeChild(badChild);
-					}
-					badChildren = new ArrayList<String>();
-				}
-			}
-			myZones.remove(zoneTag);
-			myZones.put(zoneTag, zone);
-		}
-
-	}
-
-	public static void saveZones()
-	{
-		File file = new File(plugin.getDataFolder() + File.separator + ZONE_FILE);
-
-		try 
-		{
-			String data = BuildZoneData();
-			Writer output = new BufferedWriter(new FileWriter(file, false));
-			try 
-			{
-				output.write(data);
-			}
-			finally {
-				output.close();
+				myZones.remove(zoneTag);
+				myZones.put(zoneTag, zone);
 			}
 		}
 		catch(Exception e)
 		{
 			Log.Write(e.getMessage());
 		}
-	}
 
-	private static String BuildZoneData()
-	{
-		String result = "#Zone Tag|World|Zone Name|Flags|Enter Message|Exit Message|Floor|Ceiling|Child Zones|PointList\n";
-		String line = "";
-
-		for(String tag: myZoneTags)
-		{
-			EpicZone z = myZones.get(tag);
-			line = z.getTag() + "|";
-			line = line + z.getWorld() + "|";
-			line = line + z.getName() + "|";
-			line = line + BuildFlags(z) + "|";
-			line = line + z.getEnterText() + "|";
-			line = line + z.getExitText() + "|";
-			line = line + z.getFloor() + "|";
-			line = line + z.getCeiling() + "|";
-			line = line + BuildChildren(z) + "|";
-			line = line + BuildPointList(z) + "\n";
-			result = result + line;
-		}
-		return result;
-	}
-
-	private static String BuildFlags(EpicZone z)
-	{
-		String result = "";
-
-		if(z.hasPVP())
-		{result = result + "pvp:true ";}
-		else
-		{result = result + "pvp:false ";}
-
-		//if(z.getFlags().get("nomobs") != null){result = result + "nomobs:" + z.getFlags().get("nomobs").toString() + " ";}
-
-		if(z.hasRegen())
-		{
-			if(z.getRegenDelay() > 0)
-			{
-				result = result + "regen:" + z.getRegenInterval() + ":" + z.getRegenAmount() + ":" + z.getRegenDelay() + " ";
-			}
-			else
-			{
-				result = result + "regen:" + z.getRegenInterval() + ":" + z.getRegenAmount() + " ";	
-			}
-		}
-
-		if(z.getAllowedMobs() != null)
-		{
-
-			if(z.getAllowedMobs().size() > 0)
-			{
-				result = result + "mobs";
-				for(String mobType: z.getAllowedMobs())
-				{
-					result = result + ":" + mobType.replace("org.bukkit.craftbukkit.entity.Craft", "");
-				}
-				result = result + " ";
-			}
-			else
-			{
-				result = result + "mobs:all ";
-			}
-		}
-
-		if(z.getAllowFire())
-		{result = result + "fire:true ";}
-		else
-		{result = result + "fire:false ";}
-
-		if(z.getAllowExplode())
-		{result = result + "explode:true ";}
-		else
-		{result = result + "explode:false ";}
-
-		if(z.isSanctuary())
-		{result = result + "sanctuary:true ";}
-		else
-		{result = result + "sanctuary:false ";}
-
-		if(z.getOwners().size() > 0)
-		{
-			result = result + "owners";
-			for(String owner: z.getOwners())
-			{
-				result = result + ":" + owner;
-			}
-			result = result + " ";
-		}
-		
-		return result;
-	}
-
-	private static String BuildChildren(EpicZone z)
-	{
-		String result = "";
-
-		for(String tag: z.getChildrenTags())
-		{
-			result = result + tag + " ";
-		}
-
-		return result;
-	}
-
-	private static String BuildPointList(EpicZone z)
-	{
-
-		String result = "";
-		Polygon poly = z.getPolygon();
-
-		if(poly == null || poly.npoints <= 1)
-		{
-			result = z.getCenter().x + ":" + z.getCenter().y + " " + z.getRadius();
-		}
-		else
-		{
-			for(int i = 0; i < poly.npoints; i++)
-			{
-				result = result + poly.xpoints[i] + ":" + poly.ypoints[i] + " ";
-			}
-		}
-
-		return result;
 	}
 
 	public static EpicZone getZoneForPoint(int elevation, Point location, String worldName)

@@ -62,7 +62,6 @@ public class Config extends Configuration {
 	public boolean defaultPVP;
 	public boolean enableRadius;
 	public boolean enableHeroChat;
-	public String permissionSystem;
 	public int zoneTool = 280; //Default Tool Is Stick
 
 	public Config(File file)
@@ -85,7 +84,6 @@ public class Config extends Configuration {
 		enableRadius = true;
 		enableHeroChat = false;
 		zoneTool = 280;
-		permissionSystem = "GroupManager";
 	}
 
 	@Override
@@ -117,17 +115,7 @@ public class Config extends Configuration {
 			enableRadius = getBoolean("enableRadius", true);
 			enableHeroChat = getBoolean("enableHeroChat", false);
 			zoneTool = getInt("zoneTool", zoneTool);
-			permissionSystem = getString("permissionSystem");
-			
-			if(permissionSystem == null || permissionSystem.trim().length() == 0)
-			{
-				permissionSystem = "GroupManager";
-			}
-			else
-			{
-				permissionSystem = permissionSystem.trim();
-			}
-			
+
 		}
 	}
 
@@ -140,20 +128,13 @@ public class Config extends Configuration {
 		FileOutputStream stream;
 		BufferedWriter writer;
 
-		root.put("#The default flags are used when no zone can be found for a given event.", "");
-		root.put("#Defaults are NOT applied to zones on creation.", "");
 		root.put("defaultEnter", defaultEnter);
 		root.put("defaultBuild", defaultBuild);
 		root.put("defaultDestroy", defaultDestroy);
 		root.put("defaultPVP", defaultPVP);
-		root.put("#The map radius is set as a block radius from 0,0 of your world.", "");
 		root.put("enableRadius", enableRadius);
 		root.put("mapRadius", getMapRadius());
-		root.put("#zoneTool is the tool used to draw zones with.", "");
 		root.put("zoneTool", zoneTool);
-		root.put("#Defines what permissions system you use, valid values are Permissions or GroupManager.", "");
-		root.put("permissionSystem", permissionSystem);
-		root.put("#Enables or disables HeroChat integration.", "");
 		root.put("enableHeroChat", enableHeroChat);
 
 		try 
@@ -187,7 +168,7 @@ public class Config extends Configuration {
 			mapRadius.put(w.getName(), value);	
 		}
 	}
-	
+
 	private void setMapRadius(String data)
 	{
 		if(data.length() > 0)
@@ -219,7 +200,7 @@ public class Config extends Configuration {
 			}
 		}
 	}
-	
+
 	private String getMapRadius()
 	{
 		String result = "";

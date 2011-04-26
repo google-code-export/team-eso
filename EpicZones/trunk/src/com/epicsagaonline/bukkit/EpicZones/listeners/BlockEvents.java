@@ -70,7 +70,7 @@ public class BlockEvents extends BlockListener {
 			EpicZone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
 			if (zone != null)
 			{
-				if(!zone.getAllowFire())
+				if(!zone.getFire())
 				{
 					event.setCancelled(true);
 				}
@@ -85,7 +85,7 @@ public class BlockEvents extends BlockListener {
 			EpicZone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
 			if (zone != null)
 			{
-				if(!zone.getAllowFire())
+				if(!zone.getFire())
 				{
 					event.setCancelled(true);
 				}
@@ -104,7 +104,7 @@ public class BlockEvents extends BlockListener {
 			int blockHeight = event.getBlock().getLocation().getBlockY();
 			boolean hasPerms = false;
 			EpicZone currentZone = null;
-
+			
 			if(General.pointWithinBorder(blockPoint, player))
 			{
 				currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);

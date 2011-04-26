@@ -65,7 +65,7 @@ public class EntityEvents extends EntityListener
 		EpicZone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
 		if (zone != null)
 		{
-			if(!zone.getAllowExplode())
+			if(!zone.getExplode())
 			{
 				event.setCancelled(true);
 			}
@@ -80,10 +80,18 @@ public class EntityEvents extends EntityListener
 			EpicZone zone = General.getZoneForPoint(e.getLocation().getBlockY(),new Point(e.getLocation().getBlockX(),e.getLocation().getBlockZ()), e.getLocation().getWorld().getName());
 			if(zone != null)
 			{
-				if(!zone.getAllowFire())
+				if(!zone.getFire())
 				{
-					e.setFireTicks(0);
-					event.setCancelled(true);
+					if(isPlayer(e))
+					{
+						e.setFireTicks(0);
+						event.setCancelled(true);
+					}
+					else if (!zone.getFireBurnsMobs())
+					{
+						e.setFireTicks(0);
+						event.setCancelled(true);
+					}
 				}
 			}
 		}
@@ -95,7 +103,7 @@ public class EntityEvents extends EntityListener
 		{
 			Entity e = event.getEntity();
 			EpicZone sancZone = General.getZoneForPoint(e.getLocation().getBlockY(),new Point(e.getLocation().getBlockX(),e.getLocation().getBlockZ()), e.getLocation().getWorld().getName());
-			if((sancZone != null && !sancZone.isSanctuary()) || sancZone == null)
+			if((sancZone != null && !sancZone.getSanctuary()) || sancZone == null)
 			{
 				if(event.getCause() == DamageCause.ENTITY_ATTACK)
 				{
@@ -108,7 +116,7 @@ public class EntityEvents extends EntityListener
 							EpicZone zone = ezp.getCurrentZone();
 							if(zone != null)
 							{
-								if(!zone.hasPVP())
+								if(!zone.getPVP())
 								{
 									event.setCancelled(true);
 								}
@@ -131,7 +139,7 @@ public class EntityEvents extends EntityListener
 							EpicZone zone = ezp.getCurrentZone();
 							if(zone != null)
 							{
-								if(!zone.hasPVP())
+								if(!zone.getPVP())
 								{
 									event.setCancelled(true);
 								}
@@ -143,7 +151,7 @@ public class EntityEvents extends EntityListener
 				{
 					if(sancZone != null)
 					{
-						if(!sancZone.getAllowExplode())
+						if(!sancZone.getExplode())
 						{
 							event.setCancelled(true);
 						}
@@ -153,10 +161,18 @@ public class EntityEvents extends EntityListener
 				{
 					if(sancZone != null)
 					{
-						if(!sancZone.getAllowFire())
+						if(!sancZone.getFire())
 						{
-							e.setFireTicks(0);
-							event.setCancelled(true);
+							if(isPlayer(e))
+							{
+								e.setFireTicks(0);
+								event.setCancelled(true);
+							}
+							else if (!sancZone.getFireBurnsMobs())
+							{
+								e.setFireTicks(0);
+								event.setCancelled(true);
+							}
 						}
 					}
 				}
@@ -168,10 +184,6 @@ public class EntityEvents extends EntityListener
 					e.setFireTicks(0);
 					event.setCancelled(true);
 				}
-				else if(!sancZone.getAllowFire())
-				{
-					e.setFireTicks(0);
-				}
 			}
 		}
 	}
@@ -181,14 +193,13 @@ public class EntityEvents extends EntityListener
 		if(!event.isCancelled() && isCreature(event.getCreatureType()))
 		{
 
-			Entity mob = event.getEntity();
 			EpicZone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
 
 			if(zone != null)
 			{
-				if(!zone.getAllowedMobs().contains("all"))
+				if(!zone.getMobs().contains("all"))
 				{
-					if (zone.getAllowedMobs().contains("none") || !zone.getAllowedMobs().contains(mob.getClass().getName()))
+					if (zone.getMobs().contains("none") || !zone.getMobs().contains(event.getCreatureType().toString()))
 					{
 						event.setCancelled(true);
 					}

@@ -220,7 +220,7 @@ public class PlayerEvents extends PlayerListener
 			}
 		}
 	}
-
+	
 	private boolean PlayerWithinZoneLogic(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint)
 	{
 
