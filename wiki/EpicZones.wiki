@@ -1,12 +1,14 @@
 #summary Polygon based area protection, with child zones, permissions inheritance, and map border protection.
 
-== Introduction ==
-Polygon based area protection, with child zones, permissions inheritance, and map border protection. 
+<wiki:toc max_depth="1" />
 
+----
+= Introduction =
+Polygon based area protection, with child zones, permissions inheritance, and map border protection. 
 *Lead Developer* jblaske
 
-
-== Features ==
+----
+= Features =
     * Polygonal area creation. (Not just cuboids!)
     * In-game zone creation.
     * Provide a Circular border to your map.
@@ -15,7 +17,292 @@ Polygon based area protection, with child zones, permissions inheritance, and ma
     * Display Entering and Exiting messages in chat.
     * Enhanced /who
 
+----
+= Creating Zones =
+Use the /zone command at any time for in game help. This requires that you have the *epiczones.admin* permission.
 
+The following is an example for creating a PVP enabled arena zone in game:
+{{{
+/zone create arena
+}}}
+You are then put into draw mode, use the zoneTool in your config (Default is Stick) to right click and set points. When you are done drawing, enter the command:
+{{{
+/zone save
+}}}
+
+When a zone is created, its Name is defaulted to the tag, and its world is defaulted to the world you are in. Both can be changed after drawing your polygon.
+{{{
+/zone name PVP Arena //Sets name to 'PVP Arena'
+/zone flag pvp true //Enables PVP
+/zone enter PVP is enabled, beware! //Sets the enter message to a informative warning
+/zone exit You are no longer in a PVP zone, you can relax now. //Sets the exit message to let players know they are save.
+/zone save //Saves the zone to file.
+}}}
+And your zone is done!
+
+== Child/Parent Zones ==
+If your zone is within the borders of another zone, you will want to make sure it is a child of that zone.
+
+These commands will show you how to set a zone as a child to another zone:
+{{{
+/zone edit bigcity
+/zone addchildren arena
+/zone save
+}}}
+
+Next you will want to set some permissions on your zone. In these next commands we will make it so that only members of our server can enter the arena.
+{{{
+/zone edit arena
+/zone perm default entry deny
+/zone perm member entry allow
+/zone save
+}}}
+More information on Permissions can be found [EpicZones#Permissions below].
+
+Now you are all set, you have a basic PVP arena zone that is a child to the big city!
+
+*NOTE:* You must have only 1 point selected when you save your zone, to make your zone a circle.
+*NOTE:* You must have at least 3 points selected when you save your zone, to make your zone a polygon.
+
+----
+= Map Radius =
+Map radius, when enabled, will prevent players from traveling outside of the fixed range from 0,0 on the map.
+
+To allow a player to ignore the map radius add this to their permissions in your permissions plugin configuration.
+{{{epiczones.ignoremapradius}}}
+
+----
+= Permissions =
+EpicZones handles its zone based permissions internally. Each zone controls who can do what within it. There are also default settings for when no zone can be found where a player is located. These are the "default..." options in the config file.
+
+To give a player permissions to do things in a zone, you add that player, or their group (if you are using a permissions plugin that has grouping) into the zone's permissions.
+
+*Permissions are set while in edit mode on a zone.*
+
+If you want to deny all players in the default group, the ability to build within a zone. You would use the following command:
+{{{/zone perm default build deny}}}
+
+If you would like a member to be able to ignore all zone permissions add this to their permissions in your permissions plugin configuration.
+{{{epiczones.ignorepermissions}}}
+
+== Possible Permission Nodes ==
+    * build
+      * The placement of blocks and pouring of buckets
+    * destroy
+      * The destruction of blocks and the scooping of buckets
+    * entry
+      * Player walk or teleport within a zone.
+
+== Permission Hierarchy ==
+These are the steps permission checks when seeing if a user has permission to perform an action. If the answer is 'no' the logic progresses deeper.
+
+    * Is player explicitly denied?
+      * Is player explicitly allowed?
+        * Is player explicitly denied in parent?
+          * Is player explicitly allowed in parent?
+            * Is player allowed by default config?
+
+----
+= Flags =
+
+=== PVP ===
+ Zone level control to dictate weather player versus player damage is allowed.
+
+==== Values ====
+ * *True* A setting of true, means that players will be able to damage each other with weapons and fists.
+ * *False* A Setting of false, means that players will not be able to damage each other with weapons and fists.
+
+==== Notes ====
+ * You must have PVP enabled in your server.properties file.
+ * When checking for pvp allowance, it checks the zone of the player being damaged, not the player dealing the damage.
+==== Syntax ====
+{{{
+/zone flag pvp <true/false>
+}}}
+
+
+
+=== Regen ===
+ Zone level control that dictates the regen or degen of health when a player is inside the zone.
+
+==== Values ====
+ * *Interval* Frequency of regen tick for that zone in miliseconds.
+ * *Amount* the amount the players health is modified by each regen tick (can be negative). A value of 1 equals half a heart.
+ * *Delay* (optional) Amount of time a player must be within the zone before regen ticks apply to them
+ * *MaxRegen* (optional) The maximum amount the zone will regen a player's health.
+ * *MinDegen* (optional) The minimum amount the zone will degen a player's health.
+ * *RestDelay* (optional) A length in time that a user must hold still before the regen/degen effects will take place.
+ * *BedBonus* (optional) The amount of bonus regen if a player is in a bed.
+
+==== Notes ====
+ * Currently, you cannot modify MaxRegen, MinDegen, RestDelay nor BedBonus in game. These values must be changed manually in the zone's yml file.
+ * Moving the mouse to look around still counts as moving, and will prevent a player from entering 'rest' mode. This will be changed in the future.
+
+==== Syntax ====
+{{{
+/zone flag regen <interval> <amount> [delay]
+}}}
+
+
+
+=== Mobs ===
+ Zone level control of the mobs allowed to spawn within.
+
+==== Values ====
+ * none
+ * all
+ * animals
+ * monsters
+ * squid
+ * chicken
+ * cow
+ * sheep
+ * pig
+ * wolf
+ * creeper
+ * zombie
+ * ghast
+ * giant
+ * skeleton
+ * slime
+ * spider
+
+==== Syntax ====
+{{{
+/zone flag mobs [value] [value] [value]
+}}}
+
+
+
+=== Fire ===
+ Zone level control of fire
+ Flag use: /zone flag fire [true|false]
+ A value of true, means fire will be allowed in the zone.
+
+==== Values ====
+ * *True* A setting of true, means that fire will be allowed within the zone.
+ * *False* A Setting of false, means that fire will be extinguished within the zone.
+
+==== Notes ====
+ * Setting the value to false, will not prohibit mobs from catching fire within a zone. To prevent this, you must also set up the Fire Burns Mobs flag.
+
+==== Syntax ====
+{{{
+/zone flag fire <true/false>
+}}}
+
+
+
+=== Explode === 
+ Zone level control of terrain destruction and damage from explosions.
+ Flag use: /zone flag explode [true|false]
+ A value of true, means explosions will destroy terrain
+
+==== Values ====
+ * *True* A setting of true, means that explosions will be allowed within the zone.
+ * *False* A Setting of false, means that explosions and damage caused by them will be blocked within the zone.
+
+==== Syntax ====
+{{{
+/zone flag explode <true/false>
+}}}
+
+
+
+=== Fire Burns Mobs ===
+ Zone level control to dictate weather or not fire will kill mobs. This can be used to keep mobs from dyeing during the day, or to keep your pigs from roasting when they walk over your lit netherrack.
+
+==== Values ====
+ * *True* A setting of true, means that fire will damage mobs.
+ * *False* A Setting of false, means fire will not damage mobs.
+
+==== Notes ====
+ * In order to utilize this flag, you must also set the value of the fire flag to false.
+
+==== Syntax ====
+{{{
+/zone flag fireburnsmobs <true/false>
+}}}
+
+
+
+----
+= Commands =
+All commands can be accessed with the ez prefix, to circumnavigate command conflicts, and have other aliases to allow easy use of the commands.
+
+=== Zone ===
+*Permissions Required:* epiczones.admin
+ The zone command is the core of EpicZones, its how you define and manage all of your zones in game.
+
+==== Aliases ====
+ * ezzone
+ * zone
+
+==== Syntax ====
+{{{
+/zone <sub-command> [parameter] [parameter]
+}}}
+
+==== Sub-Commands ====
+ * create
+ * save
+ * flag
+ * radius
+ * floor
+ * ceiling
+ * addchildren
+ * removechildren
+ * addowners
+ * removeowners
+ * name
+ * enter
+ * exit
+ * draw
+ * confirm
+ * edit
+ * world
+ * cancel
+ * delete
+ * list
+ * info
+ * perm
+
+=== Who ===
+*Permissions Required:* none
+ Gives a list of players and the zones that they are in, if they are in a zone.
+
+==== Aliases ====
+ * ezwho
+ * who
+ * online
+ * whois
+
+==== Syntax ====
+{{{
+/who [all]
+}}}
+
+=== Reload ===
+*Permissions Required:* epiczones.admin
+ Reloads all of the EpicZones configurations and zones into server memory.
+
+==== Aliases ====
+ * ezreload
+ * reload
+
+==== Syntax ====
+{{{
+/ezreload
+}}}
+
+----
+= HeroChat =
+ Enable hero chat in your EpicZones config file.
+ Make sure you have a channel in your HeroChat config that has the same name as your zone's tag.
+ That's it! EpicZones will auto leave or join any channels that match up to your zones. Enter a child zone that doesn't have a channel? no worries, EpicZones checks for parent channels.
+
+----
+= Example Files =
 == Default Config.yml ==
 {{{
 defaultEnter: true
@@ -35,75 +322,3 @@ test2|world1|Test Zone 2|pvp:false regen:false nomobs:false|Entering Test Zone 2
 }}}
  * Regen and NoMobs have no effect currently, and do not need to be specified.
  * ZoneTag must be unique.
-
-
-== Creating Zones In Game ==
-Use the /zone command at any time for in game help.
-
-Example for creating a zone in game.
-{{{
-/zone create arena
-}}}
-You are then put into draw mode, use the zoneTool in your config (Default is Stick) to right click and set points. When you are done.
-
-When a zone is created, its Name is defaulted to the tag, and its world is defaulted to the world you are in. Both can be changed after drawing your polygon.
-{{{
-/zone save
-/zone name PvP Arena
-/zone flag pvp true
-/zone enter PVP is enabled, beware!
-/zone exit You are no longer in a pvp zone, you can relax now
-/zone save
-}}}
-And your zone is done!
-
-Be sure to set your new zone as a child on any zones it is within like this:
-{{{
-/zone edit parentzone
-/zone addchildren arena
-/zone save
-}}}
-Currently, you cannot add permissions from within game, you must modify your permissions config.yml manually.
-
-== Map Radius ==
-Map radius, when enabled will prevent players from travling outside of the fixed range from 0,0 on the map.
-
-To allow a player to ignore the map radius add this to their permissions
-{{{epiczones.ignoremapradius}}}
-
-== Permissions Explained ==
-EpicZones is fully integrated with Permissions, to define who can do what within zones. This allows permissions to properly inherit from groups and also allow for specific permissions for players.
-
-To give a player permissions to do things in a zone, you add a permission to that player's group or the player specifically in the form of epiczones.zonetag.flag
-
-So, if you wanted joebob to have build access in test1, listed above. You would add the following permission to joebob's permissions.
-{{{epiczones.test1.build}}}
-It's that simple!
-
-Now you wonder, how do i specifically deny somebody from doing things now? Easy just add .deny to the end! This would deny build permissions in test1.
-{{{epiczones.test1.build.deny}}}
-NOTE: Deny permissions take precedence over allow permissions. Child permissions take precedence over parent permissions.
-
-If you would like a member to be able to ignore all zone permissions add this to their permissions
-{{{epiczones.ignorepermissions}}}
-
-
-== Possible Permission Flags ==
-    * build
-      * The placement of blocks and pouring of buckets
-    * destroy
-      * The destruction of blocks and the scooping of buckets
-    * entry
-      * Player walk or teleport within a zone.
-
-== Flags ==
-    * PVP
-      * You must have PVP enabled in your server.properties file
-      * Setting pvp:true in a zone, will allow players to damage each other.
-      * When checking for pvp allowance, it checks the zone of the player being damaged, not the player dealing the damage.
-
-
-== Commands ==
-    * /who (epiczones.who)
-    * /reloadez (epiczones.admin)
-    * /zone (epiczones.admin)
