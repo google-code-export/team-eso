@@ -239,11 +239,6 @@ All commands can be accessed with the ez prefix, to circumnavigate command confl
  * ezzone
  * zone
 
-==== Syntax ====
-{{{
-/zone <sub-command> [parameter] [parameter]
-}}}
-
 ==== Sub-Commands ====
  * create
  * save
@@ -267,6 +262,11 @@ All commands can be accessed with the ez prefix, to circumnavigate command confl
  * list
  * info
  * perm
+
+==== Syntax ====
+{{{
+/zone <sub-command> [parameter] [parameter]
+}}}
 
 === Who ===
 *Permissions Required:* none
