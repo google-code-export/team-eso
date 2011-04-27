@@ -349,5 +349,3 @@ sanctuary: false
 type: POLY
 world: world
 }}}
- * Regen and NoMobs have no effect currently, and do not need to be specified.
- * ZoneTag must be unique.
