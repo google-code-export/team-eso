@@ -350,3 +350,108 @@ sanctuary: false
 type: POLY
 world: world
 }}}
+
+----
+= Changelog =
+
+ * *Version 0.20.1*
+   * Bug fix causing groups to not work properly
+ * *Version 0.20*
+   * Zone based permissions
+   * Enhanced Regen
+   * Refined Ownership
+   * Bug Fixes
+   * Code Cleanup
+ * *Version 0.19*
+   * Added Sanctuary flag
+   * Added Owners
+   * Improved Fire Suppression
+   * You will no longer take damage from an explosion if a zone is marked for no explosions
+   * You will no longer take burning damage in a zone that is marked for no fire
+   * Lots of other little things I can't remember.
+ * *Version 0.18*
+   * Multiworld bug fixes
+ * *Version 0.17*
+   * Support for GroupManager 1.0
+   * HeroChat 4.1.0 Support
+   * Permissions Check for /who
+   * PreLoads multi world plugins
+     * EpicGates
+     * MultiVerse
+   * A few other bug fixes
+ * *Version 0.16*
+   * fixed a bug causing EZ to improperly detects movement in world, outside of zones
+   * fixed a few bugs with HeroChat integration
+ * *Version 0.15*
+   * Verified support for CB 440
+   * Some more help message coloring.
+ * *Version 0.14*
+   * Fixed Permissions 2.5 support
+   * Fixed /zone command issues
+   * Added world based default permissions. ({{{epiczones.<worldname>.<flag>.[deny]}}})
+ * *Version 0.13.1*
+   * Support for Permissions 2.4
+ * *Version 0.13*
+   * Removed support for Permissions 2.0
+   * Updated for new bukkit versions
+   * Added multi world map radius border
+   * Lots of code refactoring.
+ * *Version 0.12*
+   * Zone Based Fire Suppression
+   * Zone Based Explosion Suppression
+   * Zone Based Mob Lists
+   * Zone List command
+   * Zone Info command
+   * Several Stability Fixes
+   * /reloadez now works properly
+   * Setting flags in-game should now work properly
+ * *Version 0.11.1*
+   * Critical Fixes - Do not use Version 0.10 or 0.11
+ * *Version 0.10*
+   * Cleanup for newer versions of bukkit
+   * Circular Zone support.
+ * *Version 0.9*
+   * Added HeroChat support
+ * *Version 0.8*
+   * Fixed a bug when setting PVP flag
+   * Enhanced Border Protection
+     * Will now notify players with ignoremapradius when they enter/exit the radius.
+     * Border prevents Build/Destroy actions.
+     * Border properly blocks vehicles.
+   * Enhanced Zones
+     * Zones properly watch Vehicles now.
+   * Added regen flag to zones
+     * Flag template: regen:interval:amount:delay
+     * Interval: Frequency of regen tick for that zone.
+     * Amount: the amount the players health is modified by each regen tick (can be negative)
+     * Delay: Amount of time a player must be within the zone before regen ticks apply to them
+ * *Version 0.7*
+   * Fixed a bug in permissions where child explicit deny was being overridden by the parent zone.
+   * Fixed a bug where permissions were not properly refreshing when using /reloadez
+ * *Version 0.6*
+   * Added In-Game Zone Creation
+   * Added Multi-World Suport
+   * Refined "Point Within Zone" detection even further.
+   * Added permissions to /zone, /reloadez and /who commands.
+ * *Version 0.5*
+   * Added PVP flag support.
+   * Fixed bug with default permissions overriding explicit deny.
+   * Fixed a bug that would cause a border preventing movement to lock a player within it.
+   * Made movement checking more efficient.
+ * *Version 0.4*
+   * Fixed some issues in map radius
+   * Fixed bucket zone detection
+   * Added Distance to /who
+ * *Version 0.3*
+   * Revamped permissions
+   * Revamped parent/child relationships
+   * Refined "Point Within Zone" detection
+   * Reloading the server won't cause a crash now
+   * Ability to ignore permissions
+   * Ability to ignore map radius
+ * *Version 0.2*
+   * Fixed map radius detection
+   * Made map radius use configurable
+   * Fixed group based permissions checking to work a little better.
+ * *Version 0.1*
+   * Initial Release
