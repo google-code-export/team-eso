@@ -314,11 +314,40 @@ enableRadius: true
  * Default permissions are used, when nothing is specified for any given user/group.
 
 
-== Example Zones.txt ==
+== Example Zone Config ==
 {{{
-#Zone Tag|World|Zone Name|Flags|Enter Message|Exit Message|Floor|Ceiling|Child Zones|PointList
-test1|world1|Test Zone 1|pvp:false regen:false nomobs:false|Entering Test Zone 1...|Leaving Test Zone 1...|0|128|test2 |-20:20 20:20 20:-20 -20:-20
-test2|world1|Test Zone 2|pvp:false regen:false nomobs:false|Entering Test Zone 2...|Leaving Test Zone 2...|0|128||-10:10 10:10 10:-10 -10:-10
+ceiling: 128
+childzones: []
+entertext: Entering Test Zone 1...
+exittext: Leaving Test Zone 1...
+explode: false
+fire: false
+fireburnsmobs: false
+floor: 0
+mobs: 
+- all
+name: Test Zone 1
+owners: 
+- jblaske
+permissions:
+  default:
+    destroy: deny
+    build: deny
+    entry: deny
+points: '-20:20 20:20 20:-20 -20:-20 '
+pvp: false
+radius: 0
+regen:
+  amount: 0
+  bedbonus: 0
+  delay: 0
+  interval: 500
+  maxregen: 20
+  mindegen: 0
+  restdelay: 0
+sanctuary: false
+type: POLY
+world: world
 }}}
  * Regen and NoMobs have no effect currently, and do not need to be specified.
  * ZoneTag must be unique.
