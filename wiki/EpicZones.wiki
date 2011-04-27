@@ -9,13 +9,14 @@ Polygon based area protection, with child zones, permissions inheritance, and ma
 
 ----
 = Features =
-    * Polygonal area creation. (Not just cuboids!)
-    * In-game zone creation.
-    * Provide a Circular border to your map.
-    * Hierarchical Permissions with Child and Parent Zones.
-    * Utilizes Permissions for zone rights.
-    * Display Entering and Exiting messages in chat.
-    * Enhanced /who
+ * Polygonal area creation. (Not just cuboids!)
+ * In-game zone creation.
+ * Provide a Circular border to your map.
+ * Hierarchical Permissions with Child and Parent Zones.
+ * Display Entering and Exiting messages in chat.
+ * Enhanced /who
+ * Advanced control of zone based regeneration
+ * Many zone specific controls for things like Fire, Explosions and Mob spawning control
 
 ----
 = Creating Zones =
