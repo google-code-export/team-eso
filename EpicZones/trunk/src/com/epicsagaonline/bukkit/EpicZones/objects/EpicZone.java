@@ -41,16 +41,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
+import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission.PermNode;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission.PermType;
 
 public class EpicZone {
 
-	public enum ZoneType{ POLY, CIRCLE }
+	public enum ZoneType{ POLY, CIRCLE, GLOBAL }
 
 	private String tag = "";
 	private String name = "";
@@ -65,7 +69,6 @@ public class EpicZone {
 	private String exitText = "";
 	private EpicZone parent = null;
 	private Map<String, EpicZone> children = new HashMap<String, EpicZone>();
-	private Set<String> childrenTags = new HashSet<String>();
 	private boolean hasParentFlag = false;
 	private boolean pvp = false;
 	private boolean hasRegen = false;
@@ -77,8 +80,10 @@ public class EpicZone {
 	private boolean explode = false;
 	private ArrayList<String> owners = new ArrayList<String>();
 	private boolean sanctuary = false;
-	private boolean fireBurnsMobs = false;
+	private boolean fireBurnsMobs = true;
 	private ArrayList<EpicZonePermission> permissions = new ArrayList<EpicZonePermission>();
+	private ArrayList<PillarBlock> pillarBlocks = new ArrayList<PillarBlock>();
+	private Set<String> childrenTags = new HashSet<String>();
 
 	public EpicZone(){}
 
@@ -96,7 +101,6 @@ public class EpicZone {
 		this.exitText = prime.exitText;
 		this.parent = prime.parent;
 		this.children = prime.children;
-		this.childrenTags = prime.childrenTags;
 		this.hasParentFlag = prime.hasParentFlag;
 		this.pvp = prime.pvp;
 		this.hasRegen = prime.hasRegen;
@@ -126,7 +130,7 @@ public class EpicZone {
 			this.floor = Integer.valueOf(split[6]);
 			this.ceiling = Integer.valueOf(split[7]);
 			this.parent = null;
-			this.children = null;
+			this.children = new HashMap<String, EpicZone>();;
 			this.regen = new EpicZoneRegen();
 
 			buildFlags(split[3]);
@@ -150,8 +154,7 @@ public class EpicZone {
 	public String getWorld(){return world;}
 	public EpicZone getParent(){return parent;}
 	public Map<String, EpicZone> getChildren(){return children;}
-	public Set<String> getChildrenTags(){return childrenTags;}
-	public boolean hasChildren(){return childrenTags.size() > 0;}
+	public boolean hasChildren(){return (children.size() > 0 || childrenTags.size() > 0);}
 	public boolean hasParent(){return hasParentFlag;}
 	public boolean hasRegen(){return hasRegen;}
 	public EpicZoneRegen getRegen(){return regen;}
@@ -165,6 +168,31 @@ public class EpicZone {
 	public boolean getFireBurnsMobs(){return fireBurnsMobs;}
 	public ZoneType getType(){return type;}
 	public ArrayList<EpicZonePermission> getPermissions() {return permissions;}
+	public ArrayList<PillarBlock> getPillarBlocks(){return pillarBlocks;}
+
+	public Set<String> getChildrenTags()
+	{
+		Set<String> result = new HashSet<String>();
+
+		for(String zoneTag : this.children.keySet())
+		{
+			result.add(zoneTag);
+		}
+		for(String zoneTag : this.childrenTags)
+		{
+			if(!result.contains(zoneTag))
+			{
+				result.add(zoneTag);
+			}
+		}
+
+		return result;
+	}
+
+	public void setPillarBlocks(ArrayList<PillarBlock> value)
+	{
+		this.pillarBlocks = value;
+	}
 
 	public String getPoints()
 	{
@@ -190,15 +218,48 @@ public class EpicZone {
 		return result;
 	}
 
+	public ArrayList<Point> getPointsArray()
+	{
+		ArrayList<Point> result = new ArrayList<Point>();
+		Polygon poly = this.getPolygon();
+
+		if(poly != null)
+		{
+			for(int i = 0; i < poly.npoints; i++)
+			{
+				result.add(new Point(poly.xpoints[i], poly.ypoints[i]));
+			}
+		}
+		else
+		{
+			result = null; //Don't show borders for circle zones yet.
+		}
+
+		return result;
+	}
+
 	public void addChild(EpicZone childZone)
 	{
-		if(this.children == null){this.children = new HashMap<String, EpicZone>();}
-		this.children.put(childZone.getTag(), childZone);
+		if(this.children == null)
+		{
+			this.children = new HashMap<String, EpicZone>();
+		}
+		if(childZone != null)
+		{
+			this.children.put(childZone.getTag(), childZone);
+		}
 	}
 
 	public void setPolygon(String value)
 	{
-		buildPolygon(value);
+		if(this.type != ZoneType.GLOBAL)
+		{
+			buildPolygon(value);
+		}
+		else
+		{
+			this.polygon = null;
+		}
 	}
 
 	public void setPermissions(ArrayList<EpicZonePermission> value)
@@ -209,6 +270,10 @@ public class EpicZone {
 	public void addChildTag(String tag)
 	{
 		this.childrenTags.add(tag);
+		if(General.myZones.get(tag) != null)
+		{
+			this.addChild(General.myZones.get(tag));
+		}
 	}
 
 	public void addPermission(String member, String node, String permission)
@@ -225,7 +290,7 @@ public class EpicZone {
 
 	public void setType(String value)
 	{
-		this.type = ZoneType.valueOf(value);
+		this.type = ZoneType.valueOf(value.toUpperCase());
 	}
 
 	public void setFire(Boolean value)
@@ -260,15 +325,7 @@ public class EpicZone {
 
 	public void removeChild(String tag)
 	{
-		if(this.childrenTags != null)
-		{
-			this.childrenTags.remove(tag);
-		}
-
-		if(this.children != null)
-		{
-			this.children.remove(tag);
-		}
+		this.children.remove(tag);
 	}
 
 	public void setWorld(String value)
@@ -278,7 +335,7 @@ public class EpicZone {
 
 	public void setTag(String value)
 	{
-		this.tag=value;
+		this.tag = value;
 	}
 
 	public void setName(String value)
@@ -406,22 +463,140 @@ public class EpicZone {
 			}
 		}
 	}
+	
+	public void addMob(String mobType)
+	{
+		boolean validType;
+				
+		if(this.mobs == null)
+		{
+			this.mobs = new ArrayList<String>();
+		}
+		
+		mobType = mobType.trim().toUpperCase();
+		validType = false;
+		
+		try
+		{
+			if(mobType.equalsIgnoreCase("none") ||
+					mobType.equalsIgnoreCase("monsters") || 
+					mobType.equalsIgnoreCase("monster") ||
+					mobType.equalsIgnoreCase("animals") ||
+					mobType.equalsIgnoreCase("animal") ||
+					mobType.equalsIgnoreCase("all"))
+			{
+				validType = true;
+			}
+			else
+			{
+				CreatureType.valueOf(mobType);
+				validType = true;				
+			}
+		}
+		catch(Exception e)
+		{
+			validType = false;	
+		}
+
+		if (validType)
+		{
+			if(mobType.equalsIgnoreCase("none"))
+			{
+				mobs.add("none");
+				return;
+			}
+			if(mobType.equalsIgnoreCase("animals") || mobType.equalsIgnoreCase("animal"))
+			{
+				if(!mobs.contains(CreatureType.SQUID.toString()))
+				{
+					mobs.add(CreatureType.SQUID.toString());
+				}
+
+				if(!mobs.contains(CreatureType.CHICKEN.toString()))
+				{
+					mobs.add(CreatureType.CHICKEN.toString());
+				}
+
+				if(!mobs.contains(CreatureType.COW.toString()))
+				{
+					mobs.add(CreatureType.COW.toString());
+				}
+
+				if(!mobs.contains(CreatureType.SHEEP.toString()))
+				{
+					mobs.add(CreatureType.SHEEP.toString());
+				}
+
+				if(!mobs.contains(CreatureType.PIG.toString()))
+				{
+					mobs.add(CreatureType.PIG.toString());
+				}
+				if(!mobs.contains(CreatureType.WOLF.toString()))
+				{
+					mobs.add(CreatureType.WOLF.toString());
+				}
+			}	
+			else if(mobType.equalsIgnoreCase("monsters") || mobType.equalsIgnoreCase("monster"))
+			{
+				if(!mobs.contains(CreatureType.CREEPER.toString()))
+				{
+					mobs.add(CreatureType.CREEPER.toString());
+				}
+				if(!mobs.contains(CreatureType.ZOMBIE.toString()))
+				{
+					mobs.add(CreatureType.ZOMBIE.toString());
+				}
+				if(!mobs.contains(CreatureType.GHAST.toString()))
+				{
+					mobs.add(CreatureType.GHAST.toString());
+				}
+				if(!mobs.contains(CreatureType.GIANT.toString()))
+				{
+					mobs.add(CreatureType.GIANT.toString());
+				}
+				if(!mobs.contains(CreatureType.SKELETON.toString()))
+				{
+					mobs.add(CreatureType.SKELETON.toString());
+				}
+				if(!mobs.contains(CreatureType.SLIME.toString()))
+				{
+					mobs.add(CreatureType.SLIME.toString());
+				}
+				if(!mobs.contains(CreatureType.SPIDER.toString()))
+				{
+					mobs.add(CreatureType.SPIDER.toString());
+				}
+			}
+			else if(mobType.equalsIgnoreCase("all"))
+			{
+				mobs.add("all");
+			}				
+			else if(!mobs.contains(CreatureType.valueOf(mobType.toUpperCase()).toString()))
+			{
+				mobs.add(CreatureType.valueOf(mobType.toUpperCase()).toString());
+			}
+		}
+	}
 
 	public void setMobs(String data)
 	{
 		if (data.length() > 0)
 		{
-			String[] split;
-			split = (data + ":").split(":");
-			if(split.length == 0)
+			String[] split = null;
+
+			if(data.contains(":"))
+			{
+				split = (data + ":").split(":");
+			}
+			else if(data.contains(","))
 			{
 				split = (data + ",").split(",");
 			}
-			if(split.length == 0)
+			else if(data.contains(" "))
 			{
 				split = (data + " ").split(" ");
 			}
-			if(split.length > 0)
+			if(split != null)
 			{
 				BuildMobsFlag(split);
 			}
@@ -433,111 +608,9 @@ public class EpicZone {
 		if(split.length > 0)
 		{
 			mobs = new ArrayList<String>();
-			boolean validType;
 			for(String mobType: split)
 			{
-				mobType = mobType.trim();
-				validType = false;
-				try
-				{
-					if(mobType.equalsIgnoreCase("none") ||
-							mobType.equalsIgnoreCase("monsters") || 
-							mobType.equalsIgnoreCase("monster") ||
-							mobType.equalsIgnoreCase("animals") ||
-							mobType.equalsIgnoreCase("animal") ||
-							mobType.equalsIgnoreCase("all"))
-					{
-						validType = true;
-					}
-					else
-					{
-						CreatureType.valueOf(mobType);
-						validType = true;				
-					}
-				}
-				catch(Exception e)
-				{
-					validType = false;	
-				}
-
-				if (validType)
-				{
-					if(mobType.equalsIgnoreCase("none"))
-					{
-						mobs.add("none");
-						return;
-					}
-					if(mobType.equalsIgnoreCase("animals") || mobType.equalsIgnoreCase("animal"))
-					{
-						if(!mobs.contains(CreatureType.SQUID.toString()))
-						{
-							mobs.add(CreatureType.SQUID.toString());
-						}
-
-						if(!mobs.contains(CreatureType.CHICKEN.toString()))
-						{
-							mobs.add(CreatureType.CHICKEN.toString());
-						}
-
-						if(!mobs.contains(CreatureType.COW.toString()))
-						{
-							mobs.add(CreatureType.COW.toString());
-						}
-
-						if(!mobs.contains(CreatureType.SHEEP.toString()))
-						{
-							mobs.add(CreatureType.SHEEP.toString());
-						}
-
-						if(!mobs.contains(CreatureType.PIG.toString()))
-						{
-							mobs.add(CreatureType.PIG.toString());
-						}
-						if(!mobs.contains(CreatureType.WOLF.toString()))
-						{
-							mobs.add(CreatureType.WOLF.toString());
-						}
-					}	
-					else if(mobType.equalsIgnoreCase("monsters") || mobType.equalsIgnoreCase("monster"))
-					{
-						if(!mobs.contains(CreatureType.CREEPER.toString()))
-						{
-							mobs.add(CreatureType.CREEPER.toString());
-						}
-						if(!mobs.contains(CreatureType.ZOMBIE.toString()))
-						{
-							mobs.add(CreatureType.ZOMBIE.toString());
-						}
-						if(!mobs.contains(CreatureType.GHAST.toString()))
-						{
-							mobs.add(CreatureType.GHAST.toString());
-						}
-						if(!mobs.contains(CreatureType.GIANT.toString()))
-						{
-							mobs.add(CreatureType.GIANT.toString());
-						}
-						if(!mobs.contains(CreatureType.SKELETON.toString()))
-						{
-							mobs.add(CreatureType.SKELETON.toString());
-						}
-						if(!mobs.contains(CreatureType.SLIME.toString()))
-						{
-							mobs.add(CreatureType.SLIME.toString());
-						}
-						if(!mobs.contains(CreatureType.SPIDER.toString()))
-						{
-							mobs.add(CreatureType.SPIDER.toString());
-						}
-					}
-					else if(mobType.equalsIgnoreCase("all"))
-					{
-						mobs.add("all");
-					}				
-					else if(!mobs.contains(CreatureType.valueOf(mobType).toString()))
-					{
-						mobs.add(CreatureType.valueOf(mobType).toString());
-					}
-				}
+				addMob(mobType);
 			}
 		}
 		else
@@ -577,7 +650,7 @@ public class EpicZone {
 	public void setRegen(String value)
 	{
 		this.regen = new EpicZoneRegen(value);
-		this.hasRegen  = (this.regen.getAmount() != 0 || this.regen.getBedBonus() > 0);
+		this.hasRegen = (this.regen.getAmount() != 0 || this.regen.getBedBonus() > 0);
 	}
 
 	private void buildChildren(String data)
@@ -608,6 +681,7 @@ public class EpicZone {
 				String[] split = dataList[i].split(":");
 				this.polygon.addPoint(Integer.valueOf(split[0]), Integer.valueOf(split[1]));
 			}
+			this.type = ZoneType.POLY;
 		}
 		else if(dataList.length >= 1)
 		{
@@ -618,6 +692,7 @@ public class EpicZone {
 			{
 				this.radius = Integer.valueOf(dataList[1]);
 			}
+			this.type = ZoneType.CIRCLE;
 		}
 	}
 
@@ -662,7 +737,7 @@ public class EpicZone {
 		cal.add(Calendar.MILLISECOND, -this.regen.getDelay());
 		return cal.getTime();
 	}
-	
+
 	public Date getAdjustedRestDelay()
 	{
 		Calendar cal = Calendar.getInstance();
@@ -710,10 +785,7 @@ public class EpicZone {
 
 	public boolean hasPermission(Player player, String node, PermType permission)
 	{
-		
-		boolean result = false;
-		
-		for( EpicZonePermission perm : permissions)
+		for(EpicZonePermission perm : permissions)
 		{
 			if(perm.getMember().equalsIgnoreCase(player.getName()))
 			{
@@ -721,29 +793,93 @@ public class EpicZone {
 				{
 					if(perm.getPermission() == permission)
 					{
-						result = true;
-						break;
+						return true;
 					}
 				}
 			}
-			
-			for( String groupName : EpicZones.permissions.getGroupNames(player))
+		}
+		return false;
+	}
+
+	public boolean hasPermissionFromGroup(Player player, String node, PermType permission)
+	{
+		for(EpicZonePermission perm : permissions)
+		{		
+			for(String groupName : EpicZones.permissions.getGroupNames(player))
 			{
 				if(perm.getMember().equalsIgnoreCase(groupName))
 				{
 					if(perm.getNode().equals(PermNode.valueOf(node.toUpperCase())))
 					{
-						if(perm.getPermission() == PermType.ALLOW)
+						if(perm.getPermission() == permission)
 						{
-							result = true;
-							break;
+							return true;
 						}
 					}
 				}
 			}
 		}
-		
+		return false;
+	}
+
+	public void addPillar(Block blk)
+	{
+		if(this.pillarBlocks == null)
+		{
+			this.pillarBlocks = new ArrayList<PillarBlock>();
+		}
+		this.pillarBlocks.add(new PillarBlock(blk.getLocation(), blk.getType()));
+	}
+
+	public void ShowPillars()
+	{
+		ArrayList<Point> points = this.getPointsArray();
+		org.bukkit.World world = General.plugin.getServer().getWorld(this.world);
+		this.pillarBlocks = new ArrayList<PillarBlock>();
+
+		if(points != null)
+		{		
+			for( Point pnt : points )
+			{
+				Block blk = world.getBlockAt(pnt.x, world.getHighestBlockYAt(pnt.x, pnt.y), pnt.y);
+
+				Location low = blk.getLocation().clone();
+				Location mid = blk.getLocation().clone();
+				Location high = blk.getLocation().clone();
+
+				low.setY(low.getBlockY() + 1);
+				mid.setY(mid.getBlockY() + 2);
+				high.setY(high.getBlockY() + 3);
+
+				this.pillarBlocks.add(new PillarBlock(world.getBlockAt(low).getLocation(), world.getBlockAt(low).getType()));
+				this.pillarBlocks.add(new PillarBlock(world.getBlockAt(mid).getLocation(), world.getBlockAt(mid).getType()));
+				this.pillarBlocks.add(new PillarBlock(world.getBlockAt(high).getLocation(), world.getBlockAt(high).getType()));
+
+				world.getBlockAt(low).setType(Material.BEDROCK);
+				world.getBlockAt(mid).setType(Material.BEDROCK);
+				world.getBlockAt(high).setType(Material.BEDROCK);
+			}
+		}
+	}
+
+	public void HidePillars()
+	{
+		if( this.pillarBlocks != null )
+		{
+			org.bukkit.World world = General.plugin.getServer().getWorld(this.world); 
+			for( PillarBlock blk : this.pillarBlocks )
+			{
+				world.getBlockAt(blk.location).setType(blk.material);
+			}
+		}
+		this.pillarBlocks = null;
+	}
+
+	public boolean IsPointWithin(String worldName, Integer height, Point point)
+	{
+		boolean result = false;
+
 		return result;
-		
 	}
 }
+

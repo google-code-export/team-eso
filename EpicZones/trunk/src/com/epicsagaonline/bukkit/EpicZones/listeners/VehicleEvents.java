@@ -64,9 +64,10 @@ public class VehicleEvents extends VehicleListener
 		Vehicle vehicle = event.getVehicle();
 		Entity passenger = vehicle.getPassenger();
 
-		if(passenger != null)
+		if(passenger != null && passenger instanceof Player)
 		{
-			EpicZonePlayer ezp = General.getPlayer(passenger.getEntityId());
+			Player player = (Player) passenger;
+			EpicZonePlayer ezp = General.getPlayer(player.getName());
 
 			if(ezp != null)
 			{

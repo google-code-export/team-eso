@@ -18,7 +18,7 @@ public class EpicZoneRegen {
 	{
 		return this.amount;
 	}
-	
+
 	public void setDelay(Integer value)
 	{
 		this.delay = value;	
@@ -27,7 +27,7 @@ public class EpicZoneRegen {
 	{
 		return this.delay;
 	}
-	
+
 	public void setInterval(Integer value)
 	{
 		this.interval = value;	
@@ -36,7 +36,7 @@ public class EpicZoneRegen {
 	{
 		return this.interval;
 	}
-	
+
 	public void setMaxRegen(Integer value)
 	{
 		this.maxRegen = value;	
@@ -45,7 +45,7 @@ public class EpicZoneRegen {
 	{
 		return this.maxRegen;
 	}
-	
+
 	public void setMinDegen(Integer value)
 	{
 		this.minDegen = value;	
@@ -54,7 +54,7 @@ public class EpicZoneRegen {
 	{
 		return this.minDegen;
 	}
-	
+
 	public void setRestDelay(Integer value)
 	{
 		this.restDelay = value;	
@@ -63,7 +63,7 @@ public class EpicZoneRegen {
 	{
 		return this.restDelay;
 	}
-	
+
 	public void setBedBonus(Integer value)
 	{
 		this.bedBonus = value;	
@@ -72,7 +72,7 @@ public class EpicZoneRegen {
 	{
 		return this.bedBonus;
 	}
-	
+
 	public EpicZoneRegen()
 	{
 		this.amount = 0;
@@ -87,19 +87,49 @@ public class EpicZoneRegen {
 	public EpicZoneRegen(String value)
 	{
 
-		String[] split = value.split(":");
-
-		if (split.length == 7)
+		String[] split = null;
+		if(value.contains(":"))
 		{
-			this.amount = Integer.valueOf(split[0]);
-			this.delay = Integer.valueOf(split[1]);
-			this.interval = Integer.valueOf(split[2]);
-			this.maxRegen = Integer.valueOf(split[3]);
-			this.minDegen = Integer.valueOf(split[4]);
-			this.restDelay = Integer.valueOf(split[5]);
-			this.bedBonus = Integer.valueOf(split[6]);
+			split = value.split(":");
+		}
+		else if(value.contains(" "))
+		{
+			split = value.split(" ");
+		}
+		
+		if(split != null)
+		{
+			if (split.length > 0)
+			{
+				this.amount = Integer.valueOf(split[0]);
+			}
+			if (split.length > 1)
+			{
+				this.delay = Integer.valueOf(split[1]);
+			}
+			if (split.length > 2)
+			{
+				this.interval = Integer.valueOf(split[2]);
+			}
+			if (split.length > 3)
+			{
+				this.maxRegen = Integer.valueOf(split[3]);
+			}
+			if (split.length > 4)
+			{
+				this.minDegen = Integer.valueOf(split[4]);
+			}
+			if (split.length > 5)
+			{
+				this.restDelay = Integer.valueOf(split[5]);
+			}
+			if (split.length > 6)
+			{
+				this.bedBonus = Integer.valueOf(split[6]);
+			}
 		}
 	}
+
 
 	public String toString()
 	{

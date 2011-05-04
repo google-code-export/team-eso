@@ -36,23 +36,24 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Scanner;
 
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone.ZoneType;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZoneDAL;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
 public class General {
 
 	public static Map<String, EpicZone> myZones = new HashMap<String, EpicZone>();
-	public static ArrayList<String> myZoneTags = new ArrayList<String>();
-	public static ArrayList<EpicZonePlayer> myPlayers = new ArrayList<EpicZonePlayer>();
+	public static Map<String, EpicZone> myGlobalZones = new HashMap<String, EpicZone>();
+	public static Map<String, EpicZonePlayer> myPlayers = new HashMap<String, EpicZonePlayer>();
 	public static Config config;
 	public static final String NO_PERM_ENTER = "You do not have permission to enter ";
 	public static final String NO_PERM_BORDER = "You have reached the border of the map.";
@@ -63,48 +64,28 @@ public class General {
 
 	public static EpicZonePlayer getPlayer(String name)
 	{
-		for(EpicZonePlayer ezp: myPlayers)
-		{
-			if(ezp.getName().equalsIgnoreCase(name))
-				return ezp;
-		}
-
-		return null;
-
-	}
-
-	public static EpicZonePlayer getPlayer(int entityID)
-	{
-		for(EpicZonePlayer ezp: myPlayers)
-		{
-			if(ezp.getEntityID() == entityID)
-				return ezp;
-		}
-
-		return null;
-
+		return myPlayers.get(name.toLowerCase());
 	}
 
 	public static void addPlayer(int entityID, String name)
 	{
-		myPlayers.add(new EpicZonePlayer(entityID, name));
+		myPlayers.put(name.toLowerCase(), new EpicZonePlayer(entityID, name));
 	}
 
-	public static void removePlayer(int entityID)
+	public static void removePlayer(String playerName)
 	{
-		int index = -1;
-
-		for(int i = 0; i < myPlayers.size(); i++)
+		EpicZonePlayer ezp = myPlayers.get(playerName);
+		if (ezp != null)
 		{
-			if(myPlayers.get(i).getEntityID() == entityID)
+			if(ezp.getMode() != EpicZoneMode.None)
 			{
-				index = i;
-				break;
+				if(ezp.getEditZone() != null)
+				{
+					ezp.getEditZone().HidePillars();
+				}
 			}
+			myPlayers.remove(playerName);
 		}
-
-		if (index > -1){myPlayers.remove(index);}
-
 	}
 
 	public static void LoadZones()
@@ -122,10 +103,10 @@ public class General {
 		}
 
 		myZones = EpicZoneDAL.Load();
-		
-		reconsileZoneTags();
+
+		reconsileGlobalZones();
 		reconcileChildren();
-		
+
 	}
 
 	public static boolean loadZonesFromText()
@@ -143,7 +124,6 @@ public class General {
 
 					Scanner scanner = new Scanner(file);
 					myZones.clear();
-					myZoneTags.clear();
 
 					try {
 						while(scanner.hasNext())
@@ -153,7 +133,6 @@ public class General {
 							if(line.startsWith("#") || line.isEmpty()){continue;}
 							newZone = new EpicZone(line);;
 							General.myZones.put(newZone.getTag(), newZone);
-							General.myZoneTags.add(newZone.getTag());
 						}
 
 					}
@@ -183,21 +162,62 @@ public class General {
 
 	public static void SaveZones()
 	{
-		for(String zoneTag : myZoneTags)
+		for(String zoneTag : myZones.keySet())
 		{
 			EpicZoneDAL.Save(myZones.get(zoneTag));
 		}
 	}
 
-	private static void reconsileZoneTags()
+	public static void reconsileGlobalZones()
 	{
-		myZoneTags.clear();
-		Iterator<Entry<String, EpicZone>> it = myZones.entrySet().iterator();
-		while(it.hasNext())
+		for(String zoneTag : myZones.keySet())
 		{
-			Entry<String, EpicZone> pairs = (Entry<String, EpicZone>)it.next();
-			myZoneTags.add(pairs.getKey());
+			EpicZone zone = myZones.get(zoneTag);
+			if(zone.getType() == ZoneType.GLOBAL)
+			{
+				myGlobalZones.put(zone.getTag(), zone);
+			}
 		}
+
+		for (World world : plugin.getServer().getWorlds())
+		{
+			if (myGlobalZones.get(world.getName().toLowerCase()) == null)
+			{
+
+				EpicZone newGlobal = new EpicZone();
+
+				newGlobal.setTag(world.getName().toLowerCase());
+				newGlobal.setName(world.getName());
+				newGlobal.setRadius(1000);
+				newGlobal.setType("GLOBAL");
+				newGlobal.setMobs("all");
+				newGlobal.setWorld(world.getName());
+
+				for(String zoneTag : myZones.keySet())
+				{
+					EpicZone zone = myZones.get(zoneTag);
+					if(zone.getWorld().equalsIgnoreCase(world.getName()))
+					{
+						newGlobal.addChild(zone);	
+					}
+				}
+
+				myZones.put(newGlobal.getTag(), newGlobal);
+				myGlobalZones.put(world.getName(), newGlobal);
+
+				EpicZoneDAL.Save(myZones.get(newGlobal.getTag()));
+
+				Log.Write("Global Zone Created For World [" + world.getName() + "]");
+
+			}
+			else
+			{
+				myGlobalZones.put(world.getName(), myGlobalZones.get(world.getName()));
+			}
+		}
+
+
+
 	}
 
 	private static void reconcileChildren()
@@ -207,22 +227,18 @@ public class General {
 
 		try
 		{
-			for(String zoneTag: myZoneTags)
+			for(String zoneTag: myZones.keySet())
 			{
 				EpicZone zone = myZones.get(zoneTag);
 				if(zone.hasChildren())
-				{					
+				{			
 					for(String child: zone.getChildrenTags())
 					{
 						EpicZone childZone = myZones.get(child);
-
 						if(childZone != null)
 						{
 							childZone.setParent(zone);
 							zone.addChild(childZone);
-
-							myZones.remove(child);
-							myZones.put(child, childZone);
 						}
 						else
 						{
@@ -239,8 +255,6 @@ public class General {
 						badChildren = new ArrayList<String>();
 					}
 				}
-				myZones.remove(zoneTag);
-				myZones.put(zoneTag, zone);
 			}
 		}
 		catch(Exception e)
@@ -255,7 +269,7 @@ public class General {
 
 		EpicZone result = null;
 		String resultTag = "";
-		for(String zoneTag: General.myZoneTags)
+		for(String zoneTag: General.myZones.keySet())
 		{
 			EpicZone zone = General.myZones.get(zoneTag);
 			if(zone.getWorld().equalsIgnoreCase(worldName))
@@ -263,7 +277,7 @@ public class General {
 				resultTag = General.isPointInZone(zone, elevation, location, worldName);
 				if(resultTag.length() > 0)
 				{
-					result = General.myZones.get(resultTag);
+					result = zone;
 					break;
 				}
 			}
@@ -278,24 +292,27 @@ public class General {
 
 		String result = "";
 
-		if(zone.hasChildren())
+		if(zone != null)
 		{
-			for(String zoneTag: zone.getChildrenTags())
+			if(zone.hasChildren())
 			{
-				result = isPointInZone(zone.getChildren().get(zoneTag), playerHeight, playerPoint, worldName);
-				if(result.length() > 0)
+				for(String zoneTag: zone.getChildren().keySet())
 				{
-					return result;
+					result = isPointInZone(zone.getChildren().get(zoneTag), playerHeight, playerPoint, worldName);
+					if(result.length() > 0)
+					{
+						return result;
+					}
 				}
 			}
-		}
-		if(worldName.equalsIgnoreCase(zone.getWorld()))
-		{
-			if(playerHeight >= zone.getFloor() && playerHeight <= zone.getCeiling())
+			if(worldName.equalsIgnoreCase(zone.getWorld()))
 			{
-				if(zone.pointWithin(playerPoint))
+				if(playerHeight >= zone.getFloor() && playerHeight <= zone.getCeiling())
 				{
-					result = zone.getTag();
+					if(zone.pointWithin(playerPoint))
+					{
+						result = zone.getTag();
+					}
 				}
 			}
 		}
@@ -310,15 +327,17 @@ public class General {
 		{
 
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
+			EpicZone globalZone = myGlobalZones.get(player.getWorld().getName());
+
 			double xsquared = point.x * point.x;
 			double ysquared = point.y * point.y;
 			double distanceFromCenter = Math.sqrt(xsquared + ysquared);
 
 			ezp.setDistanceFromCenter((int)distanceFromCenter);
 
-			if(General.config.mapRadius.get(player.getWorld().getName()) != null)
+			if(globalZone != null)
 			{
-				if(distanceFromCenter <= General.config.mapRadius.get(player.getWorld().getName()))
+				if(distanceFromCenter <= globalZone.getRadius())
 				{
 					if(ezp.getPastBorder())
 					{
@@ -366,14 +385,15 @@ public class General {
 
 	public static boolean ShouldCheckPlayer(EpicZonePlayer ezp)
 	{
-		if (ezp.getLastCheck().before(new Date()))
+		boolean result = false;
+		if(ezp!= null)
 		{
-			return true;
+			if (ezp.getLastCheck().before(new Date()))
+			{
+				result = true;
+			}
 		}
-		else
-		{
-			return false;
-		}
+		return result;
 	}
 
 	public static boolean IsNumeric(String data)

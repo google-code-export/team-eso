@@ -36,10 +36,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.bukkit.World;
 import org.bukkit.util.config.Configuration;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -55,14 +52,11 @@ public class Config extends Configuration {
 
 	private File file;
 
-	public Map<String, Integer> mapRadius = new HashMap<String, Integer>();
-	public boolean defaultEnter;
-	public boolean defaultBuild;
-	public boolean defaultDestroy;
-	public boolean defaultPVP;
 	public boolean enableRadius;
 	public boolean enableHeroChat;
+	public boolean globalZoneDefaultAllow;
 	public int zoneTool = 280; //Default Tool Is Stick
+	public boolean showPillars;
 
 	public Config(File file)
 	{
@@ -76,11 +70,6 @@ public class Config extends Configuration {
 
 	public void setDefaults()
 	{
-		getDefaultMapRadius(1000);
-		defaultEnter = true;
-		defaultBuild = true;
-		defaultDestroy = true;
-		defaultPVP = false;
 		enableRadius = true;
 		enableHeroChat = false;
 		zoneTool = 280;
@@ -107,13 +96,9 @@ public class Config extends Configuration {
 		{
 			super.load();
 
-			setMapRadius(getString("mapRadius").trim());
-			defaultEnter = getBoolean("defaultEnter", true);
-			defaultBuild = getBoolean("defaultBuild", true);
-			defaultDestroy = getBoolean("defaultDestroy", true);
-			defaultPVP = getBoolean("defaultPVP", false);
 			enableRadius = getBoolean("enableRadius", true);
 			enableHeroChat = getBoolean("enableHeroChat", false);
+			globalZoneDefaultAllow = getBoolean("globalZoneDefaultAllow", true);
 			zoneTool = getInt("zoneTool", zoneTool);
 
 		}
@@ -128,14 +113,10 @@ public class Config extends Configuration {
 		FileOutputStream stream;
 		BufferedWriter writer;
 
-		root.put("defaultEnter", defaultEnter);
-		root.put("defaultBuild", defaultBuild);
-		root.put("defaultDestroy", defaultDestroy);
-		root.put("defaultPVP", defaultPVP);
 		root.put("enableRadius", enableRadius);
-		root.put("mapRadius", getMapRadius());
 		root.put("zoneTool", zoneTool);
 		root.put("enableHeroChat", enableHeroChat);
+		root.put("globalZoneDefaultAllow", globalZoneDefaultAllow);
 
 		try 
 		{
@@ -151,63 +132,11 @@ public class Config extends Configuration {
 			{
 				writer.close();
 			}
-
 		}
 		catch(IOException e)
 		{
 			return false;
 		}
 		return true;
-	}
-
-	private void getDefaultMapRadius(int value)
-	{
-		mapRadius = new HashMap<String, Integer>();
-		for(World w: General.plugin.getServer().getWorlds())
-		{
-			mapRadius.put(w.getName(), value);	
-		}
-	}
-
-	private void setMapRadius(String data)
-	{
-		if(data.length() > 0)
-		{
-			if(data.contains(" "))
-			{
-				for(String border : data.split(" "))
-				{
-					if(border.contains(":"))
-					{
-						String[] split = border.split(":");
-						mapRadius.remove(split[0]);
-						mapRadius.put(split[0], Integer.parseInt(split[1]));
-					}
-				}
-			}
-			else if(data.contains(":"))
-			{
-				String[] split = data.split(":");
-				mapRadius.remove(split[0]);
-				mapRadius.put(split[0], Integer.parseInt(split[1]));
-			}
-			else
-			{
-				if(General.IsNumeric(data))
-				{
-					getDefaultMapRadius(Integer.parseInt(data));
-				}
-			}
-		}
-	}
-
-	private String getMapRadius()
-	{
-		String result = "";
-		for(World w: General.plugin.getServer().getWorlds())
-		{
-			result = result + w.getName() + ":" + mapRadius.get(w.getName()) + " ";	
-		}
-		return result.trim();
 	}
 }

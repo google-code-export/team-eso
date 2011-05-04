@@ -58,7 +58,7 @@ public class Regen implements Runnable {
 		{
 			if(player.getHealth() <= MAX_HEALTH && player.getHealth() > MIN_HEALTH)
 			{
-				EpicZonePlayer ezp = General.getPlayer(player.getEntityId());
+				EpicZonePlayer ezp = General.getPlayer(player.getName());
 				if(ezp != null)
 				{
 					EpicZone zone = ezp.getCurrentZone();

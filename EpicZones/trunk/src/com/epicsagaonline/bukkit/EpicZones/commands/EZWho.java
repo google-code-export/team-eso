@@ -22,12 +22,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-*/
+ */
 
 /**
-* @author jblaske@gmail.com
-* @license MIT License
-*/
+ * @author jblaske@gmail.com
+ * @license MIT License
+ */
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
@@ -150,7 +150,7 @@ public class EZWho implements CommandHandler {
 			int aSquared = (a * a);
 			int bSquared = (b * b);
 			int cSquared = aSquared + bSquared;			
-			
+
 			result = (int)Math.ceil(Math.sqrt(cSquared));
 		}
 
@@ -159,21 +159,26 @@ public class EZWho implements CommandHandler {
 
 	private static ArrayList<EpicZonePlayer> getPlayers(EpicZone currentZone, boolean allZones)
 	{
+		ArrayList<EpicZonePlayer> result = new ArrayList<EpicZonePlayer>();
 		if (allZones)
 		{
-			return General.myPlayers;
+			for(String playerName : General.myPlayers.keySet())
+			{
+				result.add(General.getPlayer(playerName));
+			}
 		}
 		else
 		{
-			ArrayList<EpicZonePlayer> result = new ArrayList<EpicZonePlayer>();
-			for (EpicZonePlayer ezp: General.myPlayers)
+			for(String playerName : General.myPlayers.keySet())
 			{
-				if (!result.contains(ezp) && ezp.getCurrentZone().equals(currentZone))
+				EpicZonePlayer ezp = General.getPlayer(playerName);
+				if (ezp.getCurrentZone().equals(currentZone))
 				{
 					result.add(ezp);
-				}
+				}				
 			}
 			return result;
 		}
+		return result;
 	}
 }

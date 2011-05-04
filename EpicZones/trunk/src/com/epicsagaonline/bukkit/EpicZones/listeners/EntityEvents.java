@@ -36,6 +36,7 @@ import java.awt.Point;
 
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -112,7 +113,8 @@ public class EntityEvents extends EntityListener
 						EntityDamageByEntityEvent sub = (EntityDamageByEntityEvent)event;
 						if(isPlayer(sub.getEntity()) && isPlayer(sub.getDamager()))
 						{
-							EpicZonePlayer ezp = General.getPlayer(sub.getEntity().getEntityId());
+							Player player = (Player)sub.getEntity();
+							EpicZonePlayer ezp = General.getPlayer(player.getName());
 							EpicZone zone = ezp.getCurrentZone();
 							if(zone != null)
 							{
@@ -123,7 +125,7 @@ public class EntityEvents extends EntityListener
 							}
 							else
 							{
-								if(!General.config.defaultPVP)
+								if(!General.myGlobalZones.get(e.getWorld().getName()).getPVP())
 								{
 									event.setCancelled(true);
 								}
@@ -135,7 +137,8 @@ public class EntityEvents extends EntityListener
 						EntityDamageByEntityEvent sub = (EntityDamageByEntityEvent)event;
 						if(isPlayer(sub.getEntity()) && isPlayer(sub.getDamager()))
 						{
-							EpicZonePlayer ezp = General.getPlayer(sub.getEntity().getEntityId());
+							Player player = (Player)sub.getEntity();
+							EpicZonePlayer ezp = General.getPlayer(player.getName());
 							EpicZone zone = ezp.getCurrentZone();
 							if(zone != null)
 							{
@@ -197,7 +200,7 @@ public class EntityEvents extends EntityListener
 
 			if(zone != null)
 			{
-				if(!zone.getMobs().contains("all"))
+				if(zone.getMobs() != null && (zone.getMobs().size() > 0 || !zone.getMobs().contains("all")))
 				{
 					if (zone.getMobs().contains("none") || !zone.getMobs().contains(event.getCreatureType().toString()))
 					{
@@ -265,13 +268,13 @@ public class EntityEvents extends EntityListener
 
 		boolean result = false;
 
-		if(General.getPlayer(entity.getEntityId()) != null)
+		if(entity instanceof Player)
 		{
-			result = true;
-		}
-		else
-		{
-			result = false;
+			Player player = (Player) entity;
+			if(General.getPlayer(player.getName()) != null)
+			{
+				result = true;
+			}
 		}
 
 		return result;

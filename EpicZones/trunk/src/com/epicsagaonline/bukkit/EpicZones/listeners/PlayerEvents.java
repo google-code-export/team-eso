@@ -72,6 +72,8 @@ public class PlayerEvents extends PlayerListener
 		itemsOfDestruction.add(259);
 		itemsOfDestruction.add(326);
 		itemsOfDestruction.add(327);
+		itemsOfDestruction.add(232);
+		itemsOfDestruction.add(231);
 	}
 
 	public @Override void onPlayerMove(PlayerMoveEvent event)
@@ -86,7 +88,10 @@ public class PlayerEvents extends PlayerListener
 		{
 			if(!ezp.isTeleporting())
 			{
-				if(ezp.getCurrentLocation() == null){ezp.setCurrentLocation(event.getFrom());}
+				if(ezp.getCurrentLocation() == null)
+				{
+					ezp.setCurrentLocation(event.getFrom());
+				}
 				if(!PlayerWithinZoneLogic(player, ezp, playerHeight, playerPoint))
 				{
 					ezp.setIsTeleporting(true);
@@ -103,6 +108,7 @@ public class PlayerEvents extends PlayerListener
 			ezp.Check();
 		}
 		ezp.setHasMoved(true);
+
 	}
 
 	public @Override void onPlayerTeleport(PlayerTeleportEvent event)
@@ -146,7 +152,7 @@ public class PlayerEvents extends PlayerListener
 
 	public @Override void onPlayerQuit(PlayerQuitEvent event)
 	{
-		General.removePlayer(event.getPlayer().getEntityId());
+		General.removePlayer(event.getPlayer().getName());
 	}
 
 	public @Override void onPlayerInteract(PlayerInteractEvent event) 
@@ -210,17 +216,19 @@ public class PlayerEvents extends PlayerListener
 				}
 				else if(event.getPlayer().getItemInHand().getTypeId() == General.config.zoneTool)
 				{
-					if(General.getPlayer(event.getPlayer().getEntityId()).getMode() == EpicZoneMode.ZoneDraw)
+					if(General.getPlayer(event.getPlayer().getName()).getMode() == EpicZoneMode.ZoneDraw)
 					{
 						Point point = new Point(event.getClickedBlock().getLocation().getBlockX(), event.getClickedBlock().getLocation().getBlockZ());
-						General.getPlayer(event.getPlayer().getEntityId()).getEditZone().addPoint(point);
+						EpicZonePlayer ezp = General.getPlayer(event.getPlayer().getName());
+						ezp.getEditZone().addPoint(point);
+						ezp.getEditZone().addPillar(event.getClickedBlock());
 						event.getPlayer().sendMessage("Point " + point.x + ":" + point.y + " added to zone.");
 					}
 				}
 			}
 		}
 	}
-	
+
 	private boolean PlayerWithinZoneLogic(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint)
 	{
 
@@ -229,7 +237,6 @@ public class PlayerEvents extends PlayerListener
 		if(General.pointWithinBorder(playerPoint, player))
 		{
 			foundZone = FindZone(player, ezp, playerHeight, playerPoint, worldName);
-
 			if(foundZone != null)
 			{
 				if (ezp.getCurrentZone() == null || foundZone != ezp.getCurrentZone())
@@ -251,13 +258,13 @@ public class PlayerEvents extends PlayerListener
 			}
 			else
 			{
-				if(ZonePermissionsHandler.hasPermissions(player, null, "entry"))
+				if(ZonePermissionsHandler.hasPermissions(player, General.myGlobalZones.get(player.getWorld().getName()), "entry"))
 				{
 					if (ezp.getCurrentZone() != null)
 					{
 						if(ezp.getCurrentZone().getExitText().length() > 0){player.sendMessage(ezp.getCurrentZone().getExitText());}
 						HeroChatIntegration.leaveChat(ezp.getCurrentZone().getTag(), player);
-						ezp.setCurrentZone(null);
+						ezp.setCurrentZone(General.myGlobalZones.get(player.getWorld().getName()));
 					}
 				}
 				else
@@ -284,7 +291,6 @@ public class PlayerEvents extends PlayerListener
 
 		if(ezp.getCurrentZone() != null)
 		{
-
 			String resultTag;
 			result = ezp.getCurrentZone();
 			resultTag = General.isPointInZone(result, playerHeight, playerPoint, worldName);
@@ -292,6 +298,7 @@ public class PlayerEvents extends PlayerListener
 			{
 				if(!resultTag.equalsIgnoreCase(ezp.getCurrentZone().getTag()))
 				{
+
 					result = General.myZones.get(resultTag);
 				}
 			}

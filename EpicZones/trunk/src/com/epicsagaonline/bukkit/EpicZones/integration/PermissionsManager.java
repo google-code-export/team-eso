@@ -73,13 +73,20 @@ public class PermissionsManager
 
 		boolean result = false;
 
-		if(Permissions_Perms != null)
+		try
 		{
-			result = (Permissions_Perms.has(player, permission));
+			if(Permissions_Perms != null)
+			{
+				result = (Permissions_Perms.has(player, permission));
+			}
+			else if(GroupManager_Perms != null)
+			{
+				result = (GroupManager_Perms.getWorldData(player).getPermissionsHandler().has(player, permission));			
+			}
 		}
-		else if(GroupManager_Perms != null)
+		catch (Exception e)
 		{
-			result = (GroupManager_Perms.getWorldData(player).getPermissionsHandler().has(player, permission));			
+			Log.Write(e.getMessage());
 		}
 
 		return result;
@@ -89,17 +96,44 @@ public class PermissionsManager
 	public ArrayList<String> getGroupNames(Player player)
 	{
 		ArrayList<String> result = new ArrayList<String>();
+		if(Permissions_Perms != null )
+		{
+			if(Permissions_Perms.getGroups(player.getWorld().getName(), player.getName()) != null)
+			{
+				for(String grp: Permissions_Perms.getGroups(player.getWorld().getName(), player.getName()))
+				{
+					result.add(0, grp);	 
+				}
+			}
+		}
+		else if(GroupManager_Perms != null)
+		{
+			if(GroupManager_Perms.getWorldData(player).getGroupList() != null)
+			{
+				for(org.anjocaido.groupmanager.data.Group grp: GroupManager_Perms.getWorldData(player).getGroupList())
+				{
+					result.add(grp.getName());
+				}
+			}
+		}
+
+		return result;
+	}
+
+	public ArrayList<String> getChildGroupNames(String worldName, String groupName)
+	{
+		ArrayList<String> result = new ArrayList<String>();
 
 		if(Permissions_Perms != null )
 		{	
-			for(String grp: Permissions_Perms.getGroups(player.getWorld().getName(), player.getName()))
+			for(String grp: Permissions_Perms.getGroups(worldName, groupName))
 			{
 				result.add(grp);	 
 			}
 		}
 		else if(GroupManager_Perms != null)
 		{
-			for(org.anjocaido.groupmanager.data.Group grp: GroupManager_Perms.getWorldData(player).getGroupList())
+			for(org.anjocaido.groupmanager.data.Group grp: GroupManager_Perms.getWorldData(groupName).getGroupList())
 			{
 				result.add(grp.getName());
 			}	
@@ -121,6 +155,7 @@ public class PermissionsManager
 			GroupManager_Perms = gm.getWorldsHolder();
 			return GroupManager_Perms != null;
 		}
+		Permissions_Perms = null;
 		return false;
 	}
 
@@ -134,7 +169,7 @@ public class PermissionsManager
 				plugin.getServer().getPluginManager().enablePlugin(p);
 			}
 			Permissions_Perms = ((Permissions)p).getHandler();
-			return true;
+			return Permissions_Perms != null;
 		}
 		return false;
 	}

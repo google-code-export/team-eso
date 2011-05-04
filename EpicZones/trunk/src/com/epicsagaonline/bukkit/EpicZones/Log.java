@@ -4,7 +4,10 @@ public class Log {
 
 	public static void Write(String message)
 	{
-		System.out.println("[EpicZones] " + message.trim());
+		if(message != null)
+		{
+			System.out.println("[EpicZones] " + message.trim());
+		}
 	}
-	
+
 }

@@ -41,9 +41,11 @@ import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.SignChangeEvent;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Log;
 import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
@@ -168,4 +170,10 @@ public class BlockEvents extends BlockListener {
 		}
 	}
 
+	public @Override void onSignChange(SignChangeEvent event)
+	{
+		
+		Log.Write("Sign Change Event!");
+		
+	}
 }

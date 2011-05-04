@@ -31,8 +31,8 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.objects;
 
-
 import org.bukkit.Location;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -69,9 +69,9 @@ public class EpicZonePlayer {
 	public String getPreviousZoneTag(){return previousZoneTag;}
 	public boolean getHasMoved(){return hasMoved;}
 	public Date getLastMoved(){return lastMoved;}
-
+	
 	public enum EpicZoneMode{None, ZoneDraw, ZoneEdit, ZoneDrawConfirm, ZoneDeleteConfirm}
-
+	
 	public void setHasMoved(boolean value)
 	{
 		this.hasMoved = value;		

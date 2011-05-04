@@ -4,6 +4,7 @@ package com.epicsagaonline.bukkit.EpicZones;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone.ZoneType;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission.PermType;
 
 public class ZonePermissionsHandler 
@@ -13,30 +14,48 @@ public class ZonePermissionsHandler
 
 	public static boolean hasPermissions(Player player, EpicZone zone, String flag)
 	{
-		if(!EpicZones.permissions.hasPermission(player, PERMS_IGNORE))
+		try
 		{
-			if(zone == null)
+			if(!EpicZones.permissions.hasPermission(player, PERMS_IGNORE))
 			{
-				return getDefaultPerm(flag);
-			}
-
-			if(!zone.isOwner(player.getName()))
-			{
-				if(zone.hasPermission(player, flag, PermType.DENY)) //  EpicZones.permissions.hasPermission(player, getPermNode(zone, flag, true)))
+				if(zone == null)
 				{
-					return false;
+					zone = General.myGlobalZones.get(player.getWorld().getName());
 				}
-				if(zone.hasPermission(player, flag, PermType.ALLOW)) //  EpicZones.permissions.hasPermission(player, getPermNode(zone, flag, true)))
+				if(!zone.isOwner(player.getName()))
 				{
-					return true;
-				}
-				else if(zone.hasParent())
-				{
-					return hasPermissions(player, zone.getParent(), flag);
+					if(zone.hasPermission(player, flag, PermType.DENY)) //  EpicZones.permissions.hasPermission(player, getPermNode(zone, flag, true)))
+					{
+						return false;
+					}
+					if(zone.hasPermission(player, flag, PermType.ALLOW)) //  EpicZones.permissions.hasPermission(player, getPermNode(zone, flag, true)))
+					{
+						return true;
+					}
+					if(zone.hasPermissionFromGroup(player, flag, PermType.DENY)) //  EpicZones.permissions.hasPermission(player, getPermNode(zone, flag, true)))
+					{
+						return false;
+					}
+					if(zone.hasPermissionFromGroup(player, flag, PermType.ALLOW)) //  EpicZones.permissions.hasPermission(player, getPermNode(zone, flag, true)))
+					{
+						return true;
+					}
+					if(zone.hasParent())
+					{
+						return hasPermissions(player, zone.getParent(), flag);
+					}
+					if(zone.getType() != ZoneType.GLOBAL)
+					{
+						return hasPermissions(player, General.myGlobalZones.get(player.getWorld().getName()), flag);	
+					}
+					else
+					{
+						return General.config.globalZoneDefaultAllow;
+					}
 				}
 				else
 				{
-					return getDefaultPerm(flag);	
+					return true;
 				}
 			}
 			else
@@ -44,22 +63,10 @@ public class ZonePermissionsHandler
 				return true;
 			}
 		}
-		else
+		catch (Exception e)
 		{
-			return true;
+			Log.Write(e.getMessage());
+			return false;
 		}
 	}
-
-	private static boolean getDefaultPerm(String flag)
-	{
-		if(flag.equals("entry"))
-			return General.config.defaultEnter;
-		if(flag.equals("destroy"))
-			return General.config.defaultDestroy;
-		if(flag.equals("build"))
-			return General.config.defaultBuild;
-
-		return false;
-	}
-
 }

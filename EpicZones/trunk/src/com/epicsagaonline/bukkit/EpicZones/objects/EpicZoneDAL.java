@@ -78,6 +78,15 @@ public class EpicZoneDAL{
 
 	}
 
+	public static void ReloadZone(String zoneTag)
+	{
+		File file = new File(General.plugin.getDataFolder() + File.separator + PATH  + File.separator + zoneTag);
+		if(file.exists())
+		{
+			General.myZones.put(zoneTag, Load(file));
+		}
+	}
+	
 	private static EpicZone Load(File file)
 	{
 
@@ -98,7 +107,6 @@ public class EpicZoneDAL{
 		result.setFloor(config.getInt("floor", 0));
 		result.setCeiling(config.getInt("ceiling", 128));
 		result.setPVP(config.getBoolean("pvp", false));
-		result.setMobs(config.getString("mobs"));
 		result.setFire(config.getBoolean("fire", false));
 		result.setExplode(config.getBoolean("explode", false));
 		result.setSanctuary(config.getBoolean("sanctuary", false));
@@ -106,6 +114,19 @@ public class EpicZoneDAL{
 		result.setPolygon(config.getString("points"));
 		result.setRegen(getRegen(config));
 
+		
+		list = config.getList("mobs");
+		if(list != null)
+		{
+			for(Object mob: list)
+			{
+				if(mob instanceof String)
+				{
+					result.addMob((String)mob);
+				}
+			}
+		}
+		
 		list = config.getList("owners");
 		if(list != null)
 		{
@@ -165,7 +186,7 @@ public class EpicZoneDAL{
 
 		result.rebuildBoundingBox();
 
-		Log.Write("Zone Loaded [" + result.getName() + "]");
+		Log.Write("Loaded " + result.getType().toString() + " Zone [" + result.getName() + "]");
 
 		return result;
 
@@ -206,7 +227,7 @@ public class EpicZoneDAL{
 			config.put("floor", zone.getFloor());
 			config.put("ceiling", zone.getCeiling());
 			config.put("pvp", zone.getPVP());
-			config.put("mobs", zone.getMobs());
+			config.put("mobs", zone.getMobs().toArray());
 			config.put("fire", zone.getFire());
 			config.put("explode", zone.getExplode());
 			config.put("sanctuary", zone.getSanctuary());
@@ -296,5 +317,21 @@ public class EpicZoneDAL{
 		}
 
 		return mainMap;
+	}
+
+	public static void DeleteZone(String zoneTag)
+	{
+		EpicZone zone = General.myZones.get(zoneTag);
+		if(zone != null)
+		{
+			File file = new File(General.plugin.getDataFolder() + File.separator + PATH + File.separator + zone.getTag() + ".yml");
+			if (file.exists())
+			{
+				if(file.delete())
+				{
+					General.LoadZones();
+				}
+			}
+		}
 	}
 }

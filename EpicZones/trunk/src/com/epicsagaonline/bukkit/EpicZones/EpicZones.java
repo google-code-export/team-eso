@@ -54,6 +54,8 @@ import com.epicsagaonline.bukkit.EpicZones.listeners.BlockEvents;
 import com.epicsagaonline.bukkit.EpicZones.listeners.EntityEvents;
 import com.epicsagaonline.bukkit.EpicZones.listeners.PlayerEvents;
 import com.epicsagaonline.bukkit.EpicZones.listeners.VehicleEvents;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
+import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 import com.herocraftonline.dthielke.herochat.HeroChat;
 
 import org.bukkit.plugin.Plugin;
@@ -74,7 +76,7 @@ public class EpicZones extends JavaPlugin
 	private static final String[] WHO_COMMANDS = {"ezwho", "who", "online", "whois"};
 	private static final String[] RELOAD_COMMANDS = {"ezreload", "reload"};
 	private static final String CONFIG_FILE = "config.yml";
-	
+
 	private static CommandHandler reloadCommandHandler = new EZReload();
 	private static CommandHandler zoneCommandHandler = new EZZone();
 	private static CommandHandler whoCommandHandler = new EZWho();
@@ -90,7 +92,7 @@ public class EpicZones extends JavaPlugin
 		{
 			this.getDataFolder().mkdir();
 		}
-		
+
 		General.config = new Config(file);
 
 		PluginDescriptionFile pdfFile = this.getDescription();
@@ -99,29 +101,30 @@ public class EpicZones extends JavaPlugin
 		{
 
 			PluginManager pm = getServer().getPluginManager();
-			
+
 			pm.registerEvent(Event.Type.PLAYER_MOVE, this.playerListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_TELEPORT, this.playerListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_LOGIN, this.playerListener, Event.Priority.Monitor, this);
 			pm.registerEvent(Event.Type.PLAYER_QUIT, this.playerListener, Event.Priority.Monitor, this);
 			pm.registerEvent(Event.Type.PLAYER_INTERACT , this.playerListener, Event.Priority.Normal, this);
-			
+
 			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_IGNITE, this.blockListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_BURN, this.blockListener, Event.Priority.Normal, this);
-			
+			pm.registerEvent(Event.Type.SIGN_CHANGE, this.blockListener, Event.Priority.Normal, this);
+
 			pm.registerEvent(Event.Type.ENTITY_DAMAGE, this.entityListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.CREATURE_SPAWN, this.entityListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.ENTITY_EXPLODE, this.entityListener, Event.Priority.Normal, this);
-			
+
 			pm.registerEvent(Event.Type.VEHICLE_MOVE, this.vehicleListener, Event.Priority.Normal, this);
-			
-			
+
+
 			getServer().getScheduler().scheduleAsyncRepeatingTask(this, regen, 10, 10);
 
 			registerCommands();
-			
+
 			setupMultiWorld();
 			setupEpicZones();
 			setupPermissions();
@@ -139,7 +142,18 @@ public class EpicZones extends JavaPlugin
 
 	public void onDisable() 
 	{
-		PluginDescriptionFile pdfFile = this.getDescription();	
+		PluginDescriptionFile pdfFile = this.getDescription();
+		for(String playerName : General.myPlayers.keySet())
+		{
+			EpicZonePlayer ezp = General.myPlayers.get(playerName);
+			if(ezp.getMode() != EpicZoneMode.None)
+			{
+				if(ezp.getEditZone() != null)
+				{
+					ezp.getEditZone().HidePillars();
+				}
+			}
+		}
 		Log.Write("version " + pdfFile.getVersion() + " is disabled.");
 	}
 
@@ -182,8 +196,16 @@ public class EpicZones extends JavaPlugin
 	{
 		EnablePlugin("EpicGates", "Multi World");
 		EnablePlugin("MultiVerse", "Multi World");
+		EnablePlugin("WorldWarp", "Multi World");
+		EnablePlugin("WormholeXTremeWorlds", "Multi World");
+		EnablePlugin("NetherPlugin", "Multi World");
+		EnablePlugin("Nethrar", "Multi World");
+		EnablePlugin("NetherPortal", "Multi World");
+		EnablePlugin("Nether", "Multi World");
+		EnablePlugin("NetherGate", "Multi World");
+		EnablePlugin("Stargate", "Multi World");
 	}
-	
+
 	private void EnablePlugin(String pluginName, String pluginType)
 	{
 		Plugin plg;
@@ -197,7 +219,7 @@ public class EpicZones extends JavaPlugin
 			}
 		}
 	}
-	
+
 	public void setupHeroChat()
 	{
 		if(General.config.enableHeroChat)
@@ -233,7 +255,6 @@ public class EpicZones extends JavaPlugin
 	{
 		General.plugin = this;
 		General.myZones.clear();
-		General.myZoneTags.clear();
 		General.myPlayers.clear();
 		General.config.load();
 		General.config.save();
