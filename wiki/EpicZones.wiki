@@ -246,13 +246,10 @@ All commands can be accessed with the ez prefix, to circumnavigate command confl
  * radius
  * floor
  * ceiling
- * addchildren
- * removechildren
- * addowners
- * removeowners
+ * child
+ * owner
+ * message
  * name
- * enter
- * exit
  * draw
  * confirm
  * edit
