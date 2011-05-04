@@ -269,7 +269,7 @@ All commands can be accessed with the ez prefix, to circumnavigate command confl
 }}}
 
 === Who ===
-*Permissions Required:* none
+*Permissions Required:* epiczones.who
  Gives a list of players and the zones that they are in, if they are in a zone.
 
 ==== Aliases ====
@@ -353,7 +353,15 @@ world: world
 
 ----
 = Changelog =
-
+ * *Version 0.21*
+   * Fixed bug causing mob flags to not work properly.
+   * Fixed bug causing PVP zones to not function properly.
+   * Fixed a bug where signs and pictures could be placed with out permissions.
+   * Fixed a bug that didn't let you override inheriting group permission denies.
+   * When in edit mode, 3 block tall pillars of bedrock will be generated at the zone points, for easy identification of zone borders
+   * Default global zones now replace the old map radius logic.
+   * Fixed a bug in regen
+   * Other things I can't remember at the moment.
  * *Version 0.20.1*
    * Bug fix causing groups to not work properly
  * *Version 0.20*
