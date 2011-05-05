@@ -127,9 +127,9 @@ These are the steps permission checks when seeing if a user has permission to pe
  Zone level control that dictates the regen or degen of health when a player is inside the zone.
 
 ==== Values ====
- * *Interval* Frequency of regen tick for that zone in miliseconds.
  * *Amount* the amount the players health is modified by each regen tick (can be negative). A value of 1 equals half a heart.
- * *Delay* (optional) Amount of time a player must be within the zone before regen ticks apply to them
+ * *Delay* (optional) Amount of time a player must be within the zone 
+ * *Interval* (optional) Frequency of regen tick for that zone in miliseconds.before regen ticks apply to them
  * *MaxRegen* (optional) The maximum amount the zone will regen a player's health.
  * *MinDegen* (optional) The minimum amount the zone will degen a player's health.
  * *RestDelay* (optional) A length in time that a user must hold still before the regen/degen effects will take place.
@@ -141,7 +141,7 @@ These are the steps permission checks when seeing if a user has permission to pe
 
 ==== Syntax ====
 {{{
-/zone flag regen <interval> <amount> [delay]
+/zone flag regen <amount> [Delay] [Interval] [MaxRegen] [MinDegen] [RestDelay] [BedBonus]
 }}}
 
 
