@@ -350,6 +350,12 @@ world: world
 
 ----
 = Changelog =
+ * *Version 0.22*
+   * Brand New Zone Detection Algorithm, much more efficient and properly works with Global zones now.
+   * Permissions now will no longer duplicate
+   * Permissions detection is now more efficient
+   * Block break permissions are now more efficient
+   * Other minor bug fixes found along the way
  * *Version 0.21*
    * Fixed bug causing mob flags to not work properly.
    * Fixed bug causing PVP zones to not function properly.
