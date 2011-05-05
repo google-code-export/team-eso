@@ -350,6 +350,9 @@ world: world
 
 ----
 = Changelog =
+ * *Version 0.22.1*
+   * Fixed a bug causing mobs not to spawn
+   * Cleaned out a bunch of old commented out code
  * *Version 0.22*
    * Brand New Zone Detection Algorithm, much more efficient and properly works with Global zones now.
    * Permissions now will no longer duplicate
