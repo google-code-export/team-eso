@@ -262,7 +262,8 @@ All commands can be accessed with the ez prefix, to circumnavigate command confl
 
 ==== Notes ====
 You can color code your zone messages and names with the following color key:
-[CODE]&0 BLACK
+{{{
+&0 BLACK
 &1 DARK_BLUE
 &2 DARK_GREEN
 &3 DARK_AQUA
@@ -277,7 +278,8 @@ You can color code your zone messages and names with the following color key:
 &C RED
 &D LIGHT_PURPLE
 &E YELLOW
-&F WHITE[/CODE]
+&F WHITE
+}}}
 
 ==== Syntax ====
 {{{
