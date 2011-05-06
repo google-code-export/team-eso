@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -57,11 +58,11 @@ public class EZZoneCeiling
 					{
 						Integer value = Integer.parseInt(data[1]);
 						ezp.getEditZone().setCeiling(value);
-						sender.sendMessage("Zone Updated. Ceiling to: " + value);
+						Message.Send(sender, 100, new String[]{"ceiling", data[1]});
 					}
 					else
 					{
-						sender.sendMessage("[" + data[1] + "] is not a valid value for ceiling.");
+						Message.Send(sender, 101, new String[]{data[1]});
 					}
 				}
 			}

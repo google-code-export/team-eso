@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -53,8 +54,8 @@ public class EZZoneDraw
 			{
 				if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 				{
-					ezp.setMode(EpicZoneMode.ZoneDeleteConfirm);
-					sender.sendMessage("WARNING! Entering draw mode will erase all points for the zone! Type /zone draw confirm or /zone draw deny.");
+					ezp.setMode(EpicZoneMode.ZoneDrawConfirm);
+					Message.Send(sender, 21);
 				}
 				else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
 				{
@@ -63,12 +64,12 @@ public class EZZoneDraw
 						if(data[1].equalsIgnoreCase("confirm"))
 						{
 							ezp.setMode(EpicZoneMode.ZoneDraw);
-							sender.sendMessage("Start drawing your zone with the zone edit tool. Type /zone save when you are done drawing.");
+							Message.Send(sender, 19);
 						}
 						else if(data[1].equalsIgnoreCase("deny"))
 						{
 							ezp.setMode(EpicZoneMode.ZoneEdit);
-							sender.sendMessage("Draw Mode canceled, back in Edit Mode. type /zone for more options.");
+							Message.Send(sender, 17);
 						}
 					}
 				}

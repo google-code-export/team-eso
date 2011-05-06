@@ -41,11 +41,10 @@ import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.SignChangeEvent;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
-import com.epicsagaonline.bukkit.EpicZones.Log;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
@@ -56,11 +55,7 @@ import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
  */
 public class BlockEvents extends BlockListener {
 	//private final EpicZones plugin;
-	private static final String NO_PERM_DESTROY = "You do not have permissions to destroy in this zone.";
-	private static final String NO_PERM_DESTROY_BORDER = "You do not have permissions to destroy outside the border of the map.";
-	private static final String NO_PERM_BUILD = "You do not have permissions to build in this zone.";
-	private static final String NO_PERM_BUILD_BORDER = "You do not have permissions to build outside the border of the map.";
-
+	
 	public BlockEvents(final EpicZones plugin) {
 		//this.plugin = plugin;
 	}
@@ -69,7 +64,7 @@ public class BlockEvents extends BlockListener {
 	{
 		if(!event.isCancelled())
 		{
-			EpicZone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
+			EpicZone zone = General.GetZoneForPlayer(null, event.getBlock().getLocation().getWorld().getName(), event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()));
 			if (zone != null)
 			{
 				if(!zone.getFire())
@@ -84,7 +79,7 @@ public class BlockEvents extends BlockListener {
 	{
 		if(!event.isCancelled())
 		{
-			EpicZone zone = General.getZoneForPoint(event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()), event.getBlock().getLocation().getWorld().getName());
+			EpicZone zone = General.GetZoneForPlayer(null, event.getBlock().getLocation().getWorld().getName(), event.getBlock().getLocation().getBlockY() ,new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()));
 			if (zone != null)
 			{
 				if(!zone.getFire())
@@ -106,16 +101,17 @@ public class BlockEvents extends BlockListener {
 			int blockHeight = event.getBlock().getLocation().getBlockY();
 			boolean hasPerms = false;
 			EpicZone currentZone = null;
-			
-			if(General.pointWithinBorder(blockPoint, player))
+
+			if(General.BorderLogic(blockPoint, player))
 			{
-				currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
+				currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
 				hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "destroy");
 
 				if(!hasPerms)
 				{
-					if (ezp.getLastWarned().before(new Date())){
-						player.sendMessage(NO_PERM_DESTROY);
+					if (ezp.getLastWarned().before(new Date()))
+					{
+						Message.Send(player, 32);
 						ezp.Warn();
 					}
 					event.setCancelled(true);
@@ -123,8 +119,9 @@ public class BlockEvents extends BlockListener {
 			}
 			else
 			{
-				if (ezp.getLastWarned().before(new Date())){
-					player.sendMessage(NO_PERM_DESTROY_BORDER);
+				if (ezp.getLastWarned().before(new Date()))
+				{
+					Message.Send(player, 33);
 					ezp.Warn();
 				}
 				event.setCancelled(true);
@@ -145,15 +142,15 @@ public class BlockEvents extends BlockListener {
 
 			EpicZone currentZone = null;
 
-			if(General.pointWithinBorder(blockPoint, player))
+			if(General.BorderLogic(blockPoint, player))
 			{
-				currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
+				currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
 				hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "build");
 
 				if(!hasPerms)
 				{
 					if (ezp.getLastWarned().before(new Date())){
-						player.sendMessage(NO_PERM_BUILD);
+						Message.Send(player, 32);
 						ezp.Warn();
 					}
 					event.setCancelled(true);
@@ -162,18 +159,11 @@ public class BlockEvents extends BlockListener {
 			else
 			{
 				if (ezp.getLastWarned().before(new Date())){
-					player.sendMessage(NO_PERM_BUILD_BORDER);
+					Message.Send(player, 33);
 					ezp.Warn();
 				}
 				event.setCancelled(true);
 			}
 		}
-	}
-
-	public @Override void onSignChange(SignChangeEvent event)
-	{
-		
-		Log.Write("Sign Change Event!");
-		
 	}
 }

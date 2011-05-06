@@ -35,6 +35,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZoneDAL;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
@@ -55,12 +56,12 @@ public class EZZoneCancel
 				ezp.setMode(EpicZoneMode.None);
 				ezp.setEditZone(null);
 				EpicZoneDAL.ReloadZone(zoneTag);
-				sender.sendMessage("Zone modification cancelled, no changes were saved.");
+				Message.Send(sender, 16);
 			}
 			else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm || ezp.getMode() == EpicZoneMode.ZoneDeleteConfirm)
 			{
 				ezp.setMode(EpicZoneMode.ZoneEdit);
-				sender.sendMessage("Draw Mode canceled, back in Edit Mode. type /zone for more options.");
+				Message.Send(sender, 17);
 			}
 			else
 			{

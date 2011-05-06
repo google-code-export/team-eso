@@ -95,6 +95,7 @@ public class EpicZoneDAL{
 		String tag = file.getName().substring(0, file.getName().indexOf("."));		
 		EpicZone result = new EpicZone();
 		Configuration config = new Configuration(file);
+boolean mobsAdded = false;
 
 		config.load();
 		result.setTag(tag);
@@ -114,7 +115,6 @@ public class EpicZoneDAL{
 		result.setPolygon(config.getString("points"));
 		result.setRegen(getRegen(config));
 
-		
 		list = config.getList("mobs");
 		if(list != null)
 		{
@@ -123,8 +123,13 @@ public class EpicZoneDAL{
 				if(mob instanceof String)
 				{
 					result.addMob((String)mob);
+					mobsAdded = true;
 				}
 			}
+		}
+		if(!mobsAdded)
+		{
+			result.addMob("ALL");
 		}
 		
 		list = config.getList("owners");
@@ -287,13 +292,14 @@ public class EpicZoneDAL{
 		}
 	}
 
-	private static Map<String, Object> BuildPerms(ArrayList<EpicZonePermission> perms)
+	private static Map<String, Object> BuildPerms(Map<String, EpicZonePermission> perms)
 	{
 		Map<String, Object> mainMap = new HashMap<String, Object>();
 		ArrayList<String> members = new ArrayList<String>();
 
-		for(EpicZonePermission perm : perms)
+		for(String permKey : perms.keySet())
 		{
+			EpicZonePermission perm = perms.get(permKey);
 			if(!members.contains(perm.getMember().toLowerCase()))
 			{
 				members.add(perm.getMember().toLowerCase());
@@ -303,8 +309,9 @@ public class EpicZoneDAL{
 		for(String memberName : members)
 		{
 			Map<String, Object> map = new HashMap<String, Object>();
-			for(EpicZonePermission perm : perms)
+			for(String permKey : perms.keySet())
 			{
+				EpicZonePermission perm = perms.get(permKey);
 				if(memberName.equals(perm.getMember().toLowerCase()))
 				{
 					map.put(perm.getNode().toString().toLowerCase(), perm.getPermission().toString().toLowerCase());

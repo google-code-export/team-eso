@@ -56,7 +56,7 @@ public class Config extends Configuration {
 	public boolean enableHeroChat;
 	public boolean globalZoneDefaultAllow;
 	public int zoneTool = 280; //Default Tool Is Stick
-	public boolean showPillars;
+	public String language = "EN_US";
 
 	public Config(File file)
 	{
@@ -72,7 +72,9 @@ public class Config extends Configuration {
 	{
 		enableRadius = true;
 		enableHeroChat = false;
+		globalZoneDefaultAllow = true;
 		zoneTool = 280;
+		language = "EN_US";
 	}
 
 	@Override
@@ -100,6 +102,7 @@ public class Config extends Configuration {
 			enableHeroChat = getBoolean("enableHeroChat", false);
 			globalZoneDefaultAllow = getBoolean("globalZoneDefaultAllow", true);
 			zoneTool = getInt("zoneTool", zoneTool);
+			language = getString("language", language).toUpperCase();
 
 		}
 	}
@@ -117,6 +120,7 @@ public class Config extends Configuration {
 		root.put("zoneTool", zoneTool);
 		root.put("enableHeroChat", enableHeroChat);
 		root.put("globalZoneDefaultAllow", globalZoneDefaultAllow);
+		root.put("language", language);
 
 		try 
 		{

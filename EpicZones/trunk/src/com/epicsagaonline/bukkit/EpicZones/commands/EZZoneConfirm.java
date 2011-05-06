@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZoneDAL;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
@@ -59,8 +60,9 @@ public class EZZoneConfirm
 					{
 						General.myZones.get(ezp.getEditZone().getParent().getTag()).removeChild(ezp.getEditZone().getTag());
 					}
+					ezp.getEditZone().HidePillars();
 					EpicZoneDAL.DeleteZone(ezp.getEditZone().getTag());
-					sender.sendMessage("Zone [" + ezp.getEditZone().getTag() + "] has been deleted.");
+					Message.Send(sender, 102, new String[]{ezp.getEditZone().getTag()});
 
 					ezp.setMode(EpicZoneMode.None);
 					ezp.setEditZone(null);
@@ -70,7 +72,8 @@ public class EZZoneConfirm
 				{
 					ezp.setMode(EpicZoneMode.ZoneDraw);
 					ezp.getEditZone().clearPolyPoints();
-					sender.sendMessage("Start drawing your zone with the zone edit tool. Type /zone save when you are done drawing.");
+					ezp.getEditZone().HidePillars();
+					Message.Send(sender, 19);
 				}
 			}
 			else

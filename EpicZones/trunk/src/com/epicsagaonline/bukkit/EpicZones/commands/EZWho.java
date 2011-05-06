@@ -39,6 +39,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
@@ -46,7 +47,7 @@ public class EZWho implements CommandHandler {
 
 	public boolean onCommand(String command, CommandSender sender, String[] args) {
 
-		if((sender instanceof Player && EpicZones.permissions.hasPermission((Player)sender, "epiczones.who")))
+		if((sender instanceof Player && EpicZones.permissions.hasPermission((Player)sender, "epiczones.who")) || EpicZones.permissions.isDisabled)
 		{
 			Player player = (Player)sender;
 			int pageNumber = 1;
@@ -86,34 +87,36 @@ public class EZWho implements CommandHandler {
 		return false;
 	}
 
-	private static void buildWho(EpicZonePlayer ezp, Player player, CommandSender sender, int pageNumber, boolean allZones)
+	private static void buildWho(EpicZonePlayer ezp, Player player, CommandSender sender, Integer pageNumber, boolean allZones)
 	{
 
 		EpicZone currentZone = General.getPlayer(player.getName()).getCurrentZone();
 		if(currentZone == null){allZones = true;}
 		ArrayList<EpicZonePlayer> players = getPlayers(currentZone, allZones);
-		int playersPerPage = 8;
-		int playerCount = players.size();
+		Integer playersPerPage = 8;
+		Integer playerCount = players.size();
 
 		if (allZones)
 		{
-			sender.sendMessage(playerCount + " Players Online [Page " + pageNumber + " of " + ((int)Math.ceil((double)playerCount / (double)playersPerPage)) + "]");
+			Integer totalPages = ((int)Math.floor((double)playerCount / (double)playersPerPage));
+			Message.Send(sender, 113, new String[]{playerCount.toString(), pageNumber.toString(), totalPages.toString()});
 			for(int i = (pageNumber - 1) * playersPerPage; i < (pageNumber * playersPerPage); i++)
 			{
 				if (players.size() > i)
 				{
-					sender.sendMessage(buildWhoPlayerName(ezp, players, i, allZones));
+					Message.Send(sender,buildWhoPlayerName(ezp, players, i, allZones));
 				}
 			}
 		}
 		else
 		{
-			sender.sendMessage(playerCount + " Players Online in " + currentZone.getName() + " [Page " + pageNumber + " of " + ((int)Math.ceil((double)playerCount / playersPerPage) + 1) + "]");
+			Integer totalPages = ((int)Math.floor((double)playerCount / playersPerPage) + 1); 
+			Message.Send(sender, 114, new String[]{playerCount.toString(), currentZone.getName(), pageNumber.toString(), totalPages.toString()});
 			for(int i = (pageNumber - 1) * playersPerPage; i < pageNumber * playersPerPage; i++)
 			{
 				if (players.size() > i)
 				{
-					sender.sendMessage(buildWhoPlayerName(ezp, players, i, allZones));
+					Message.Send(sender, buildWhoPlayerName(ezp, players, i, allZones));
 				}
 			}
 		}
@@ -121,27 +124,26 @@ public class EZWho implements CommandHandler {
 
 	private static String buildWhoPlayerName(EpicZonePlayer ezp, ArrayList<EpicZonePlayer> players, int index, boolean allZones )
 	{
-
 		if (allZones)
 		{
 			if(players.get(index).getCurrentZone() != null)
 			{
-				return players.get(index).getName() + " - " + players.get(index).getCurrentZone().getName() + " - Distance: " + CalcDist(ezp, players.get(index));
+				return Message.get(115, new String[]{players.get(index).getName(), players.get(index).getCurrentZone().getName(), CalcDist(ezp, players.get(index))});
 			}
 			else
 			{
-				return players.get(index).getName() + " - Distance: " + CalcDist(ezp, players.get(index));
+				return Message.get(116, new String[]{players.get(index).getName(), CalcDist(ezp, players.get(index))});
 			}
 		}
 		else
 		{
-			return players.get(index).getName() + " - Distance: " + CalcDist(ezp, players.get(index));
+			return Message.get(116, new String[]{players.get(index).getName(), CalcDist(ezp, players.get(index))});
 		}
 	}
 
-	private static int	CalcDist(EpicZonePlayer player1, EpicZonePlayer player2)
+	private static String CalcDist(EpicZonePlayer player1, EpicZonePlayer player2)
 	{
-		int result = 0;
+		Integer result = 0;
 
 		if(!player1.getName().equals(player2.getName()))
 		{
@@ -154,7 +156,7 @@ public class EZWho implements CommandHandler {
 			result = (int)Math.ceil(Math.sqrt(cSquared));
 		}
 
-		return result;
+		return result.toString();
 	}
 
 	private static ArrayList<EpicZonePlayer> getPlayers(EpicZone currentZone, boolean allZones)

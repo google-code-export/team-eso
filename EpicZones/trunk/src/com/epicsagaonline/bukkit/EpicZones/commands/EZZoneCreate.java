@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
@@ -64,15 +65,14 @@ public class EZZoneCreate
 							zone.setTag(tag);
 							zone.setName(tag);
 							zone.setWorld(player.getWorld().getName());
-
+							
 							ezp.setEditZone(zone);
 							ezp.setMode(EpicZoneMode.ZoneDraw);
-
-							sender.sendMessage("Zone Created. Start drawing your zone with the zone edit tool. Type /zone save when you are done drawing.");
+							Message.Send(sender, 20);
 						}
 						else
 						{
-							sender.sendMessage("A zone already exists with the tag [" + tag + "]");
+							Message.Send(sender, 103, new String[]{tag});
 						}
 					}
 					else

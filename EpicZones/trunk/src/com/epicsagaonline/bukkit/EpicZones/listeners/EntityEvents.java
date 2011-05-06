@@ -63,7 +63,7 @@ public class EntityEvents extends EntityListener
 
 	public @Override void onEntityExplode(EntityExplodeEvent event)
 	{
-		EpicZone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
+		EpicZone zone = General.GetZoneForPlayer(null, event.getLocation().getWorld().getName(), event.getLocation().getBlockY() ,new Point(event.getLocation().getBlockX(), event.getLocation().getBlockZ()));
 		if (zone != null)
 		{
 			if(!zone.getExplode())
@@ -78,7 +78,7 @@ public class EntityEvents extends EntityListener
 		if(!event.isCancelled())
 		{
 			Entity e = event.getEntity();
-			EpicZone zone = General.getZoneForPoint(e.getLocation().getBlockY(),new Point(e.getLocation().getBlockX(),e.getLocation().getBlockZ()), e.getLocation().getWorld().getName());
+			EpicZone zone = General.GetZoneForPlayer(null, e.getLocation().getWorld().getName(), e.getLocation().getBlockY() ,new Point(e.getLocation().getBlockX(), e.getLocation().getBlockZ()));
 			if(zone != null)
 			{
 				if(!zone.getFire())
@@ -103,7 +103,7 @@ public class EntityEvents extends EntityListener
 		if(!event.isCancelled())
 		{
 			Entity e = event.getEntity();
-			EpicZone sancZone = General.getZoneForPoint(e.getLocation().getBlockY(),new Point(e.getLocation().getBlockX(),e.getLocation().getBlockZ()), e.getLocation().getWorld().getName());
+			EpicZone sancZone = General.GetZoneForPlayer(null, e.getLocation().getWorld().getName(), e.getLocation().getBlockY() ,new Point(e.getLocation().getBlockX(), e.getLocation().getBlockZ()));
 			if((sancZone != null && !sancZone.getSanctuary()) || sancZone == null)
 			{
 				if(event.getCause() == DamageCause.ENTITY_ATTACK)
@@ -195,16 +195,20 @@ public class EntityEvents extends EntityListener
 	{
 		if(!event.isCancelled() && isCreature(event.getCreatureType()))
 		{
-
-			EpicZone zone = General.getZoneForPoint(event.getLocation().getBlockY(),new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()), event.getLocation().getWorld().getName());
-
+			EpicZone zone = General.GetZoneForPlayer(null, event.getLocation().getWorld().getName(), event.getLocation().getBlockY() ,new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()));
 			if(zone != null)
 			{
-				if(zone.getMobs() != null && (zone.getMobs().size() > 0 || !zone.getMobs().contains("all")))
+				if(zone.getMobs() != null) //If null assume all
 				{
-					if (zone.getMobs().contains("none") || !zone.getMobs().contains(event.getCreatureType().toString()))
+					if(zone.getMobs().size() > 0) //If size = 0 assume all
 					{
-						event.setCancelled(true);
+						if(!zone.getMobs().contains("ALL"))
+						{
+							if (zone.getMobs().contains("NONE") || !zone.getMobs().contains(event.getCreatureType().toString()))
+							{
+								event.setCancelled(true);
+							}
+						}
 					}
 				}
 			}

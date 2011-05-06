@@ -35,6 +35,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -62,16 +63,16 @@ public class EZZonePerm
 						if(ValidPerm(perm))
 						{
 							ezp.getEditZone().addPermission(member, node, perm);
-							sender.sendMessage("Permission Added: " + member + ">" + node + ":" + perm);
+							Message.Send(sender, 109, new String[]{member, node, perm});
 						}
 						else
 						{
-							sender.sendMessage("[" + perm + "] is not a valid permission type.");	
+							Message.Send(sender, 110, new String[]{perm});	
 						}
 					}
 					else
 					{
-						sender.sendMessage("[" + node + "] is not a valid permission node.");
+						Message.Send(sender, 111, new String[]{node});
 					}
 				}
 				else

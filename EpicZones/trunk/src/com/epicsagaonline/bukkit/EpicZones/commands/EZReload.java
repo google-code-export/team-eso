@@ -35,19 +35,19 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 
 public class EZReload implements CommandHandler {
 
 	public boolean onCommand(String command, CommandSender sender, String[] args) {
 
-		if((sender instanceof Player && EpicZones.permissions.hasPermission((Player)sender, "epiczones.admin")) || !(sender instanceof Player))
+		if((sender instanceof Player && (EpicZones.permissions.hasPermission((Player)sender, "epiczones.admin")) || ((Player)sender).isOp()) || !(sender instanceof Player))
 		{
 			General.plugin.setupEpicZones();
 			General.plugin.setupPermissions();
 			General.plugin.setupHeroChat();
 			General.plugin.setupMultiWorld();
-			
-			sender.sendMessage("EpicZones Reloaded.");
+			Message.Send(sender, 15);
 			return true;
 		}
 		return false;

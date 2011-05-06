@@ -31,9 +31,9 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 
@@ -46,55 +46,61 @@ public class EZZoneHelp
 	{
 		if(ezp != null)
 		{
+			Message.Send(sender, 1000);
+			Message.Send(sender, 10);
 			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				sender.sendMessage(ChatColor.GOLD + "You are currently in Edit mode.");
-				sender.sendMessage(ChatColor.GOLD + "/zone name " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Name.");
-				sender.sendMessage(ChatColor.GOLD + "/zone flag " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Flag, " + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Value");
-				sender.sendMessage(ChatColor.GOLD + "/zone floor " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Floor.");
-				sender.sendMessage(ChatColor.GOLD + "/zone ceiling " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Ceiling.");
-				sender.sendMessage(ChatColor.GOLD + "/zone addchildren " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Zone Tag, multiples allowed.");
-				sender.sendMessage(ChatColor.GOLD + "/zone removechildren " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Zone Tag, multiples allowed.");
-				sender.sendMessage(ChatColor.GOLD + "/zone enter " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Enter Message");
-				sender.sendMessage(ChatColor.GOLD + "/zone exit " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Exit Message");
-				sender.sendMessage(ChatColor.GOLD + "/zone world " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = World Name");
-				sender.sendMessage(ChatColor.GOLD + "/zone draw " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Prompts you to go into Draw mode.");
-				sender.sendMessage(ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Discards all current changes.");
-				sender.sendMessage(ChatColor.GOLD + "/zone delete " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Deletes the zone you are currently editing.");
-				sender.sendMessage(ChatColor.GOLD + "/zone save " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Saves all current changes.");
+				Message.Send(sender, 11);
+				Message.Send(sender, 1001);
+				Message.Send(sender, 1002);
+				Message.Send(sender, 1003);
+				Message.Send(sender, 1004);
+				Message.Send(sender, 1005);
+				Message.Send(sender, 1006);
+				Message.Send(sender, 1007);
+				Message.Send(sender, 1008);
+				Message.Send(sender, 1009);
+				Message.Send(sender, 1010);
+				Message.Send(sender, 1011);
+				Message.Send(sender, 1012);
+				Message.Send(sender, 1013);
+				Message.Send(sender, 1014);
+				Message.Send(sender, 1015);
+				Message.Send(sender, 1016);
+				Message.Send(sender, 1017);
+				Message.Send(sender, 1018);
+				Message.Send(sender, 1019);
 			}
 			else if(ezp.getMode() == EpicZoneMode.ZoneDraw)
 			{
-				sender.sendMessage(ChatColor.GOLD + "You are currently in Draw mode.");
-				sender.sendMessage(ChatColor.GOLD + "/zone save " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Saves the point data you have drawn.");
-				sender.sendMessage(ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Discards all current changes.");
+				Message.Send(sender, 12);
+				Message.Send(sender, 1020);
+				Message.Send(sender, 1022);
 			}
 			else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
 			{
-				sender.sendMessage(ChatColor.GOLD + "You are currently in Draw Confirm mode.");
-				sender.sendMessage(ChatColor.GOLD + "/zone confirm " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Clears point data and puts you into Draw mode.");
-				sender.sendMessage(ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Puts you back into EditMode.");
+				Message.Send(sender, 13);
+				Message.Send(sender, 1021);
+				Message.Send(sender, 1022);
 			}
-			else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
+			else if(ezp.getMode() == EpicZoneMode.ZoneDeleteConfirm)
 			{
-				sender.sendMessage(ChatColor.GOLD + "You are currently in Delete Confirm mode.");
-				sender.sendMessage(ChatColor.GOLD + "/zone confirm " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Deletes the zone you are currently editing.");
-				sender.sendMessage(ChatColor.GOLD + "/zone cancel " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Puts you back into EditMode.");
+				Message.Send(sender, 14);
+				Message.Send(sender, 1021);
+				Message.Send(sender, 1022);
 			}
 			else
 			{
-				sender.sendMessage(ChatColor.GOLD + "Help for /zone command.");
-				sender.sendMessage(ChatColor.GOLD + "/zone edit " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Begin editing specified zone.");
-				sender.sendMessage(ChatColor.GOLD + "/zone create " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Create new zone.");
-				sender.sendMessage(ChatColor.GOLD + "/zone list " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Lists existing zones.");
-				sender.sendMessage(ChatColor.GOLD + "/zone info " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Detailed info for specified zone.");
+				Message.Send(sender, 1024);
+				Message.Send(sender, 1025);
+				Message.Send(sender, 1026);
+				Message.Send(sender, 1027);
 			}
 		}
 		else
 		{
-			sender.sendMessage(ChatColor.GOLD + "Help for zone command.");
-			sender.sendMessage(ChatColor.GOLD + "zone list " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Lists existing zones.");
-			sender.sendMessage(ChatColor.GOLD + "zone info " + ChatColor.AQUA + "[tag] " + ChatColor.WHITE + "| " + ChatColor.GREEN + "Detailed info for specified zone.");
+			Message.Send(sender, 1026);
+			Message.Send(sender, 1027);
 		}
 	}
 }

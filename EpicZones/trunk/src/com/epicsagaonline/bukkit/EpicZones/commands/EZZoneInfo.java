@@ -31,12 +31,12 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission;
@@ -60,110 +60,108 @@ public class EZZoneInfo
 					if(admin || zone.isOwner(ezp.getName()))
 					{
 						String messageText;
-
-						sender.sendMessage(ChatColor.GOLD + "Zone: " + ChatColor.GREEN + zone.getName() + ChatColor.GOLD + " Tag: " + ChatColor.GREEN + "" + zone.getTag());
+						Message.Send(sender, 5, new String[]{zone.getName(), zone.getTag()});
 						if(zone.getCenter() != null)
 						{
-							sender.sendMessage(ChatColor.GOLD + "Shape: " + ChatColor.GREEN + "Circle " + ChatColor.WHITE + "| " + ChatColor.GOLD + "Radius: " + ChatColor.GREEN + "" + zone.getRadius());	
+							Message.Send(sender, 121, new String[]{zone.getRadius() + ""});
 						}
 						else
 						{
-							sender.sendMessage(ChatColor.GOLD + "Shape: " + ChatColor.GREEN + "Polygon " + ChatColor.WHITE + "| " + ChatColor.GOLD + "Points " + ChatColor.GREEN + "(" + zone.getPolygon().npoints + ")");
+							Message.Send(sender, 122, new String[]{zone.getPolygon().npoints + ""});
 						}
 						if(zone.hasChildren())
 						{
-							messageText = ChatColor.GOLD + "Child Zone Tags:" + ChatColor.GREEN + "";
+							messageText = "";
 							for(String childTag: zone.getChildren().keySet())
 							{
 								messageText = messageText + " " + childTag;
 							}
-							sender.sendMessage(messageText);
+							Message.Send(sender, 123, new String[]{messageText});
 						}
-						sender.sendMessage(ChatColor.GOLD + "Enter Text: " + ChatColor.GREEN + "" + zone.getEnterText());
-						sender.sendMessage(ChatColor.GOLD + "Exit Text: " + ChatColor.GREEN + "" + zone.getExitText());
+						Message.Send(sender, 124, new String[]{zone.getEnterText()});
+						Message.Send(sender, 125, new String[]{zone.getExitText()});
 						if(zone.hasParent())
 						{
-							sender.sendMessage(ChatColor.GOLD + "Parent Zone: " + ChatColor.GREEN + zone.getParent().getName() + ChatColor.GOLD + " Tag: " + ChatColor.GREEN + zone.getParent().getTag());
+							Message.Send(sender, 126, new String[]{zone.getParent().getName(), zone.getParent().getTag()});
 						}
 						if(zone.getOwners().size() > 0)
 						{
-							messageText = ChatColor.GOLD + "Owners:" + ChatColor.GREEN + "";
-							messageText = messageText + " " + zone.getOwners().toString();
-							sender.sendMessage(messageText);
+							Message.Send(sender, 127, new String[]{zone.getOwners().toString()});
 						}
-						sender.sendMessage(ChatColor.GOLD + "Zone Flags: ");
+						Message.Send(sender, 38);
 						messageText = "";
 						if(zone.getPVP())
 						{
-							messageText = messageText + ChatColor.AQUA + "PVP: " + ChatColor.GREEN + "ON ";
+							messageText = messageText + Message.get(2, new String[]{"PVP"}) + " ";
 						}
 						else
 						{
-							messageText = messageText + ChatColor.AQUA + "PVP: " + ChatColor.RED + "OFF ";
+							messageText = messageText + Message.get(3, new String[]{"PVP"}) + " ";
 						}
 						if(zone.getFire())
 						{
-							messageText = messageText + ChatColor.AQUA + "FIRE: " + ChatColor.GREEN + "ON  ";
+							messageText = messageText + Message.get(2, new String[]{"FIRE"}) + " ";
 						}
 						else
 						{
-							messageText = messageText + ChatColor.AQUA + "FIRE: " + ChatColor.RED + "OFF ";
+							messageText = messageText + Message.get(3, new String[]{"FIRE"}) + " ";
 						}
 						if(zone.getExplode())
 						{
-							messageText = messageText + ChatColor.AQUA + "EXPLODE: " + ChatColor.GREEN + "ON  ";
+							messageText = messageText + Message.get(2, new String[]{"EXPLODE"}) + " ";
 						}
 						else
 						{
-							messageText = messageText + ChatColor.AQUA + "EXPLODE: " + ChatColor.RED + "OFF ";
+							messageText = messageText + Message.get(3, new String[]{"EXPLODE"}) + " ";
 						}
 						if(zone.getSanctuary())
 						{
-							messageText = messageText + ChatColor.AQUA + "SANCTUARY: " + ChatColor.GREEN + "ON  ";
+							messageText = messageText + Message.get(2, new String[]{"SANCTUARY"}) + " ";
 						}
 						else
 						{
-							messageText = messageText + ChatColor.AQUA + "SANCTUARY: " + ChatColor.RED + "OFF ";
+							messageText = messageText + Message.get(3, new String[]{"SANCTUARY"}) + " ";
 						}
-						sender.sendMessage(messageText);
+						Message.Send(sender, messageText);
 						messageText = "";
 						if(zone.getFireBurnsMobs())
 						{
-							messageText = messageText + ChatColor.AQUA + "FIREBURNSMOBS: " + ChatColor.GREEN + "ON  ";
+							messageText = messageText + Message.get(2, new String[]{"FIREBURNSMOBS"}) + " ";
 						}
 						else
 						{
-							messageText = messageText + ChatColor.AQUA + "FIREBURNSMOBS: " + ChatColor.RED + "OFF ";
+							messageText = messageText + Message.get(3, new String[]{"FIREBURNSMOBS"}) + " ";
 						}
 						if(zone.hasRegen())
 						{
-							messageText = messageText + ChatColor.AQUA + "REGEN: " + ChatColor.GREEN + "Delay [" + zone.getRegen().getDelay() + "] Amount[" + zone.getRegen().getAmount() + "] Interval[" + zone.getRegen().getInterval() + "]";
+							messageText = messageText + Message.get(118, new String[]{zone.getRegen().getDelay() + "", zone.getRegen().getAmount() + "", zone.getRegen().getInterval() + ""});
 						}
 						else
 						{
-							messageText = messageText + ChatColor.AQUA + "REGEN: " + ChatColor.RED + "OFF ";
+							messageText = messageText + Message.get(3, new String[]{"REGEN"});
 						}
-						sender.sendMessage(messageText);
-						messageText = ChatColor.AQUA + "MOBS:" + ChatColor.GREEN + "";
+						Message.Send(sender, messageText);
+						messageText = "";
 						for(String mobType: zone.getMobs())
 						{
-							messageText = messageText + " " + mobType.replace("org.bukkit.craftbukkit.entity.Craft", "");
+							messageText = messageText + " " + mobType;
 						}
-						sender.sendMessage(messageText);
-						sender.sendMessage("Permissions:");
-						for(EpicZonePermission perm : zone.getPermissions())
+						Message.Send(sender, 119, new String[]{messageText});
+						Message.Send(sender, 39);
+						for(String permKey : zone.getPermissions().keySet())
 						{
-							sender.sendMessage(perm.getMember() + " > " + perm.getNode().toString() + ":" + perm.getPermission().toString());
+							EpicZonePermission perm = zone.getPermissions().get(permKey);
+							Message.Send(sender, 120, new String[]{perm.getMember(), perm.getNode().toString(), perm.getPermission().toString()});
 						}
 					}
 					else
 					{
-						sender.sendMessage("You do not have permission to use this command.");
+						Message.Send(sender, 37);
 					}
 				}
 				else
 				{
-					sender.sendMessage("No zone with the tag [" + data[1] + "] exists.");
+					Message.Send(sender, 117, new String[]{data[1]});
 				}
 			}
 		}

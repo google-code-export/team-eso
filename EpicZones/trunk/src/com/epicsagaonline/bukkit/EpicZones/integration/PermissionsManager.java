@@ -49,7 +49,8 @@ public class PermissionsManager
 	private WorldsHolder GroupManager_Perms;
 	private PermissionHandler Permissions_Perms;
 	private EpicZones plugin;
-
+    public boolean isDisabled = false;
+    
 	public PermissionsManager(EpicZones plugin)
 	{
 		boolean permStart = false;
@@ -65,6 +66,7 @@ public class PermissionsManager
 		if (!permStart)
 		{
 			Log.Write("[NOTICE] Unable to detect a permissions system, some features will not be available.");
+			isDisabled = true;
 		}
 	}
 

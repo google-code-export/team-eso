@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone.ZoneType;
@@ -68,16 +69,16 @@ public class EZZoneEdit
 									ezp.setEditZone(new EpicZone(zone));
 									ezp.setMode(EpicZoneMode.ZoneEdit);
 									ezp.getEditZone().ShowPillars();
-									sender.sendMessage("Editing Zone: " + tag);
+									Message.Send(sender, 105, new String[]{tag});
 								}
 								else
 								{
-									sender.sendMessage("You do not have permission to edit " + tag + ".");	
+									Message.Send(sender, 106, new String[]{tag});	
 								}
 							}
 							else
 							{
-								sender.sendMessage("Global zones cannot be edited.");
+								Message.Send(sender, 22);
 							}
 						}
 						else

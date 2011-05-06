@@ -31,12 +31,12 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
@@ -57,19 +57,19 @@ public class EZZoneList
 				String messageText = "";
 				if(admin || zone.isOwner(ezp.getName()))
 				{
-					messageText = ChatColor.GREEN + zone.getName() + ChatColor.GOLD + " [" + zone.getTag() + "]";
+					messageText = Message.get(5, new String[]{zone.getName(), zone.getTag() });
 					if(zone.hasChildren())
 					{
-						messageText = messageText + ChatColor.WHITE + " | " + ChatColor.GREEN + "Children " + ChatColor.GOLD + "(" + zone.getChildren().size() + ")";
+						messageText = messageText + Message.get(123, new String[]{zone.getChildren().size()+""});
 					}
 					if(zone.hasParent())
 					{
-						messageText = messageText + ChatColor.WHITE + " | " + ChatColor.GREEN + "Parent " + ChatColor.GOLD + "[" + zone.getParent().getTag() + "]";
+						messageText = messageText + Message.get(126, new String[]{zone.getParent().getTag()});
 					}
 				}
 				if(messageText.length() > 0)
 				{
-					sender.sendMessage(messageText);
+					Message.Send(sender, messageText);
 					sentMessage = true;
 				}
 			}
@@ -77,11 +77,11 @@ public class EZZoneList
 			{
 				if(admin)
 				{
-					sender.sendMessage("No zones to list.");
+					Message.Send(sender, 23);
 				}
 				else
 				{
-					sender.sendMessage("You don't own any zones.");
+					Message.Send(sender, 24);
 				}
 			}
 		}

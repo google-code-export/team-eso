@@ -258,6 +258,7 @@ public class EpicZones extends JavaPlugin
 		General.myPlayers.clear();
 		General.config.load();
 		General.config.save();
+		Message.LoadMessageList();
 		General.LoadZones();
 		for(Player p:getServer().getOnlinePlayers())
 		{

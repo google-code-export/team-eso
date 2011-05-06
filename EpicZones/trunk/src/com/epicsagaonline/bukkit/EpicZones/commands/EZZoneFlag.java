@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -49,7 +50,7 @@ public class EZZoneFlag
 			Player player = (Player)sender;
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
 			boolean admin = EpicZones.permissions.hasPermission(player, "epiczones.admin") || player.isOp();
-			if(admin) //Owners are not allowd to edit flags on a zone.
+			if(admin) //Owners are not allowed to edit flags on a zone.
 			{
 				if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 				{
@@ -63,12 +64,11 @@ public class EZZoneFlag
 						}			
 						if(SetFlag(flag.toLowerCase(), ezp, value))
 						{
-							sender.sendMessage("Zone Updated. Flag:" + flag + " set to: " + value);
+							Message.Send(sender, 107, new String[]{flag, value});
 						}
 						else
 						{
-							sender.sendMessage("The flag [" + flag + "] is not a valid flag.");
-							sender.sendMessage("Valid flags are: pvp, mobs, regen, fire, explode, sanctuary");
+							Message.Send(sender, 108, new String[]{flag});
 						}
 					}
 				}

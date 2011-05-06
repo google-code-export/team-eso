@@ -31,9 +31,7 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.listeners;
 
-import java.awt.Point;
-
-
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -43,9 +41,6 @@ import org.bukkit.util.Vector;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
-import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
-import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
-import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
 public class VehicleEvents extends VehicleListener 
 {
@@ -60,131 +55,21 @@ public class VehicleEvents extends VehicleListener
 
 	public @Override void onVehicleMove(VehicleMoveEvent event)
 	{
-
 		Vehicle vehicle = event.getVehicle();
 		Entity passenger = vehicle.getPassenger();
-
-		if(passenger != null && passenger instanceof Player)
+		if(passenger != null)
 		{
-			Player player = (Player) passenger;
-			EpicZonePlayer ezp = General.getPlayer(player.getName());
-
-			if(ezp != null)
+			if( passenger instanceof Player)
 			{
-				int playerHeight = event.getTo().getBlockY();
-				Point playerPoint = new Point(event.getTo().getBlockX(), event.getTo().getBlockZ());
-
-				if(General.ShouldCheckPlayer(ezp))
+				Player player = (Player) passenger;
+				if(!General.PlayerMovementLogic(player, event.getFrom(), event.getTo()))
 				{
-					if(!ezp.isTeleporting())
-					{
-						if(ezp.getCurrentLocation() == null){ezp.setCurrentLocation(event.getFrom());}
-						if(!VehicleWithinZoneLogic((Player)passenger, ezp, playerHeight, playerPoint))
-						{
-							ezp.setIsTeleporting(true);
-							vehicle.teleport(ezp.getCurrentLocation());
-							vehicle.setVelocity(zero);
-							ezp.setIsTeleporting(false);
-							//event.setTo(ezp.getCurrentLocation());
-							//event.setCancelled(true);
-						}
-						else
-						{
-							ezp.setCurrentLocation(event.getFrom());
-						}
-					}
-					ezp.Check();
+					Location loc = General.getPlayer(player.getName()).getCurrentLocation();
+					loc.setY(loc.getY()+1);
+					vehicle.teleport(loc);
+					vehicle.setVelocity(zero);
 				}
 			}
 		}
-	}
-
-	public static boolean VehicleWithinZoneLogic(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint)
-	{
-
-		EpicZone foundZone = null;
-		String worldName = player.getWorld().getName();
-
-		if(General.pointWithinBorder(playerPoint, player))
-		{
-
-			foundZone = FindZone(player, ezp, playerHeight, playerPoint, worldName);
-
-			if(foundZone != null)
-			{
-
-				if (ezp.getCurrentZone() == null || foundZone != ezp.getCurrentZone())
-				{
-					if(ZonePermissionsHandler.hasPermissions(player, foundZone, "entry"))
-					{
-						ezp.setCurrentZone(foundZone);
-						if(foundZone.getEnterText().length() > 0){player.sendMessage(foundZone.getEnterText());}
-					}
-					else
-					{
-						General.WarnPlayer(player, ezp, General.NO_PERM_ENTER + foundZone.getName());
-						return false;
-					}
-				}
-
-			}
-			else
-			{
-				if(ZonePermissionsHandler.hasPermissions(player, null, "entry"))
-				{
-					if (ezp.getCurrentZone() != null)
-					{
-						if(ezp.getCurrentZone().getExitText().length() > 0){player.sendMessage(ezp.getCurrentZone().getExitText());}
-						ezp.setCurrentZone(null);
-					}
-				}
-				else
-				{
-					General.WarnPlayer(player, ezp, General.NO_PERM_ENTER + player.getWorld().getName());
-					return false;
-				}
-			}
-		}
-		else
-		{
-			General.WarnPlayer(player, ezp, General.NO_PERM_BORDER);
-			return false;
-		}
-
-		return true;
-
-	}
-
-	private static EpicZone FindZone(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint, String worldName)
-	{
-
-		EpicZone result = null;
-
-		if(ezp.getCurrentZone() != null)
-		{
-
-			String resultTag;
-			result = ezp.getCurrentZone();
-			resultTag = General.isPointInZone(result, playerHeight, playerPoint, worldName);
-			if(resultTag.length() > 0)
-			{
-				if(!resultTag.equalsIgnoreCase(ezp.getCurrentZone().getTag()))
-				{
-					result = General.myZones.get(resultTag);
-				}
-			}
-			else
-			{
-				result = null;
-			}
-
-		}
-		else
-		{
-			result = General.getZoneForPoint(playerHeight, playerPoint, worldName);
-		}
-
-		return result;
-
 	}
 }

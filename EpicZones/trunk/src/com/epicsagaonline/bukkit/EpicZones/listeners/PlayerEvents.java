@@ -37,7 +37,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
@@ -49,8 +48,8 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
-import com.epicsagaonline.bukkit.EpicZones.integration.HeroChatIntegration;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -63,7 +62,6 @@ import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 public class PlayerEvents extends PlayerListener
 {
 
-	private static final String NO_PERM_BUCKET = "You do not have permissions to do that in this zone.";
 	private static final int EMPTY_BUCKET = 325;
 	private Set<Integer> itemsOfDestruction = new HashSet<Integer>();
 
@@ -78,67 +76,19 @@ public class PlayerEvents extends PlayerListener
 
 	public @Override void onPlayerMove(PlayerMoveEvent event)
 	{
-
-		Player player = event.getPlayer();
-		EpicZonePlayer ezp = General.getPlayer(player.getName());
-		int playerHeight = event.getTo().getBlockY();
-		Point playerPoint = new Point(event.getTo().getBlockX(), event.getTo().getBlockZ());
-
-		if(General.ShouldCheckPlayer(ezp))
+		if(!General.PlayerMovementLogic(event.getPlayer(), event.getFrom(), event.getTo()))
 		{
-			if(!ezp.isTeleporting())
-			{
-				if(ezp.getCurrentLocation() == null)
-				{
-					ezp.setCurrentLocation(event.getFrom());
-				}
-				if(!PlayerWithinZoneLogic(player, ezp, playerHeight, playerPoint))
-				{
-					ezp.setIsTeleporting(true);
-					player.teleport(ezp.getCurrentLocation());
-					ezp.setIsTeleporting(false);
-					event.setTo(ezp.getCurrentLocation());
-					event.setCancelled(true);
-				}
-				else
-				{
-					ezp.setCurrentLocation(event.getFrom());
-				}
-			}
-			ezp.Check();
+			event.setTo(General.getPlayer(event.getPlayer().getName()).getCurrentLocation());
+			event.setCancelled(true);
 		}
-		ezp.setHasMoved(true);
-
 	}
 
 	public @Override void onPlayerTeleport(PlayerTeleportEvent event)
 	{
-
-		Player player = event.getPlayer();
-		EpicZonePlayer ezp = General.getPlayer(player.getName());
-		int playerHeight = event.getTo().getBlockY();
-		Point playerPoint = new Point(event.getTo().getBlockX(), event.getTo().getBlockZ());
-
-		if(General.ShouldCheckPlayer(ezp))
+		if(!General.PlayerMovementLogic(event.getPlayer(), event.getFrom(), event.getTo()))
 		{
-			if(!ezp.isTeleporting())
-			{
-				if(ezp.getEntityID() != player.getEntityId()){ezp.setEntityID(player.getEntityId());}
-				if(ezp.getCurrentLocation() == null){ezp.setCurrentLocation(event.getFrom());}
-				if(!PlayerWithinZoneLogic(player, ezp, playerHeight, playerPoint))
-				{
-					ezp.setIsTeleporting(true);
-					player.teleport(ezp.getCurrentLocation());
-					ezp.setIsTeleporting(false);
-					event.setTo(ezp.getCurrentLocation());
-					event.setCancelled(true);
-				}
-				else
-				{
-					ezp.setCurrentLocation(event.getTo());
-				}
-			}
-			ezp.Check();
+			event.setTo(General.getPlayer(event.getPlayer().getName()).getCurrentLocation());
+			event.setCancelled(true);
 		}
 	}
 
@@ -172,16 +122,16 @@ public class PlayerEvents extends PlayerListener
 					boolean hasPerms = false;
 
 					EpicZone currentZone = null;
-					if(General.pointWithinBorder(blockPoint, player))
+					if(General.BorderLogic(blockPoint, player))
 					{
-						currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
+						currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
 						hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "build");
 
 						if(!hasPerms)
 						{
 							if (ezp.getLastWarned().before(new Date()))
 							{
-								player.sendMessage(NO_PERM_BUCKET);
+								Message.Send(player, 36);
 								ezp.Warn();
 							}
 							event.setCancelled(true);
@@ -198,16 +148,16 @@ public class PlayerEvents extends PlayerListener
 					boolean hasPerms = false;
 
 					EpicZone currentZone = null;
-					if(General.pointWithinBorder(blockPoint, player))
+					if(General.BorderLogic(blockPoint, player))
 					{
-						currentZone = General.getZoneForPoint(blockHeight, blockPoint, worldName);
+						currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
 						hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "destroy");
 
 						if(!hasPerms)
 						{
 							if (ezp.getLastWarned().before(new Date()))
 							{
-								player.sendMessage(NO_PERM_BUCKET);
+								Message.Send(player, 36);
 								ezp.Warn();
 							}
 							event.setCancelled(true);
@@ -222,98 +172,11 @@ public class PlayerEvents extends PlayerListener
 						EpicZonePlayer ezp = General.getPlayer(event.getPlayer().getName());
 						ezp.getEditZone().addPoint(point);
 						ezp.getEditZone().addPillar(event.getClickedBlock());
-						event.getPlayer().sendMessage("Point " + point.x + ":" + point.y + " added to zone.");
+						ezp.getEditZone().ShowPillar(point);
+						Message.Send(event.getPlayer(), 112, new String[]{Integer.toString(point.x), Integer.toString(point.y)});
 					}
 				}
 			}
 		}
 	}
-
-	private boolean PlayerWithinZoneLogic(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint)
-	{
-
-		EpicZone foundZone = null;
-		String worldName = player.getWorld().getName();
-		if(General.pointWithinBorder(playerPoint, player))
-		{
-			foundZone = FindZone(player, ezp, playerHeight, playerPoint, worldName);
-			if(foundZone != null)
-			{
-				if (ezp.getCurrentZone() == null || foundZone != ezp.getCurrentZone())
-				{
-					if(ZonePermissionsHandler.hasPermissions(player, foundZone, "entry"))
-					{
-						if(ezp.getCurrentZone() != null){ezp.setPreviousZoneTag(ezp.getCurrentZone().getTag());}
-						ezp.setCurrentZone(foundZone);
-						HeroChatIntegration.joinChat(foundZone.getTag(), ezp, player);
-						if(foundZone.getEnterText().length() > 0){player.sendMessage(foundZone.getEnterText());}
-					}
-					else
-					{
-						General.WarnPlayer(player, ezp, General.NO_PERM_ENTER + foundZone.getName());
-						return false;
-					}
-				}
-
-			}
-			else
-			{
-				if(ZonePermissionsHandler.hasPermissions(player, General.myGlobalZones.get(player.getWorld().getName()), "entry"))
-				{
-					if (ezp.getCurrentZone() != null)
-					{
-						if(ezp.getCurrentZone().getExitText().length() > 0){player.sendMessage(ezp.getCurrentZone().getExitText());}
-						HeroChatIntegration.leaveChat(ezp.getCurrentZone().getTag(), player);
-						ezp.setCurrentZone(General.myGlobalZones.get(player.getWorld().getName()));
-					}
-				}
-				else
-				{
-					General.WarnPlayer(player, ezp, General.NO_PERM_ENTER + player.getWorld().getName());
-					return false;
-				}
-			}
-		}
-		else
-		{
-			General.WarnPlayer(player, ezp, General.NO_PERM_BORDER);
-			return false;
-		}
-
-		return true;
-
-	}
-
-	private EpicZone FindZone(Player player, EpicZonePlayer ezp, int playerHeight, Point playerPoint, String worldName)
-	{
-
-		EpicZone result = null;
-
-		if(ezp.getCurrentZone() != null)
-		{
-			String resultTag;
-			result = ezp.getCurrentZone();
-			resultTag = General.isPointInZone(result, playerHeight, playerPoint, worldName);
-			if(resultTag.length() > 0)
-			{
-				if(!resultTag.equalsIgnoreCase(ezp.getCurrentZone().getTag()))
-				{
-
-					result = General.myZones.get(resultTag);
-				}
-			}
-			else
-			{
-				result = null;
-			}
-		}
-		else
-		{
-			result = General.getZoneForPoint(playerHeight, playerPoint, worldName);
-		}
-
-		return result;
-
-	}
-
 }

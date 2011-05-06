@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -49,7 +50,7 @@ public class EZZoneFloor
 			Player player = (Player)sender;
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
 			boolean admin = EpicZones.permissions.hasPermission(player, "epiczones.admin") || player.isOp();
-			if(admin) //Owners are not allwoed to change the size of their zone.
+			if(admin) //Owners are not allowed to change the size of their zone.
 			{
 				if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 				{
@@ -57,11 +58,11 @@ public class EZZoneFloor
 					{
 						Integer value = Integer.parseInt(data[1]);
 						ezp.getEditZone().setFloor(value);
-						sender.sendMessage("Zone Updated. Floor to: " + value);
+						Message.Send(sender, 100, new String[]{"floor", data[1]});
 					}
 					else
 					{
-						sender.sendMessage("[" + data[1] + "] is not a valid value for floor.");
+						Message.Send(sender, 101, new String[]{data[1]});
 					}
 				}
 			}

@@ -35,6 +35,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -64,16 +65,16 @@ public class EZZoneMessage
 						if(cmd.equalsIgnoreCase("enter"))
 						{
 							ezp.getEditZone().setEnterText(message);
-							sender.sendMessage("Zone Updated. Enter message set to: " + message);
+							Message.Send(sender, 100, new String[]{"enter message", message});
 						}
 						else if(cmd.equalsIgnoreCase("exit"))
 						{
 							ezp.getEditZone().setExitText(message);
-							sender.sendMessage("Zone Updated. Enter message set to: " + message);
+							Message.Send(sender, 100, new String[]{"exit message", message});
 						}
 						else
 						{
-							sender.sendMessage("You did not specify if you wanted to edit the 'enter' or 'exit' text.");
+							Message.Send(sender, 25);
 						}
 					}
 				}

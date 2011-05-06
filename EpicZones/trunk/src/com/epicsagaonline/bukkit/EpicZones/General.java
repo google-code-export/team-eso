@@ -39,10 +39,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.integration.HeroChatIntegration;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone.ZoneType;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -106,6 +108,7 @@ public class General {
 
 		reconsileGlobalZones();
 		reconcileChildren();
+		SaveZones();
 
 	}
 
@@ -264,63 +267,35 @@ public class General {
 
 	}
 
-	public static EpicZone getZoneForPoint(int elevation, Point location, String worldName)
+	public static void WarnPlayer(Player player, EpicZonePlayer ezp, String message)
 	{
-
-		EpicZone result = null;
-		String resultTag = "";
-		for(String zoneTag: General.myZones.keySet())
+		if (ezp.getLastWarned().before(new Date()))
 		{
-			EpicZone zone = General.myZones.get(zoneTag);
-			if(zone.getWorld().equalsIgnoreCase(worldName))
-			{
-				resultTag = General.isPointInZone(zone, elevation, location, worldName);
-				if(resultTag.length() > 0)
-				{
-					result = zone;
-					break;
-				}
-			}
+			Message.Send(player, message);
+			ezp.Warn();
 		}
-
-		return result;
-
 	}
 
-	public static String isPointInZone(EpicZone zone, int playerHeight, Point playerPoint, String worldName)
+	public static boolean ShouldCheckPlayer(EpicZonePlayer ezp)
 	{
-
-		String result = "";
-
-		if(zone != null)
+		boolean result = false;
+		if(ezp!= null)
 		{
-			if(zone.hasChildren())
+			if (ezp.getLastCheck().before(new Date()))
 			{
-				for(String zoneTag: zone.getChildren().keySet())
-				{
-					result = isPointInZone(zone.getChildren().get(zoneTag), playerHeight, playerPoint, worldName);
-					if(result.length() > 0)
-					{
-						return result;
-					}
-				}
-			}
-			if(worldName.equalsIgnoreCase(zone.getWorld()))
-			{
-				if(playerHeight >= zone.getFloor() && playerHeight <= zone.getCeiling())
-				{
-					if(zone.pointWithin(playerPoint))
-					{
-						result = zone.getTag();
-					}
-				}
+				result = true;
 			}
 		}
-
 		return result;
 	}
 
-	public static boolean pointWithinBorder(Point point, Player player)
+	public static boolean IsNumeric(String data)
+	{
+		if (data.matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+")){return true;}
+		else {return false;} 
+	}
+
+	public static boolean BorderLogic(Point point, Player player)
 	{
 
 		if(General.config.enableRadius)
@@ -374,32 +349,97 @@ public class General {
 		}
 	}
 
-	public static void WarnPlayer(Player player, EpicZonePlayer ezp, String message)
+	public static EpicZone GetZoneForPlayer(Player player, String worldName, int playerHeight, Point playerPoint)
 	{
-		if (ezp.getLastWarned().before(new Date()))
+		EpicZone result = null; 
+		if(player != null)
 		{
-			player.sendMessage(message);
-			ezp.Warn();
+			EpicZonePlayer ezp = getPlayer(player.getName());
+			if(ezp.getCurrentZone() != null)
+			{
+				result = IsPlayerWithinZone(ezp.getCurrentZone(), worldName, playerHeight, playerPoint);
+			}
 		}
+		if(result == null)
+		{
+			for(String zoneTag : myZones.keySet())
+			{
+				EpicZone zone = myZones.get(zoneTag);
+				result = IsPlayerWithinZone(zone, worldName, playerHeight, playerPoint);
+				if(result != null){break;}
+			}
+		}
+		return result;	
 	}
 
-	public static boolean ShouldCheckPlayer(EpicZonePlayer ezp)
+	private static EpicZone IsPlayerWithinZone(EpicZone zone, String worldName, int playerHeight, Point playerPoint)
 	{
-		boolean result = false;
-		if(ezp!= null)
+		EpicZone result = null;
+		if(zone.IsPointWithin(worldName, playerHeight, playerPoint))
 		{
-			if (ezp.getLastCheck().before(new Date()))
+			result = zone;
+			if(zone.hasChildren())
 			{
-				result = true;
+				EpicZone childResult = null;
+				for(String zoneTag : zone.getChildren().keySet())
+				{
+					childResult = IsPlayerWithinZone(myZones.get(zoneTag), worldName, playerHeight, playerPoint);
+					if(childResult != null)
+					{
+						result = childResult;
+						break;
+					}
+				}				
 			}
 		}
 		return result;
 	}
 
-	public static boolean IsNumeric(String data)
+	public static boolean PlayerMovementLogic(Player player, Location fromLoc, Location toLoc)
 	{
-		if (data.matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+")){return true;}
-		else {return false;} 
+		boolean result = true;
+		EpicZonePlayer ezp = General.getPlayer(player.getName());	
+		if(General.ShouldCheckPlayer(ezp))
+		{
+			if(!ezp.isTeleporting())
+			{
+				int playerHeight = toLoc.getBlockY();
+				Point playerPoint = new Point(toLoc.getBlockX(), toLoc.getBlockZ());
+				EpicZone zone = null;
+				if(General.BorderLogic(playerPoint, player))
+				{
+					zone = General.GetZoneForPlayer(player, toLoc.getWorld().getName(), playerHeight, playerPoint);
+					if(zone != null)
+					{
+						if(ZonePermissionsHandler.hasPermissions(player, zone, "entry"))
+						{
+							if((ezp.getCurrentZone() != null && !ezp.getCurrentZone().getTag().equals(zone.getTag())) || ezp.getCurrentZone() == null)
+							{
+								if(ezp.getCurrentZone() != null)
+								{
+									ezp.setPreviousZoneTag(ezp.getCurrentZone().getTag());
+									if(ezp.getCurrentZone().getExitText().length() > 0){Message.Send(player, ezp.getCurrentZone().getExitText());}	
+								}
+								ezp.setCurrentZone(zone);
+								HeroChatIntegration.joinChat(zone.getTag(), ezp, player);
+								if(zone.getEnterText().length() > 0){Message.Send(player, zone.getEnterText());}
+								ezp.setCurrentLocation(fromLoc);
+							}							
+						}
+						else
+						{
+							General.WarnPlayer(player, ezp, General.NO_PERM_ENTER + zone.getName());
+							ezp.setIsTeleporting(true);
+							player.teleport(ezp.getCurrentLocation());
+							ezp.setIsTeleporting(false);
+							result = false;
+						}
+					}
+				}
+				ezp.Check();
+			}
+			ezp.setHasMoved(true);
+		}
+		return result;
 	}
-
 }

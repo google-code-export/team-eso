@@ -18,10 +18,6 @@ public class ZonePermissionsHandler
 		{
 			if(!EpicZones.permissions.hasPermission(player, PERMS_IGNORE))
 			{
-				if(zone == null)
-				{
-					zone = General.myGlobalZones.get(player.getWorld().getName());
-				}
 				if(!zone.isOwner(player.getName()))
 				{
 					if(zone.hasPermission(player, flag, PermType.DENY)) //  EpicZones.permissions.hasPermission(player, getPermNode(zone, flag, true)))

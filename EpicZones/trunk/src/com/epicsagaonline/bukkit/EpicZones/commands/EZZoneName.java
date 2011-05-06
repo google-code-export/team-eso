@@ -35,6 +35,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -60,7 +61,7 @@ public class EZZoneName
 					if(message.length() > 0)
 					{
 						ezp.getEditZone().setName(message.trim());
-						sender.sendMessage("Zone Updated. Name set to: " + message);
+						Message.Send(sender, 100, new String[]{"name", message});
 					}
 				}
 			}

@@ -35,6 +35,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -53,22 +54,22 @@ public class EZZoneSave
 				{
 					ezp.setMode(EpicZoneMode.ZoneEdit);
 					ezp.getEditZone().rebuildBoundingBox();
-					sender.sendMessage("Drawing Complete. It's reccomended you set the name of your zone now with /zone name [value], or type /zone for more options.");
+					Message.Send(sender, 29);
 				}
 				else if(ezp.getEditZone().getPolygon().npoints == 1 && ezp.getEditZone().getRadius() > 0)
 				{
 					ezp.setMode(EpicZoneMode.ZoneEdit);
 					ezp.getEditZone().rebuildBoundingBox();
-					sender.sendMessage("Drawing Complete. It's reccomended you set the name of your zone now with /zone name [value], or type /zone for more options.");
+					Message.Send(sender, 29);
 				}
 				else
 				{
-					sender.sendMessage("You must draw at least 3 points or 1 point and set a radius, before you can move on.");
+					Message.Send(sender, 30);
 				}
 			}
 			else if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-
+				ezp.getEditZone().setParent(ezp.getCurrentZone());
 				if(General.myZones.get(ezp.getEditZone().getTag()) == null)
 				{
 					General.myZones.put(ezp.getEditZone().getTag(), ezp.getEditZone());
@@ -81,7 +82,7 @@ public class EZZoneSave
 				ezp.getEditZone().HidePillars();
 				General.SaveZones();
 				ezp.setMode(EpicZoneMode.None);
-				sender.sendMessage("Zone Saved.");
+				Message.Send(sender, 31);
 			}
 			else
 			{
