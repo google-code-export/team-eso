@@ -1,8 +1,0 @@
-Provide a framework for players to create their own quests and jobs they need completed. As well as built in quests for NPCs. 
-
-= Introduction =
-Provide a framework for players to create their own quests and jobs they need completed. As well as built in quests for NPCs. 
-
-= Details =
-
-Provide a framework for players to create their own quests and jobs they need completed. As well as built in quests for NPCs. 
