@@ -258,7 +258,7 @@ All commands can be accessed with the ez prefix, to circumnavigate command confl
  * delete
  * list
  * info
- * perm
+ * [EZ_Perm perm]
 
 ==== Notes ====
 You can color code your zone messages and names with the following color key:
