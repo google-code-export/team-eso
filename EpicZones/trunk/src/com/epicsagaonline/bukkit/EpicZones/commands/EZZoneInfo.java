@@ -34,7 +34,6 @@ package com.epicsagaonline.bukkit.EpicZones.commands;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
@@ -51,13 +50,12 @@ public class EZZoneInfo
 
 			Player player = (Player)sender;
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			boolean admin = EpicZones.permissions.hasPermission(player, "epiczones.admin") || player.isOp();
 			if(data.length > 1)
 			{
 				EpicZone zone = General.myZones.get(data[1].trim());
 				if (zone != null)
 				{
-					if(admin || zone.isOwner(ezp.getName()))
+					if(ezp.getAdmin() || zone.isOwner(ezp.getName()))
 					{
 						String messageText;
 						Message.Send(sender, 5, new String[]{zone.getName(), zone.getTag()});

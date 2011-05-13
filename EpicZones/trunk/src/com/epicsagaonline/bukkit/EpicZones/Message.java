@@ -124,7 +124,7 @@ public class Message {
 				result = result.replace("(" + i + ")", args[i]);
 			}
 		}
-		
+
 		// Format Numbers
 		// Number format string is always ID 0 in language file
 		String[] split = (result.trim() + " ").split(" ");
@@ -158,6 +158,8 @@ public class Message {
 		String line;
 		File file = new File(General.plugin.getDataFolder() + File.separator + "Language" + File.separator + General.config.language + ".txt");
 		messageList = new HashMap<Integer, String>();
+		boolean updateNeeded = false;
+		boolean foundVersion = false;
 		try 
 		{
 			if (!file.exists()) 
@@ -170,19 +172,56 @@ public class Message {
 				while (scanner.hasNext()) 
 				{
 					line = scanner.nextLine().trim();
-					if (line.startsWith("#") || line.isEmpty()){continue;}
-					Integer id;
-					String message;
-					id = Integer.parseInt(line.substring(0, line.indexOf(":")).trim());
-					message = line.substring(line.indexOf(":") + 1, line.length());
-					messageList.put(id, message);
+					if(!line.isEmpty())
+					{
+						if(line.startsWith("#"))
+						{
+							int versionIndex = line.indexOf("VERSION");
+							if(versionIndex > -1)
+							{
+								foundVersion = true;
+								String version = line.substring(line.indexOf(":") + 1, line.length());
+								if(version != null && version.length() > 0)
+								{
+									if(!version.trim().equalsIgnoreCase(General.version))
+									{
+										updateNeeded = true;
+										break;
+									}
+								}
+								else
+								{
+									updateNeeded = true;
+									break;
+								}
+							}
+						}
+						else
+						{
+							Integer id;
+							String message;
+							id = Integer.parseInt(line.substring(0, line.indexOf(":")).trim());
+							message = line.substring(line.indexOf(":") + 1, line.length());
+							messageList.put(id, message);
+						}
+					}					
 				}
 			} 
 			finally 
 			{
 				scanner.close();
 			}
-			Log.Write("Language File Loaded [" + General.config.language + ".txt" + "].");
+
+			if(updateNeeded || !foundVersion)
+			{
+				Log.Write("Updating Message List...");
+				InitMessageList();
+				LoadMessageList();
+			}
+			else
+			{
+				Log.Write("Language File Loaded [" + General.config.language + ".txt" + "].");	
+			}
 		} 
 		catch (Exception e) 
 		{
@@ -238,7 +277,9 @@ public class Message {
 
 	private static String BuildInitialStrings_ENUS() {
 		String result = new String();
-
+		result += "#VERSION: 0.24\n";
+		result += "#Author: jblaske@gmail.com\n";
+		result += "#--------------------------\n";
 		result += "#Formatting Strings\n";
 		result += "00000: ###,###,###\n";
 		result += "00001: &6(0):&A (1)\n";
@@ -248,7 +289,7 @@ public class Message {
 		result += "00005: &A(0)&6 (1)\n";
 		result += "\n";
 		result += "#Static Strings\n";
-		result += "00010: &B[] &6Required Parameter &B<> &6Optional Parameter &B... &6 Indicates repeatable. &B| &6 Indicates either/or\n";
+		result += "00010: &B[] &6Required Parameter &B<> &6Optional Parameter @@&B... &6 Indicates repeatable. &B| &6 Indicates either/or\n";
 		result += "00011: &6You are currently in Edit mode.\n";
 		result += "00012: &6You are currently in Draw mode.\n";
 		result += "00013: &6You are currently in Draw Confirm mode.\n";
@@ -278,6 +319,7 @@ public class Message {
 		result += "00037: You do not have permission to use this command.\n";
 		result += "00038: &6Zone Flags:\n";
 		result += "00039: &6Permissions:\n";
+		result += "00040: Permissions cleared.\n";
 		result += "\n";
 		result += "#Variable Strings\n";
 		result += "00100: Zone Updated. Set (0) to [(1)]\n";
@@ -308,6 +350,8 @@ public class Message {
 		result += "00125: &6Exit Text:&A (0)\n";
 		result += "00126: &6Parent:&A (0)\n";
 		result += "00127: &6Owners:&A (0)\n";
+		result += "00128: Successfully copied permissions from &A[(0)]\n";
+		result += "00129: Permissions cleared for &A[(0)]\n";
 		result += "\n";
 		result += "#Help Strings\n";
 		result += "01000: &6Help for /zone command.\n";

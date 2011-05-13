@@ -86,7 +86,7 @@ public class EpicZoneDAL{
 			General.myZones.put(zoneTag, Load(file));
 		}
 	}
-	
+
 	private static EpicZone Load(File file)
 	{
 
@@ -95,7 +95,7 @@ public class EpicZoneDAL{
 		String tag = file.getName().substring(0, file.getName().indexOf("."));		
 		EpicZone result = new EpicZone();
 		Configuration config = new Configuration(file);
-boolean mobsAdded = false;
+		boolean mobsAdded = false;
 
 		config.load();
 		result.setTag(tag);
@@ -131,7 +131,7 @@ boolean mobsAdded = false;
 		{
 			result.addMob("ALL");
 		}
-		
+
 		list = config.getList("owners");
 		if(list != null)
 		{

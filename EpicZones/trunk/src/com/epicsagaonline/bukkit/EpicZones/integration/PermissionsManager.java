@@ -32,8 +32,11 @@ THE SOFTWARE.
 package com.epicsagaonline.bukkit.EpicZones.integration;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 import org.anjocaido.groupmanager.GroupManager;
+import org.anjocaido.groupmanager.data.Group;
 import org.anjocaido.groupmanager.dataholder.worlds.WorldsHolder;
 import org.bukkit.plugin.Plugin;
 
@@ -41,28 +44,33 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.Log;
+import com.herocraftonline.dthielke.lists.Lists;
+import com.herocraftonline.dthielke.lists.PrivilegedList;
+import com.herocraftonline.dthielke.lists.PrivilegedList.PrivilegeLevel;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class PermissionsManager
 {
-	private WorldsHolder GroupManager_Perms;
-	private PermissionHandler Permissions_Perms;
+	private WorldsHolder GroupManager_Perms = null;
+	private PermissionHandler Permissions_Perms = null;
+	private Lists Lists_Perms = null;
 	private EpicZones plugin;
-    public boolean isDisabled = false;
-    
+	public boolean isDisabled = false;
+
 	public PermissionsManager(EpicZones plugin)
 	{
 		boolean permStart = false;
 		this.plugin = plugin;
-
 		permStart = startPermissions();
-
 		if(!permStart)
 		{
 			permStart = startGroupManager();
 		}
-
+		if(!permStart)
+		{
+			permStart = startLists();
+		}
 		if (!permStart)
 		{
 			Log.Write("[NOTICE] Unable to detect a permissions system, some features will not be available.");
@@ -72,9 +80,7 @@ public class PermissionsManager
 
 	public boolean hasPermission(Player player, String permission)
 	{		
-
 		boolean result = false;
-
 		try
 		{
 			if(Permissions_Perms != null)
@@ -85,14 +91,28 @@ public class PermissionsManager
 			{
 				result = (GroupManager_Perms.getWorldData(player).getPermissionsHandler().has(player, permission));			
 			}
+			else if(Lists_Perms != null)
+			{
+				PrivilegedList lst = Lists_Perms.getList(permission.replace("epiczones.",""));
+				if(lst != null)
+				{
+					Map<String, PrivilegeLevel> users = lst.getUsers();
+					if(users != null)
+					{
+						if(users.get(player.getName().toLowerCase()) != null)
+						{
+							return true;
+						}
+					}
+				}
+				return false;
+			}
 		}
 		catch (Exception e)
 		{
 			Log.Write(e.getMessage());
 		}
-
 		return result;
-
 	}
 
 	public ArrayList<String> getGroupNames(Player player)
@@ -100,9 +120,10 @@ public class PermissionsManager
 		ArrayList<String> result = new ArrayList<String>();
 		if(Permissions_Perms != null )
 		{
-			if(Permissions_Perms.getGroups(player.getWorld().getName(), player.getName()) != null)
+			String[] grps = Permissions_Perms.getGroups(player.getWorld().getName(), player.getName());
+			if(grps != null)
 			{
-				for(String grp: Permissions_Perms.getGroups(player.getWorld().getName(), player.getName()))
+				for(String grp : grps)
 				{
 					result.add(0, grp);	 
 				}
@@ -110,38 +131,42 @@ public class PermissionsManager
 		}
 		else if(GroupManager_Perms != null)
 		{
-			if(GroupManager_Perms.getWorldData(player).getGroupList() != null)
+			Collection<Group> grps = GroupManager_Perms.getWorldData(player).getGroupList();
+			if(grps != null)
 			{
-				for(org.anjocaido.groupmanager.data.Group grp: GroupManager_Perms.getWorldData(player).getGroupList())
+				for(Group grp : grps)
 				{
 					result.add(grp.getName());
 				}
 			}
 		}
-
+		else if(Lists_Perms != null)
+		{
+			PrivilegedList[] lst = Lists_Perms.getLists(player.getName()); 
+			if(lst != null)
+			{
+				for(PrivilegedList prv : lst)
+				{
+					result.add(prv.getName());
+				}
+			}
+		}
 		return result;
 	}
 
-	public ArrayList<String> getChildGroupNames(String worldName, String groupName)
+	public boolean startPermissions()
 	{
-		ArrayList<String> result = new ArrayList<String>();
-
-		if(Permissions_Perms != null )
-		{	
-			for(String grp: Permissions_Perms.getGroups(worldName, groupName))
-			{
-				result.add(grp);	 
-			}
-		}
-		else if(GroupManager_Perms != null)
+		Plugin p = plugin.getServer().getPluginManager().getPlugin("Permissions");
+		if (p != null)
 		{
-			for(org.anjocaido.groupmanager.data.Group grp: GroupManager_Perms.getWorldData(groupName).getGroupList())
+			if (!p.isEnabled())
 			{
-				result.add(grp.getName());
-			}	
+				plugin.getServer().getPluginManager().enablePlugin(p);
+			}
+			Permissions_Perms = ((Permissions)p).getHandler();
+			return Permissions_Perms != null;
 		}
-
-		return result;
+		return false;
 	}
 
 	public boolean startGroupManager()
@@ -157,21 +182,20 @@ public class PermissionsManager
 			GroupManager_Perms = gm.getWorldsHolder();
 			return GroupManager_Perms != null;
 		}
-		Permissions_Perms = null;
 		return false;
 	}
 
-	public boolean startPermissions()
+	private boolean startLists()
 	{
-		Plugin p = plugin.getServer().getPluginManager().getPlugin("Permissions");
+		Plugin p = plugin.getServer().getPluginManager().getPlugin("Lists");
 		if (p != null)
 		{
 			if (!p.isEnabled())
 			{
 				plugin.getServer().getPluginManager().enablePlugin(p);
 			}
-			Permissions_Perms = ((Permissions)p).getHandler();
-			return Permissions_Perms != null;
+			Lists_Perms = (Lists)p;
+			return Lists_Perms != null;
 		}
 		return false;
 	}

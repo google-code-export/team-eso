@@ -126,10 +126,10 @@ public class EpicZones extends JavaPlugin
 			registerCommands();
 
 			setupMultiWorld();
-			setupEpicZones();
 			setupPermissions();
+			setupEpicZones();
 			setupHeroChat();
-
+			
 			Log.Write("version " + pdfFile.getVersion() + " is enabled.");
 
 		} 
@@ -214,8 +214,15 @@ public class EpicZones extends JavaPlugin
 		{
 			if (!plg.isEnabled())
 			{
-				Log.Write("Detected " + pluginType + " Plugin > " + pluginName + " > Enabling...");
-				this.getServer().getPluginManager().enablePlugin(plg);
+				try
+				{
+					Log.Write("Detected " + pluginType + " Plugin > " + pluginName + " > Enabling...");
+					this.getServer().getPluginManager().enablePlugin(plg);
+				}
+				catch (Exception e)
+				{
+					Log.Write(e.getMessage());
+				}
 			}
 		}
 	}
@@ -258,11 +265,12 @@ public class EpicZones extends JavaPlugin
 		General.myPlayers.clear();
 		General.config.load();
 		General.config.save();
+		General.version = this.getDescription().getVersion();
 		Message.LoadMessageList();
 		General.LoadZones();
 		for(Player p:getServer().getOnlinePlayers())
 		{
-			General.addPlayer(p.getEntityId(), p.getName());
+			General.addPlayer(p);
 		}
 	}
 }

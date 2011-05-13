@@ -50,6 +50,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Log;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission.PermNode;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission.PermType;
 
@@ -297,6 +298,15 @@ public class EpicZone {
 		}
 	}
 
+	public void removePermission(String member, String node, String permission)
+	{
+		if(this.permissions == null){this.permissions = new HashMap<String, EpicZonePermission>();}
+		if(member != null && node != null && permission != null)
+		{
+			this.permissions.remove(member.toLowerCase() + node.toUpperCase());
+		}
+	}
+
 	public void setType(String value)
 	{
 		this.type = ZoneType.valueOf(value.toUpperCase());
@@ -334,7 +344,19 @@ public class EpicZone {
 
 	public void removeChild(String tag)
 	{
-		this.children.remove(tag);
+		Log.Write("1");
+		if(this.childrenTags!= null)
+		{
+			Log.Write("2");
+			this.childrenTags.remove(tag);	
+		}
+		Log.Write("3");
+		if(this.children!= null)
+		{
+			Log.Write("4");
+			this.children.remove(tag);
+		}
+		Log.Write("5");
 	}
 
 	public void setWorld(String value)
@@ -803,7 +825,7 @@ public class EpicZone {
 
 	public void ShowPillar(Point pnt)
 	{
-		
+
 		World world = General.plugin.getServer().getWorld(this.world);
 		Block blk = world.getBlockAt(pnt.x, world.getHighestBlockYAt(pnt.x, pnt.y), pnt.y);
 

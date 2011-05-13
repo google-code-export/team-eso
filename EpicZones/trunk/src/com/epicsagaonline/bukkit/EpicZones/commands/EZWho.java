@@ -104,7 +104,11 @@ public class EZWho implements CommandHandler {
 			{
 				if (players.size() > i)
 				{
-					Message.Send(sender,buildWhoPlayerName(ezp, players, i, allZones));
+					Player thisPlayer = General.plugin.getServer().getPlayer(players.get(i).getName()); 
+					if(thisPlayer != null && thisPlayer.isOnline())
+					{
+						Message.Send(sender, buildWhoPlayerName(ezp, players, i, allZones));
+					}
 				}
 			}
 		}
@@ -116,7 +120,11 @@ public class EZWho implements CommandHandler {
 			{
 				if (players.size() > i)
 				{
-					Message.Send(sender, buildWhoPlayerName(ezp, players, i, allZones));
+					Player thisPlayer = General.plugin.getServer().getPlayer(players.get(i).getName()); 
+					if(thisPlayer != null && thisPlayer.isOnline())
+					{
+						Message.Send(sender, buildWhoPlayerName(ezp, players, i, allZones));
+					}
 				}
 			}
 		}

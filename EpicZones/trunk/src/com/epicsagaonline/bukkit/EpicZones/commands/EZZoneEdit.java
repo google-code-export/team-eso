@@ -34,7 +34,6 @@ package com.epicsagaonline.bukkit.EpicZones.commands;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
@@ -51,7 +50,6 @@ public class EZZoneEdit
 		{
 			Player player = (Player)sender;
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			boolean admin = EpicZones.permissions.hasPermission(player, "epiczones.admin") || player.isOp();
 			if(ezp.getMode() == EpicZoneMode.None)
 			{
 				if(data.length > 1)
@@ -64,7 +62,7 @@ public class EZZoneEdit
 							EpicZone zone = General.myZones.get(tag);
 							if(zone.getType() != ZoneType.GLOBAL)
 							{
-								if(admin || zone.isOwner(ezp.getName()))
+								if(ezp.getAdmin() || zone.isOwner(ezp.getName()))
 								{
 									ezp.setEditZone(new EpicZone(zone));
 									ezp.setMode(EpicZoneMode.ZoneEdit);

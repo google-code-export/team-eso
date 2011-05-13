@@ -32,6 +32,9 @@ THE SOFTWARE.
 package com.epicsagaonline.bukkit.EpicZones.objects;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
+
+import com.epicsagaonline.bukkit.EpicZones.General;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -53,6 +56,7 @@ public class EpicZonePlayer {
 	private String previousZoneTag = "";
 	private boolean hasMoved = false;
 	private Date lastMoved = new Date();
+private boolean admin = false;
 
 	public EpicZone getCurrentZone(){return currentZone;}
 	public int getEntityID(){return entityID;}
@@ -69,6 +73,7 @@ public class EpicZonePlayer {
 	public String getPreviousZoneTag(){return previousZoneTag;}
 	public boolean getHasMoved(){return hasMoved;}
 	public Date getLastMoved(){return lastMoved;}
+	public boolean getAdmin(){return admin;}
 	
 	public enum EpicZoneMode{None, ZoneDraw, ZoneEdit, ZoneDrawConfirm, ZoneDeleteConfirm}
 	
@@ -101,11 +106,18 @@ public class EpicZonePlayer {
 	{
 		this.editZone = value;
 	}
-
-	public EpicZonePlayer(int entityID, String name)
+	
+	public void setAdmin(boolean value)
 	{
-		this.entityID = entityID;
-		this.name = name;
+		this.admin = value;
+	}
+
+	public EpicZonePlayer(Player player)
+	{
+		this.entityID = player.getEntityId();
+		this.name = player.getName();
+		setCurrentLocation(player.getLocation());
+		setCurrentZone(General.myGlobalZones.get(player.getWorld().getName().toLowerCase()));
 	}
 
 	public void setCurrentZone(EpicZone z)

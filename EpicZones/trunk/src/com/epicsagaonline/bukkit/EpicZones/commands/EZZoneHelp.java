@@ -32,7 +32,9 @@ THE SOFTWARE.
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
+import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -44,6 +46,13 @@ public class EZZoneHelp
 
 	public EZZoneHelp(ZoneCommand command, CommandSender sender, EpicZonePlayer ezp)
 	{
+		if(ezp == null)
+		{
+			if(sender instanceof Player)
+			{
+				ezp = General.myPlayers.get(((Player)sender).getName());
+			}
+		}
 		if(ezp != null)
 		{
 			Message.Send(sender, 1000);

@@ -34,7 +34,6 @@ package com.epicsagaonline.bukkit.EpicZones.commands;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
@@ -50,8 +49,7 @@ public class EZZoneConfirm
 		{
 			Player player = (Player)sender;
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			boolean admin = EpicZones.permissions.hasPermission(player, "epiczones.admin") || player.isOp();
-			if(admin) //Only admin will ever be to this point.
+			if(ezp.getAdmin()) //Only admin will ever be to this point.
 			{
 				if(ezp.getMode() == EpicZoneMode.ZoneDeleteConfirm)
 				{

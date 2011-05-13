@@ -63,6 +63,10 @@ public class EZZone implements CommandHandler
 			else if(subCommand.equals("perm")){new EZZonePerm(args, sender);}
 			else {new EZZoneHelp(ZoneCommand.NONE, sender, null);}
 		}
+		else
+		{
+			new EZZoneHelp(ZoneCommand.NONE, sender, null);
+		}
 		return true;	
 	}
 }

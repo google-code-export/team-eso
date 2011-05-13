@@ -57,6 +57,7 @@ public class General {
 	public static Map<String, EpicZone> myGlobalZones = new HashMap<String, EpicZone>();
 	public static Map<String, EpicZonePlayer> myPlayers = new HashMap<String, EpicZonePlayer>();
 	public static Config config;
+	public static String version;
 	public static final String NO_PERM_ENTER = "You do not have permission to enter ";
 	public static final String NO_PERM_BORDER = "You have reached the border of the map.";
 	public static EpicZones plugin;
@@ -69,9 +70,10 @@ public class General {
 		return myPlayers.get(name.toLowerCase());
 	}
 
-	public static void addPlayer(int entityID, String name)
+	public static void addPlayer(Player player)
 	{
-		myPlayers.put(name.toLowerCase(), new EpicZonePlayer(entityID, name));
+		myPlayers.put(player.getName().toLowerCase(), new EpicZonePlayer(player));
+		Security.UpdatePlayerSecurity(player);
 	}
 
 	public static void removePlayer(String playerName)
@@ -251,6 +253,7 @@ public class General {
 					}
 					if (badChildren.size() > 0)
 					{
+						Log.Write("Removing invalid children from [" + zoneTag + "]");
 						for(String badChild: badChildren)
 						{
 							zone.removeChild(badChild);
@@ -264,7 +267,6 @@ public class General {
 		{
 			Log.Write(e.getMessage());
 		}
-
 	}
 
 	public static void WarnPlayer(Player player, EpicZonePlayer ezp, String message)

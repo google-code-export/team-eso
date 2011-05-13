@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -67,28 +68,39 @@ public class PlayerEvents extends PlayerListener
 
 	public PlayerEvents(EpicZones instance)
 	{
-		itemsOfDestruction.add(259);
-		itemsOfDestruction.add(326);
-		itemsOfDestruction.add(327);
-		itemsOfDestruction.add(232);
-		itemsOfDestruction.add(231);
+		itemsOfDestruction.add(259); //Empty Bucket
+		itemsOfDestruction.add(324); //Wood Door
+		itemsOfDestruction.add(330); //Iron Door
+		itemsOfDestruction.add(326); //Water Bucket
+		itemsOfDestruction.add(327); //Lava Bucket
+		itemsOfDestruction.add(323); //Painting
+		itemsOfDestruction.add(321); //Sign
+		itemsOfDestruction.add(354); //Bed
+		itemsOfDestruction.add(355); //Cake
+		itemsOfDestruction.add(356); //Redstone Repeater
 	}
 
 	public @Override void onPlayerMove(PlayerMoveEvent event)
 	{
-		if(!General.PlayerMovementLogic(event.getPlayer(), event.getFrom(), event.getTo()))
+		if(!event.isCancelled())
 		{
-			event.setTo(General.getPlayer(event.getPlayer().getName()).getCurrentLocation());
-			event.setCancelled(true);
+			if(!General.PlayerMovementLogic(event.getPlayer(), event.getFrom(), event.getTo()))
+			{
+				event.setTo(General.getPlayer(event.getPlayer().getName()).getCurrentLocation());
+				event.setCancelled(true);
+			}
 		}
 	}
 
 	public @Override void onPlayerTeleport(PlayerTeleportEvent event)
 	{
-		if(!General.PlayerMovementLogic(event.getPlayer(), event.getFrom(), event.getTo()))
+		if(!event.isCancelled())
 		{
-			event.setTo(General.getPlayer(event.getPlayer().getName()).getCurrentLocation());
-			event.setCancelled(true);
+			if(!General.PlayerMovementLogic(event.getPlayer(), event.getFrom(), event.getTo()))
+			{
+				event.setTo(General.getPlayer(event.getPlayer().getName()).getCurrentLocation());
+				event.setCancelled(true);
+			}
 		}
 	}
 
@@ -96,7 +108,7 @@ public class PlayerEvents extends PlayerListener
 	{
 		if(event.getResult() == Result.ALLOWED)
 		{
-			General.addPlayer(event.getPlayer().getEntityId(), event.getPlayer().getName());
+			General.addPlayer(event.getPlayer());
 		}
 	}
 
@@ -109,71 +121,74 @@ public class PlayerEvents extends PlayerListener
 	{
 		if(!event.isCancelled())
 		{
-			if(event.getPlayer() != null)
+			if(event.getAction() == Action.RIGHT_CLICK_BLOCK)
 			{
-				if (itemsOfDestruction.contains((event.getPlayer().getItemInHand().getTypeId())))
+				if(event.getPlayer() != null)
 				{
-
-					Player player = event.getPlayer();
-					EpicZonePlayer ezp = General.getPlayer(player.getName());
-					Point blockPoint = new Point(event.getClickedBlock().getLocation().getBlockX(), event.getClickedBlock().getLocation().getBlockZ());
-					String worldName = player.getWorld().getName();
-					int blockHeight = event.getClickedBlock().getLocation().getBlockY();
-					boolean hasPerms = false;
-
-					EpicZone currentZone = null;
-					if(General.BorderLogic(blockPoint, player))
+					if (itemsOfDestruction.contains((event.getPlayer().getItemInHand().getTypeId())))
 					{
-						currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
-						hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "build");
 
-						if(!hasPerms)
+						Player player = event.getPlayer();
+						EpicZonePlayer ezp = General.getPlayer(player.getName());
+						Point blockPoint = new Point(event.getClickedBlock().getLocation().getBlockX(), event.getClickedBlock().getLocation().getBlockZ());
+						String worldName = player.getWorld().getName();
+						int blockHeight = event.getClickedBlock().getLocation().getBlockY();
+						boolean hasPerms = false;
+
+						EpicZone currentZone = null;
+						if(General.BorderLogic(blockPoint, player))
 						{
-							if (ezp.getLastWarned().before(new Date()))
+							currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
+							hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "build");
+
+							if(!hasPerms)
 							{
-								Message.Send(player, 36);
-								ezp.Warn();
+								if (ezp.getLastWarned().before(new Date()))
+								{
+									Message.Send(player, 36);
+									ezp.Warn();
+								}
+								event.setCancelled(true);
 							}
-							event.setCancelled(true);
 						}
 					}
-				}
-				else if(event.getPlayer().getItemInHand().getTypeId() == EMPTY_BUCKET)
-				{
-					Player player = event.getPlayer();
-					EpicZonePlayer ezp = General.getPlayer(player.getName());
-					Point blockPoint = new Point(event.getClickedBlock().getLocation().getBlockX(), event.getClickedBlock().getLocation().getBlockZ());
-					String worldName = player.getWorld().getName();
-					int blockHeight = event.getClickedBlock().getLocation().getBlockY();
-					boolean hasPerms = false;
-
-					EpicZone currentZone = null;
-					if(General.BorderLogic(blockPoint, player))
+					else if(event.getPlayer().getItemInHand().getTypeId() == EMPTY_BUCKET)
 					{
-						currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
-						hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "destroy");
+						Player player = event.getPlayer();
+						EpicZonePlayer ezp = General.getPlayer(player.getName());
+						Point blockPoint = new Point(event.getClickedBlock().getLocation().getBlockX(), event.getClickedBlock().getLocation().getBlockZ());
+						String worldName = player.getWorld().getName();
+						int blockHeight = event.getClickedBlock().getLocation().getBlockY();
+						boolean hasPerms = false;
 
-						if(!hasPerms)
+						EpicZone currentZone = null;
+						if(General.BorderLogic(blockPoint, player))
 						{
-							if (ezp.getLastWarned().before(new Date()))
+							currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
+							hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "destroy");
+
+							if(!hasPerms)
 							{
-								Message.Send(player, 36);
-								ezp.Warn();
+								if (ezp.getLastWarned().before(new Date()))
+								{
+									Message.Send(player, 36);
+									ezp.Warn();
+								}
+								event.setCancelled(true);
 							}
-							event.setCancelled(true);
 						}
 					}
-				}
-				else if(event.getPlayer().getItemInHand().getTypeId() == General.config.zoneTool)
-				{
-					if(General.getPlayer(event.getPlayer().getName()).getMode() == EpicZoneMode.ZoneDraw)
+					else if(event.getPlayer().getItemInHand().getTypeId() == General.config.zoneTool)
 					{
-						Point point = new Point(event.getClickedBlock().getLocation().getBlockX(), event.getClickedBlock().getLocation().getBlockZ());
-						EpicZonePlayer ezp = General.getPlayer(event.getPlayer().getName());
-						ezp.getEditZone().addPoint(point);
-						ezp.getEditZone().addPillar(event.getClickedBlock());
-						ezp.getEditZone().ShowPillar(point);
-						Message.Send(event.getPlayer(), 112, new String[]{Integer.toString(point.x), Integer.toString(point.y)});
+						if(General.getPlayer(event.getPlayer().getName()).getMode() == EpicZoneMode.ZoneDraw)
+						{
+							Point point = new Point(event.getClickedBlock().getLocation().getBlockX(), event.getClickedBlock().getLocation().getBlockZ());
+							EpicZonePlayer ezp = General.getPlayer(event.getPlayer().getName());
+							ezp.getEditZone().addPoint(point);
+							ezp.getEditZone().addPillar(event.getClickedBlock());
+							ezp.getEditZone().ShowPillar(point);
+							Message.Send(event.getPlayer(), 112, new String[]{Integer.toString(point.x), Integer.toString(point.y)});
+						}
 					}
 				}
 			}

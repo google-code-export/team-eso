@@ -69,7 +69,10 @@ public class EZZoneSave
 			}
 			else if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				ezp.getEditZone().setParent(ezp.getCurrentZone());
+				if(!ezp.getEditZone().hasParent())
+				{   //If a zone does not have a parent, set it's parent to the global zone the player is within.
+					ezp.getEditZone().setParent(General.myGlobalZones.get(player.getWorld().getName().toLowerCase()));	
+				}
 				if(General.myZones.get(ezp.getEditZone().getTag()) == null)
 				{
 					General.myZones.put(ezp.getEditZone().getTag(), ezp.getEditZone());
