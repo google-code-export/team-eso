@@ -1,13 +1,12 @@
 #summary Full description of the perm command
 
-= Introduction =
+= Description =
+The perm sub command allows you to set, remove, copy and clear permissions from the zone you are currently editing.
 
-Add your content here.
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+= Syntax =
+{{{
+/zone perm [add|remove] [build|destroy|entry] [allow|deny]
+/zone perm [copy] [zone to copy from]
+/zone perm [clear]
+/zone perm [clear] [user or group name]
+}}}
