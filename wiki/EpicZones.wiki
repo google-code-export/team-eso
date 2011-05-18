@@ -177,8 +177,7 @@ These are the steps permission checks when seeing if a user has permission to pe
 
 === Fire ===
  Zone level control of fire
- Flag use: /zone flag fire [ignite] [spread]
- A value of true, means fire will be allowed in the zone.
+ Flag use: /zone flag fire ignite spread
 
 ==== Values ====
  * *True* A setting of true, means that fire will be allowed within the zone.
@@ -196,8 +195,7 @@ These are the steps permission checks when seeing if a user has permission to pe
 
 === Explode === 
  Zone level control of terrain destruction and damage from explosions.
- Flag use: /zone flag explode [tnt] [creeper] [ghast]
- A value of true, means explosions will destroy terrain
+ Flag use: /zone flag explode tnt creeper ghast
 
 ==== Values ====
  * *True* A setting of true, means that explosions will be allowed within the zone.
