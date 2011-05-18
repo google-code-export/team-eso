@@ -177,7 +177,7 @@ These are the steps permission checks when seeing if a user has permission to pe
 
 === Fire ===
  Zone level control of fire
- Flag use: /zone flag fire [true|false]
+ Flag use: /zone flag fire [ignite] [spread]
  A value of true, means fire will be allowed in the zone.
 
 ==== Values ====
@@ -189,14 +189,14 @@ These are the steps permission checks when seeing if a user has permission to pe
 
 ==== Syntax ====
 {{{
-/zone flag fire <true/false>
+/zone flag fire <true/false> [true/false]
 }}}
 
 
 
 === Explode === 
  Zone level control of terrain destruction and damage from explosions.
- Flag use: /zone flag explode [true|false]
+ Flag use: /zone flag explode [tnt] [creeper] [ghast]
  A value of true, means explosions will destroy terrain
 
 ==== Values ====
@@ -205,7 +205,7 @@ These are the steps permission checks when seeing if a user has permission to pe
 
 ==== Syntax ====
 {{{
-/zone flag explode <true/false>
+/zone flag explode <true/false> [true/false] [true/false]
 }}}
 
 
@@ -371,6 +371,14 @@ world: world
 
 ----
 = Changelog =
+ * *Version 0.25*
+   * Enhanced Explode flag
+     * Explode now tracks TNT, Creeper and Ghasts all separately.
+   * Enhanced Fire flag
+     * Fire now tracks Ignite and Spread separately.
+   * Fixed some bugs with /who reporting funky information
+   * Fixed a bug that allowed players to use buckets when entering minecarts
+   * Fixed a bug with Min/Max De/Regen.
  * *Version 0.22.1*
    * Fixed a bug causing mobs not to spawn
    * Cleaned out a bunch of old commented out code
