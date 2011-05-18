@@ -108,8 +108,8 @@ public class EpicZoneDAL{
 		result.setFloor(config.getInt("floor", 0));
 		result.setCeiling(config.getInt("ceiling", 128));
 		result.setPVP(config.getBoolean("pvp", false));
-		result.setFire(config.getBoolean("fire", false));
-		result.setExplode(config.getBoolean("explode", false));
+		result.setFire(getFire(config));
+		result.setExplode(getExplode(config));
 		result.setSanctuary(config.getBoolean("sanctuary", false));
 		result.setFireBurnsMobs(config.getBoolean("fireburnsmobs", true));
 		result.setPolygon(config.getString("points"));
@@ -212,6 +212,27 @@ public class EpicZoneDAL{
 
 		return result;
 	}
+	
+	private static String getExplode(Configuration config)
+	{
+		String result = "";
+
+		result += config.getString("explode.tnt") + ":";
+		result += config.getString("explode.creeper") + ":";
+		result += config.getString("explode.ghast");
+
+		return result;
+	}
+	
+	private static String getFire(Configuration config)
+	{
+		String result = "";
+
+		result += config.getString("fire.ignite") + ":";
+		result += config.getString("fire.spread");
+
+		return result;
+	}
 
 	public static boolean Save(EpicZone zone)
 	{
@@ -234,10 +255,20 @@ public class EpicZoneDAL{
 			config.put("pvp", zone.getPVP());
 			config.put("mobs", zone.getMobs().toArray());
 			config.put("fire", zone.getFire());
-			config.put("explode", zone.getExplode());
 			config.put("sanctuary", zone.getSanctuary());
 			config.put("fireburnsmobs", zone.getFireBurnsMobs());
 
+			Map<String, Object> explode = new TreeMap<String, Object>();
+			explode.put("tnt", zone.getExplode().getTNT()); 
+			explode.put("creeper", zone.getExplode().getCreeper()); 
+			explode.put("ghast", zone.getExplode().getGhast()); 
+			config.put("explode", explode);
+			
+			Map<String, Object> fire = new TreeMap<String, Object>();
+			fire.put("ignite", zone.getFire().getIgnite()); 
+			fire.put("spread", zone.getFire().getSpread());  
+			config.put("fire", fire);
+			
 			Map<String, Object> regen = new TreeMap<String, Object>();
 			regen.put("amount", zone.getRegen().getAmount()); 
 			regen.put("delay", zone.getRegen().getDelay()); 

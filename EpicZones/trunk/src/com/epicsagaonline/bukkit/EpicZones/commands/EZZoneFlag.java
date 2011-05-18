@@ -106,11 +106,11 @@ public class EZZoneFlag
 	}
 	private void SetFire(EpicZonePlayer ezp, String data)
 	{
-		ezp.getEditZone().setAllowFire(Boolean.valueOf((data).trim()));
+		ezp.getEditZone().setFire(data.trim());
 	}
 	private void SetExplode(EpicZonePlayer ezp, String data)
 	{
-		ezp.getEditZone().setAllowExplode(Boolean.valueOf((data).trim()));
+		ezp.getEditZone().setExplode(data.trim());
 	}
 	private void SetSanctuary(EpicZonePlayer ezp, String data)
 	{

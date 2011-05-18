@@ -96,22 +96,46 @@ public class EZZoneInfo
 						{
 							messageText = messageText + Message.get(3, new String[]{"PVP"}) + " ";
 						}
-						if(zone.getFire())
+						if(zone.getFire().getIgnite() || zone.getFire().getSpread())
 						{
-							messageText = messageText + Message.get(2, new String[]{"FIRE"}) + " ";
+							messageText = messageText + Message.get(2, new String[]{"FIRE"}) + " (";
+							if(zone.getFire().getIgnite())
+							{
+								messageText = messageText + "Ignite ";
+							}
+							if(zone.getFire().getSpread())
+							{
+								messageText = messageText + "Spread ";
+							}
+							messageText = messageText.trim() + ") ";
 						}
 						else
 						{
 							messageText = messageText + Message.get(3, new String[]{"FIRE"}) + " ";
 						}
-						if(zone.getExplode())
+
+						if(zone.getExplode().getTNT() || zone.getExplode().getCreeper() || zone.getExplode().getGhast())
 						{
-							messageText = messageText + Message.get(2, new String[]{"EXPLODE"}) + " ";
+							messageText = messageText + Message.get(2, new String[]{"EXPLODE"}) + " (";
+							if(zone.getExplode().getTNT())
+							{
+								messageText = messageText + "TNT ";
+							}
+							if(zone.getExplode().getCreeper())
+							{
+								messageText = messageText + "Creeper ";
+							}
+							if(zone.getExplode().getGhast())
+							{
+								messageText = messageText + "Ghast ";
+							}
+							messageText = messageText.trim() + ") ";
 						}
 						else
 						{
 							messageText = messageText + Message.get(3, new String[]{"EXPLODE"}) + " ";
 						}
+
 						if(zone.getSanctuary())
 						{
 							messageText = messageText + Message.get(2, new String[]{"SANCTUARY"}) + " ";

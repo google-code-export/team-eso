@@ -107,6 +107,8 @@ public class EpicZones extends JavaPlugin
 			pm.registerEvent(Event.Type.PLAYER_LOGIN, this.playerListener, Event.Priority.Monitor, this);
 			pm.registerEvent(Event.Type.PLAYER_QUIT, this.playerListener, Event.Priority.Monitor, this);
 			pm.registerEvent(Event.Type.PLAYER_INTERACT , this.playerListener, Event.Priority.Normal, this);
+			pm.registerEvent(Event.Type.PLAYER_BUCKET_EMPTY , this.playerListener, Event.Priority.Normal, this);
+			pm.registerEvent(Event.Type.PLAYER_BUCKET_FILL , this.playerListener, Event.Priority.Normal, this);
 
 			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Event.Priority.Normal, this);
@@ -119,7 +121,6 @@ public class EpicZones extends JavaPlugin
 			pm.registerEvent(Event.Type.ENTITY_EXPLODE, this.entityListener, Event.Priority.Normal, this);
 
 			pm.registerEvent(Event.Type.VEHICLE_MOVE, this.vehicleListener, Event.Priority.Normal, this);
-
 
 			getServer().getScheduler().scheduleAsyncRepeatingTask(this, regen, 10, 10);
 

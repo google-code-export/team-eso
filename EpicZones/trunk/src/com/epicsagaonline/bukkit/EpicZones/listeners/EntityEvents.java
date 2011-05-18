@@ -66,9 +66,29 @@ public class EntityEvents extends EntityListener
 		EpicZone zone = General.GetZoneForPlayer(null, event.getLocation().getWorld().getName(), event.getLocation().getBlockY() ,new Point(event.getLocation().getBlockX(), event.getLocation().getBlockZ()));
 		if (zone != null)
 		{
-			if(!zone.getExplode())
+			if(event.getEntity().toString().equalsIgnoreCase("CraftTNTPrimed"))
 			{
-				event.setCancelled(true);
+				if(!zone.getExplode().getTNT())
+				{
+					event.setYield(0);
+					event.setCancelled(true);
+				}				
+			}
+			else if(event.getEntity().toString().equalsIgnoreCase("CraftCreeper"))
+			{
+				if(!zone.getExplode().getCreeper())
+				{
+					event.setYield(0);
+					event.setCancelled(true);
+				}				
+			}
+			else if(event.getEntity().toString().equalsIgnoreCase("CraftFireball"))
+			{
+				if(!zone.getExplode().getGhast())
+				{
+					event.setYield(0);
+					event.setCancelled(true);
+				}				
 			}
 		}
 	}
@@ -81,7 +101,7 @@ public class EntityEvents extends EntityListener
 			EpicZone zone = General.GetZoneForPlayer(null, e.getLocation().getWorld().getName(), e.getLocation().getBlockY() ,new Point(e.getLocation().getBlockX(), e.getLocation().getBlockZ()));
 			if(zone != null)
 			{
-				if(!zone.getFire())
+				if(!zone.getFire().getIgnite())
 				{
 					if(isPlayer(e))
 					{
@@ -101,7 +121,7 @@ public class EntityEvents extends EntityListener
 	public @Override void onEntityDamage(EntityDamageEvent event)
 	{
 		if(!event.isCancelled())
-		{
+		{		
 			Entity e = event.getEntity();
 			EpicZone sancZone = General.GetZoneForPlayer(null, e.getLocation().getWorld().getName(), e.getLocation().getBlockY() ,new Point(e.getLocation().getBlockX(), e.getLocation().getBlockZ()));
 			if((sancZone != null && !sancZone.getSanctuary()) || sancZone == null)
@@ -131,6 +151,13 @@ public class EntityEvents extends EntityListener
 								}
 							}
 						}
+						else if(sub.getDamager().toString().equalsIgnoreCase("CraftGhast"))
+						{
+							if(!sancZone.getExplode().getGhast())
+							{
+								event.setCancelled(true);
+							}
+						}
 					}
 					else if (event instanceof EntityDamageByProjectileEvent)
 					{
@@ -150,21 +177,28 @@ public class EntityEvents extends EntityListener
 						}
 					}
 				}
-				else if(event.getCause() == DamageCause.BLOCK_EXPLOSION || event.getCause() == DamageCause.ENTITY_EXPLOSION)
+				else if(event.getCause() == DamageCause.BLOCK_EXPLOSION)
 				{
 					if(sancZone != null)
 					{
-						if(!sancZone.getExplode())
+						if(!sancZone.getExplode().getTNT())
 						{
 							event.setCancelled(true);
-						}
+						}				
 					}
+				}
+				else if(event.getCause() == DamageCause.ENTITY_EXPLOSION)
+				{
+					if(!sancZone.getExplode().getCreeper())
+					{
+						event.setCancelled(true);
+					}				
 				}
 				else if(event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK)
 				{
 					if(sancZone != null)
 					{
-						if(!sancZone.getFire())
+						if(!sancZone.getFire().getIgnite())
 						{
 							if(isPlayer(e))
 							{

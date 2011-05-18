@@ -277,7 +277,7 @@ public class Message {
 
 	private static String BuildInitialStrings_ENUS() {
 		String result = new String();
-		result += "#VERSION: 0.24\n";
+		result += "#VERSION: " + General.version + "\n";
 		result += "#Author: jblaske@gmail.com\n";
 		result += "#--------------------------\n";
 		result += "#Formatting Strings\n";

@@ -78,7 +78,7 @@ public class General {
 
 	public static void removePlayer(String playerName)
 	{
-		EpicZonePlayer ezp = myPlayers.get(playerName);
+		EpicZonePlayer ezp = myPlayers.get(playerName.toLowerCase());
 		if (ezp != null)
 		{
 			if(ezp.getMode() != EpicZoneMode.None)
@@ -88,7 +88,7 @@ public class General {
 					ezp.getEditZone().HidePillars();
 				}
 			}
-			myPlayers.remove(playerName);
+			myPlayers.remove(playerName.toLowerCase());
 		}
 	}
 

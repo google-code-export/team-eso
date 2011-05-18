@@ -78,8 +78,8 @@ public class EpicZone {
 	private EpicZoneRegen regen = new EpicZoneRegen();
 	private int radius = 0;
 	private HashSet<String> mobs = new HashSet<String>();
-	private boolean fire = false;
-	private boolean explode = false;
+	private EpicZoneFire fire = new EpicZoneFire();
+	private EpicZoneExplode explode = new EpicZoneExplode();
 	private ArrayList<String> owners = new ArrayList<String>();
 	private boolean sanctuary = false;
 	private boolean fireBurnsMobs = true;
@@ -163,8 +163,8 @@ public class EpicZone {
 	public int getRadius(){return radius;}
 	public Point getCenter(){return center;}
 	public HashSet<String> getMobs(){return mobs;}
-	public boolean getFire(){return fire;}
-	public boolean getExplode(){return explode;}
+	public EpicZoneFire getFire(){return fire;}
+	public EpicZoneExplode getExplode(){return explode;}
 	public boolean getSanctuary(){return sanctuary;}
 	public ArrayList<String> getOwners(){return owners;} 
 	public boolean getFireBurnsMobs(){return fireBurnsMobs;}
@@ -312,14 +312,9 @@ public class EpicZone {
 		this.type = ZoneType.valueOf(value.toUpperCase());
 	}
 
-	public void setFire(Boolean value)
+	public void setFire(String value)
 	{
-		this.fire = value;
-	}
-
-	public void setExplode(Boolean value)
-	{
-		this.explode = value;
+		this.fire = new EpicZoneFire(value);
 	}
 
 	public void setFireBurnsMobs(Boolean value)
@@ -332,31 +327,21 @@ public class EpicZone {
 		this.sanctuary = value;
 	}
 
-	public void setAllowFire(Boolean value)
+	public void setExplode(String value)
 	{
-		this.fire = value;
-	}
-
-	public void setAllowExplode(Boolean value)
-	{
-		this.explode = value;
+		this.explode = new EpicZoneExplode(value);
 	}
 
 	public void removeChild(String tag)
 	{
-		Log.Write("1");
 		if(this.childrenTags!= null)
 		{
-			Log.Write("2");
 			this.childrenTags.remove(tag);	
 		}
-		Log.Write("3");
 		if(this.children!= null)
 		{
-			Log.Write("4");
 			this.children.remove(tag);
 		}
-		Log.Write("5");
 	}
 
 	public void setWorld(String value)
@@ -478,11 +463,16 @@ public class EpicZone {
 				}
 				else if(flag.equals("fire"))
 				{
-					this.fire = split[1].equalsIgnoreCase("true");
+					boolean value = split[1].equalsIgnoreCase("true");
+					this.fire.setIgnite(value);
+					this.fire.setSpread(value);
 				}
 				else if(flag.equals("explode"))
 				{
-					this.explode = split[1].equalsIgnoreCase("true");
+					boolean value = split[1].equalsIgnoreCase("true");
+					this.explode.setTNT(value);
+					this.explode.setCreeper(value);
+					this.explode.setGhast(value);
 				}
 				else if(flag.equals("owners"))
 				{

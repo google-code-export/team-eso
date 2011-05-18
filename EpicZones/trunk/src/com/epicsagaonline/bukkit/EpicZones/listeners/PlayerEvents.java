@@ -39,6 +39,8 @@ import java.util.Set;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -62,22 +64,17 @@ import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
  */
 public class PlayerEvents extends PlayerListener
 {
-
-	private static final int EMPTY_BUCKET = 325;
-	private Set<Integer> itemsOfDestruction = new HashSet<Integer>();
+	private Set<Integer> interactiveItems = new HashSet<Integer>();
 
 	public PlayerEvents(EpicZones instance)
 	{
-		itemsOfDestruction.add(259); //Empty Bucket
-		itemsOfDestruction.add(324); //Wood Door
-		itemsOfDestruction.add(330); //Iron Door
-		itemsOfDestruction.add(326); //Water Bucket
-		itemsOfDestruction.add(327); //Lava Bucket
-		itemsOfDestruction.add(323); //Painting
-		itemsOfDestruction.add(321); //Sign
-		itemsOfDestruction.add(354); //Bed
-		itemsOfDestruction.add(355); //Cake
-		itemsOfDestruction.add(356); //Redstone Repeater
+		interactiveItems.add(324); //Wood Door
+		interactiveItems.add(330); //Iron Door
+		interactiveItems.add(323); //Painting
+		interactiveItems.add(321); //Sign
+		interactiveItems.add(354); //Bed
+		interactiveItems.add(355); //Cake
+		interactiveItems.add(356); //Redstone Repeater
 	}
 
 	public @Override void onPlayerMove(PlayerMoveEvent event)
@@ -117,6 +114,62 @@ public class PlayerEvents extends PlayerListener
 		General.removePlayer(event.getPlayer().getName());
 	}
 
+	public @Override void onPlayerBucketEmpty(PlayerBucketEmptyEvent event)
+	{
+		if(!event.isCancelled())
+		{
+			Player player = event.getPlayer();
+			EpicZonePlayer ezp = General.getPlayer(player.getName());
+			Point blockPoint = new Point(event.getBlockClicked().getLocation().getBlockX(), event.getBlockClicked().getLocation().getBlockZ());
+			String worldName = player.getWorld().getName();
+			int blockHeight = event.getBlockClicked().getLocation().getBlockY();
+			boolean hasPerms = false;
+			EpicZone currentZone = null;
+			if(General.BorderLogic(blockPoint, player))
+			{
+				currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
+				hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "build");
+				if(!hasPerms)
+				{
+					if (ezp.getLastWarned().before(new Date()))
+					{
+						Message.Send(player, 36);
+						ezp.Warn();
+					}
+					event.setCancelled(true);
+				}
+			}
+		}
+	}
+
+	public @Override void onPlayerBucketFill(PlayerBucketFillEvent event)
+	{
+		if(!event.isCancelled())
+		{
+			Player player = event.getPlayer();
+			EpicZonePlayer ezp = General.getPlayer(player.getName());
+			Point blockPoint = new Point(event.getBlockClicked().getLocation().getBlockX(), event.getBlockClicked().getLocation().getBlockZ());
+			String worldName = player.getWorld().getName();
+			int blockHeight = event.getBlockClicked().getLocation().getBlockY();
+			boolean hasPerms = false;
+			EpicZone currentZone = null;
+			if(General.BorderLogic(blockPoint, player))
+			{
+				currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
+				hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "destroy");
+				if(!hasPerms)
+				{
+					if (ezp.getLastWarned().before(new Date()))
+					{
+						Message.Send(player, 36);
+						ezp.Warn();
+					}
+					event.setCancelled(true);
+				}
+			}
+		}
+	}
+
 	public @Override void onPlayerInteract(PlayerInteractEvent event) 
 	{
 		if(!event.isCancelled())
@@ -125,7 +178,7 @@ public class PlayerEvents extends PlayerListener
 			{
 				if(event.getPlayer() != null)
 				{
-					if (itemsOfDestruction.contains((event.getPlayer().getItemInHand().getTypeId())))
+					if (interactiveItems.contains((event.getPlayer().getItemInHand().getTypeId())))
 					{
 
 						Player player = event.getPlayer();
@@ -140,32 +193,6 @@ public class PlayerEvents extends PlayerListener
 						{
 							currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
 							hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "build");
-
-							if(!hasPerms)
-							{
-								if (ezp.getLastWarned().before(new Date()))
-								{
-									Message.Send(player, 36);
-									ezp.Warn();
-								}
-								event.setCancelled(true);
-							}
-						}
-					}
-					else if(event.getPlayer().getItemInHand().getTypeId() == EMPTY_BUCKET)
-					{
-						Player player = event.getPlayer();
-						EpicZonePlayer ezp = General.getPlayer(player.getName());
-						Point blockPoint = new Point(event.getClickedBlock().getLocation().getBlockX(), event.getClickedBlock().getLocation().getBlockZ());
-						String worldName = player.getWorld().getName();
-						int blockHeight = event.getClickedBlock().getLocation().getBlockY();
-						boolean hasPerms = false;
-
-						EpicZone currentZone = null;
-						if(General.BorderLogic(blockPoint, player))
-						{
-							currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
-							hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "destroy");
 
 							if(!hasPerms)
 							{

@@ -116,7 +116,7 @@ private boolean admin = false;
 	{
 		this.entityID = player.getEntityId();
 		this.name = player.getName();
-		setCurrentLocation(player.getLocation());
+		setCurrentLocation(player.getWorld().getSpawnLocation());
 		setCurrentZone(General.myGlobalZones.get(player.getWorld().getName().toLowerCase()));
 	}
 

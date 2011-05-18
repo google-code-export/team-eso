@@ -77,17 +77,20 @@ public class Regen implements Runnable {
 										{
 											bonus = zone.getRegen().getBedBonus();
 										}
-										
+
 										if(zone.getRegen().getMaxRegen() > 0)
 										{
-											if(player.getHealth() + zone.getRegen().getAmount() + bonus > zone.getRegen().getMaxRegen())
+											if(player.getHealth() < zone.getRegen().getMaxRegen())
 											{
-												player.setHealth(zone.getRegen().getMaxRegen());
-											}	
-											else
-											{
-												player.setHealth(((player.getHealth() + zone.getRegen().getAmount() + bonus)));
-											}	
+												if(player.getHealth() + zone.getRegen().getAmount() + bonus > zone.getRegen().getMaxRegen())
+												{
+													player.setHealth(zone.getRegen().getMaxRegen());
+												}	
+												else
+												{
+													player.setHealth(((player.getHealth() + zone.getRegen().getAmount() + bonus)));
+												}	
+											}
 										}
 										else
 										{
@@ -105,13 +108,16 @@ public class Regen implements Runnable {
 									{
 										if(zone.getRegen().getMinDegen() > 0)
 										{
-											if(player.getHealth() + zone.getRegen().getAmount() < zone.getRegen().getMinDegen())
+											if(player.getHealth() > zone.getRegen().getMinDegen())
 											{
-												player.setHealth(zone.getRegen().getMinDegen());
-											}	
-											else
-											{
-												player.setHealth(((player.getHealth() + zone.getRegen().getAmount())));
+												if(player.getHealth() + zone.getRegen().getAmount() < zone.getRegen().getMinDegen())
+												{
+													player.setHealth(zone.getRegen().getMinDegen());
+												}	
+												else
+												{
+													player.setHealth(((player.getHealth() + zone.getRegen().getAmount())));
+												}
 											}
 										}
 										else

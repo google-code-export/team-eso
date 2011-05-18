@@ -39,6 +39,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
@@ -55,7 +56,7 @@ import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
  */
 public class BlockEvents extends BlockListener {
 	//private final EpicZones plugin;
-	
+
 	public BlockEvents(final EpicZones plugin) {
 		//this.plugin = plugin;
 	}
@@ -67,10 +68,21 @@ public class BlockEvents extends BlockListener {
 			EpicZone zone = General.GetZoneForPlayer(null, event.getBlock().getLocation().getWorld().getName(), event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()));
 			if (zone != null)
 			{
-				if(!zone.getFire())
+				if(event.getCause() == IgniteCause.FLINT_AND_STEEL) //Flint and steel
 				{
-					event.setCancelled(true);
+					if(!zone.getFire().getIgnite())
+					{
+						event.setCancelled(true);
+					}
 				}
+				else //Spread and Lava
+				{
+					if(!zone.getFire().getSpread())
+					{
+						event.setCancelled(true);
+					}
+				}
+
 			}
 		}
 	}
@@ -82,7 +94,7 @@ public class BlockEvents extends BlockListener {
 			EpicZone zone = General.GetZoneForPlayer(null, event.getBlock().getLocation().getWorld().getName(), event.getBlock().getLocation().getBlockY() ,new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()));
 			if (zone != null)
 			{
-				if(!zone.getFire())
+				if(!zone.getFire().getIgnite())
 				{
 					event.setCancelled(true);
 				}
