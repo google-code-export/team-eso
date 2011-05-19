@@ -35,8 +35,8 @@ When a zone is created, its Name is defaulted to the tag, and its world is defau
 {{{
 /zone name PVP Arena //Sets name to 'PVP Arena'
 /zone flag pvp true //Enables PVP
-/zone enter PVP is enabled, beware! //Sets the enter message to a informative warning
-/zone exit You are no longer in a PVP zone, you can relax now. //Sets the exit message to let players know they are save.
+/zone message enter PVP is enabled, beware! //Sets the enter message to a informative warning
+/zone message exit You are no longer in a PVP zone, you can relax now. //Sets the exit message to let players know they are save.
 /zone save //Saves the zone to file.
 }}}
 And your zone is done!
