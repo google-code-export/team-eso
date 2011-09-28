@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 
 public class EZReload implements CommandHandler {
 
@@ -47,7 +48,7 @@ public class EZReload implements CommandHandler {
 			General.plugin.setupPermissions();
 			General.plugin.setupHeroChat();
 			General.plugin.setupMultiWorld();
-			Message.Send(sender, 15);
+			Message.Send(sender, Message_ID.Info_00015_Reloaded);
 			return true;
 		}
 		return false;

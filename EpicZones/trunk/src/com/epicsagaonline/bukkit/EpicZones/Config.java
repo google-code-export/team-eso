@@ -57,6 +57,7 @@ public class Config extends Configuration {
 	public boolean globalZoneDefaultAllow;
 	public int zoneTool = 280; //Default Tool Is Stick
 	public String language = "EN_US";
+	public boolean enableSpout;
 
 	public Config(File file)
 	{
@@ -75,6 +76,7 @@ public class Config extends Configuration {
 		globalZoneDefaultAllow = true;
 		zoneTool = 280;
 		language = "EN_US";
+		enableSpout = true;
 	}
 
 	@Override
@@ -103,6 +105,7 @@ public class Config extends Configuration {
 			globalZoneDefaultAllow = getBoolean("globalZoneDefaultAllow", true);
 			zoneTool = getInt("zoneTool", zoneTool);
 			language = getString("language", language).toUpperCase();
+			enableSpout = getBoolean("enableSpout", true);
 
 		}
 	}
@@ -121,6 +124,7 @@ public class Config extends Configuration {
 		root.put("enableHeroChat", enableHeroChat);
 		root.put("globalZoneDefaultAllow", globalZoneDefaultAllow);
 		root.put("language", language);
+		root.put("enableSpout", enableSpout);
 
 		try 
 		{

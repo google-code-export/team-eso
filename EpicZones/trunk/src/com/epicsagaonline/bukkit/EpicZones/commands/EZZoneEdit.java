@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone.ZoneType;
@@ -67,16 +68,16 @@ public class EZZoneEdit
 									ezp.setEditZone(new EpicZone(zone));
 									ezp.setMode(EpicZoneMode.ZoneEdit);
 									ezp.getEditZone().ShowPillars();
-									Message.Send(sender, 105, new String[]{tag});
+									Message.Send(sender, Message_ID.Info_00105_Mode_Edit, new String[]{tag});
 								}
 								else
 								{
-									Message.Send(sender, 106, new String[]{tag});	
+									Message.Send(sender, Message_ID.Warning_00106_Perm_EditZone, new String[]{tag});	
 								}
 							}
 							else
 							{
-								Message.Send(sender, 22);
+								Message.Send(sender, Message_ID.Warning_00022_CannotDeleteGlobalZones);
 							}
 						}
 						else

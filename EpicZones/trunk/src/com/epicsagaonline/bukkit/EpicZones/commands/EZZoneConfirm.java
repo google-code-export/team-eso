@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZoneDAL;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
@@ -60,7 +61,7 @@ public class EZZoneConfirm
 					}
 					ezp.getEditZone().HidePillars();
 					EpicZoneDAL.DeleteZone(ezp.getEditZone().getTag());
-					Message.Send(sender, 102, new String[]{ezp.getEditZone().getTag()});
+					Message.Send(sender, Message_ID.Info_00102_Zone_X_Deleted, new String[]{ezp.getEditZone().getTag()});
 
 					ezp.setMode(EpicZoneMode.None);
 					ezp.setEditZone(null);
@@ -71,7 +72,7 @@ public class EZZoneConfirm
 					ezp.setMode(EpicZoneMode.ZoneDraw);
 					ezp.getEditZone().clearPolyPoints();
 					ezp.getEditZone().HidePillars();
-					Message.Send(sender, 19);
+					Message.Send(sender, Message_ID.Mode_00019_Draw_StartMessage);
 				}
 			}
 			else

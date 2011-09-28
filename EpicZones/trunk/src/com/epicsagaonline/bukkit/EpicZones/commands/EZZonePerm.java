@@ -39,6 +39,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission;
@@ -65,16 +66,16 @@ public class EZZonePerm
 						if(ValidPerm(perm))
 						{
 							ezp.getEditZone().addPermission(member, node, perm);
-							Message.Send(sender, 109, new String[]{member, node, perm});
+							Message.Send(sender, Message_ID.Info_00109_PermissionAdded, new String[]{member, node, perm});
 						}
 						else
 						{
-							Message.Send(sender, 110, new String[]{perm});	
+							Message.Send(sender, Message_ID.Warning_00110_InvalidPermissionType, new String[]{perm});	
 						}
 					}
 					else
 					{
-						Message.Send(sender, 111, new String[]{node});
+						Message.Send(sender, Message_ID.Warning_00111_InvalidPermissionNode, new String[]{node});
 					}
 				}
 				else if(data.length > 2)
@@ -91,11 +92,11 @@ public class EZZonePerm
 								EpicZonePermission perm = srcZone.getPermissions().get(permTag);
 								ezp.getEditZone().addPermission(perm.getMember(), perm.getNode().toString(), perm.getPermission().toString());	
 							}
-							Message.Send(sender, 128, new String[]{tag});
+							Message.Send(sender, Message_ID.Info_00128_CopiedPermissions, new String[]{tag});
 						}
 						else
 						{
-							Message.Send(sender, 117, new String[]{tag});
+							Message.Send(sender, Message_ID.Warning_00117_Zone_X_DoesNotExist, new String[]{tag});
 						}
 					}
 					else if(cmd.equalsIgnoreCase("clear"))
@@ -113,7 +114,7 @@ public class EZZonePerm
 						{
 							ezp.getEditZone().removePermission(perm.getMember(), perm.getNode().toString(), perm.getPermission().toString());
 						}
-						Message.Send(sender, 129, new String[]{tag});
+						Message.Send(sender, Message_ID.Info_00129_PermissionsClearedFor_X, new String[]{tag});
 					}
 				}
 				else if(data.length > 1)
@@ -123,7 +124,7 @@ public class EZZonePerm
 					{
 						ezp.getEditZone().setPermissions(new HashMap<String, EpicZonePermission>());
 					}
-					Message.Send(sender, 40);
+					Message.Send(sender, Message_ID.Info_00040_PermissionsCleared);
 				}
 				else
 				{

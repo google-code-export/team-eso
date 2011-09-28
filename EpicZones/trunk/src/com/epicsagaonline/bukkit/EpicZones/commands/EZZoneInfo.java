@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission;
@@ -58,14 +59,14 @@ public class EZZoneInfo
 					if(ezp.getAdmin() || zone.isOwner(ezp.getName()))
 					{
 						String messageText;
-						Message.Send(sender, 5, new String[]{zone.getName(), zone.getTag()});
+						Message.Send(sender, Message_ID.Format_KeyValue, new String[]{zone.getName(), zone.getTag()});
 						if(zone.getCenter() != null)
 						{
-							Message.Send(sender, 121, new String[]{zone.getRadius() + ""});
+							Message.Send(sender, Message_ID.Info_00121_Zone_Shape_Cirdle, new String[]{zone.getRadius() + ""});
 						}
 						else
 						{
-							Message.Send(sender, 122, new String[]{zone.getPolygon().npoints + ""});
+							Message.Send(sender, Message_ID.Info_00122_Zone_Shape_Poly, new String[]{zone.getPolygon().npoints + ""});
 						}
 						if(zone.hasChildren())
 						{
@@ -74,31 +75,31 @@ public class EZZoneInfo
 							{
 								messageText = messageText + " " + childTag;
 							}
-							Message.Send(sender, 123, new String[]{messageText});
+							Message.Send(sender, Message_ID.Info_00123_Zone_Children, new String[]{messageText});
 						}
-						Message.Send(sender, 124, new String[]{zone.getEnterText()});
-						Message.Send(sender, 125, new String[]{zone.getExitText()});
+						Message.Send(sender, Message_ID.Info_00124_Zone_EnterText, new String[]{zone.getEnterText()});
+						Message.Send(sender, Message_ID.Info_00125_Zone_ExitText, new String[]{zone.getExitText()});
 						if(zone.hasParent())
 						{
-							Message.Send(sender, 126, new String[]{zone.getParent().getName(), zone.getParent().getTag()});
+							Message.Send(sender, Message_ID.Info_00126_Zone_Parent, new String[]{zone.getParent().getName(), zone.getParent().getTag()});
 						}
 						if(zone.getOwners().size() > 0)
 						{
-							Message.Send(sender, 127, new String[]{zone.getOwners().toString()});
+							Message.Send(sender, Message_ID.Info_00127_Zone_Owners, new String[]{zone.getOwners().toString()});
 						}
-						Message.Send(sender, 38);
+						Message.Send(sender, Message_ID.Info_00038_ZoneFlags);
 						messageText = "";
 						if(zone.getPVP())
 						{
-							messageText = messageText + Message.get(2, new String[]{"PVP"}) + " ";
+							messageText = messageText + Message.get(Message_ID.Format_Flag_On, new String[]{"PVP"}) + " ";
 						}
 						else
 						{
-							messageText = messageText + Message.get(3, new String[]{"PVP"}) + " ";
+							messageText = messageText + Message.get(Message_ID.Format_Flag_Off, new String[]{"PVP"}) + " ";
 						}
 						if(zone.getFire().getIgnite() || zone.getFire().getSpread())
 						{
-							messageText = messageText + Message.get(2, new String[]{"FIRE"}) + " (";
+							messageText = messageText + Message.get(Message_ID.Format_Flag_On, new String[]{"FIRE"}) + " (";
 							if(zone.getFire().getIgnite())
 							{
 								messageText = messageText + "Ignite ";
@@ -111,12 +112,12 @@ public class EZZoneInfo
 						}
 						else
 						{
-							messageText = messageText + Message.get(3, new String[]{"FIRE"}) + " ";
+							messageText = messageText + Message.get(Message_ID.Format_Flag_Off, new String[]{"FIRE"}) + " ";
 						}
 
 						if(zone.getExplode().getTNT() || zone.getExplode().getCreeper() || zone.getExplode().getGhast())
 						{
-							messageText = messageText + Message.get(2, new String[]{"EXPLODE"}) + " (";
+							messageText = messageText + Message.get(Message_ID.Format_Flag_On, new String[]{"EXPLODE"}) + " (";
 							if(zone.getExplode().getTNT())
 							{
 								messageText = messageText + "TNT ";
@@ -133,34 +134,34 @@ public class EZZoneInfo
 						}
 						else
 						{
-							messageText = messageText + Message.get(3, new String[]{"EXPLODE"}) + " ";
+							messageText = messageText + Message.get(Message_ID.Format_Flag_Off, new String[]{"EXPLODE"}) + " ";
 						}
 
 						if(zone.getSanctuary())
 						{
-							messageText = messageText + Message.get(2, new String[]{"SANCTUARY"}) + " ";
+							messageText = messageText + Message.get(Message_ID.Format_Flag_On, new String[]{"SANCTUARY"}) + " ";
 						}
 						else
 						{
-							messageText = messageText + Message.get(3, new String[]{"SANCTUARY"}) + " ";
+							messageText = messageText + Message.get(Message_ID.Format_Flag_Off, new String[]{"SANCTUARY"}) + " ";
 						}
 						Message.Send(sender, messageText);
 						messageText = "";
 						if(zone.getFireBurnsMobs())
 						{
-							messageText = messageText + Message.get(2, new String[]{"FIREBURNSMOBS"}) + " ";
+							messageText = messageText + Message.get(Message_ID.Format_Flag_On, new String[]{"FIREBURNSMOBS"}) + " ";
 						}
 						else
 						{
-							messageText = messageText + Message.get(3, new String[]{"FIREBURNSMOBS"}) + " ";
+							messageText = messageText + Message.get(Message_ID.Format_Flag_Off, new String[]{"FIREBURNSMOBS"}) + " ";
 						}
 						if(zone.hasRegen())
 						{
-							messageText = messageText + Message.get(118, new String[]{zone.getRegen().getDelay() + "", zone.getRegen().getAmount() + "", zone.getRegen().getInterval() + ""});
+							messageText = messageText + Message.get(Message_ID.Info_00118_Zone_Regen, new String[]{zone.getRegen().getDelay() + "", zone.getRegen().getAmount() + "", zone.getRegen().getInterval() + ""});
 						}
 						else
 						{
-							messageText = messageText + Message.get(3, new String[]{"REGEN"});
+							messageText = messageText + Message.get(Message_ID.Format_Flag_Off, new String[]{"REGEN"});
 						}
 						Message.Send(sender, messageText);
 						messageText = "";
@@ -168,22 +169,22 @@ public class EZZoneInfo
 						{
 							messageText = messageText + " " + mobType;
 						}
-						Message.Send(sender, 119, new String[]{messageText});
-						Message.Send(sender, 39);
+						Message.Send(sender, Message_ID.Info_00119_Zone_Mobs, new String[]{messageText});
+						Message.Send(sender, Message_ID.Info_00039_Permissions);
 						for(String permKey : zone.getPermissions().keySet())
 						{
 							EpicZonePermission perm = zone.getPermissions().get(permKey);
-							Message.Send(sender, 120, new String[]{perm.getMember(), perm.getNode().toString(), perm.getPermission().toString()});
+							Message.Send(sender, Message_ID.Info_00120_Zone_PermissionTemplate, new String[]{perm.getMember(), perm.getNode().toString(), perm.getPermission().toString()});
 						}
 					}
 					else
 					{
-						Message.Send(sender, 37);
+						Message.Send(sender, Message_ID.Warning_00037_Perm_Command);
 					}
 				}
 				else
 				{
-					Message.Send(sender, 117, new String[]{data[1]});
+					Message.Send(sender, Message_ID.Warning_00117_Zone_X_DoesNotExist, new String[]{data[1]});
 				}
 			}
 		}

@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -58,16 +59,16 @@ public class EZZoneRadius
 						{
 							Integer value = Integer.parseInt(data[1]);
 							ezp.getEditZone().setRadius(value);
-							Message.Send(sender, 100, new String[]{"radius", data[1]});
+							Message.Send(sender, Message_ID.Info_00100_ZoneUpdatedSet_X_to_Y, new String[]{"radius", data[1]});
 						}
 						else
 						{
-							Message.Send(sender, 101, new String[]{data[1]});
+							Message.Send(sender, Message_ID.Warning_00101_X_IsNotNumeric, new String[]{data[1]});
 						}
 					}
 					else
 					{
-						Message.Send(sender, 28);
+						Message.Send(sender, Message_ID.Warning_00028_Draw_NoCenterOfCircle);
 					}
 				}
 			}

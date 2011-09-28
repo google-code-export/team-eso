@@ -33,15 +33,21 @@ package com.epicsagaonline.bukkit.EpicZones.objects;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.getspout.spoutapi.SpoutManager;
+import org.getspout.spoutapi.gui.GenericLabel;
+import org.getspout.spoutapi.player.SpoutPlayer;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
-public class EpicZonePlayer {
+public class EpicZonePlayer
+{
 
 	private EpicZone currentZone;
+	private Player player;
 	private int entityID;
 	private String name;
 	private Location currentLocation;
@@ -49,37 +55,119 @@ public class EpicZonePlayer {
 	private int distanceFromCenter;
 	private boolean teleporting = false;
 	private Date lastCheck = new Date();
-	private EpicZoneMode mode = EpicZoneMode.None; 
+	private EpicZoneMode mode = EpicZoneMode.None;
 	private EpicZone editZone = null;
 	private boolean pastBorder = false;
 	private Date enteredZone = new Date();
 	private String previousZoneTag = "";
 	private boolean hasMoved = false;
 	private Date lastMoved = new Date();
-private boolean admin = false;
+	private boolean admin = false;
+	private SpoutPlayer spoutPlayer = null;
+	private GenericLabel zoneLabel = null;
 
-	public EpicZone getCurrentZone(){return currentZone;}
-	public int getEntityID(){return entityID;}
-	public String getName(){return name;}
-	public Location getCurrentLocation(){return currentLocation;}
-	public Date getLastWarned(){return lastWarned;}
-	public Date getLastCheck(){return lastCheck;}
-	public int getDistanceFromCenter(){return distanceFromCenter;}
-	public boolean isTeleporting(){return teleporting;}
-	public EpicZoneMode getMode(){return mode;}
-	public EpicZone getEditZone(){return editZone;}
-	public boolean getPastBorder(){return pastBorder;}
-	public Date getEnteredZone(){return enteredZone;}
-	public String getPreviousZoneTag(){return previousZoneTag;}
-	public boolean getHasMoved(){return hasMoved;}
-	public Date getLastMoved(){return lastMoved;}
-	public boolean getAdmin(){return admin;}
-	
-	public enum EpicZoneMode{None, ZoneDraw, ZoneEdit, ZoneDrawConfirm, ZoneDeleteConfirm}
-	
+	public GenericLabel getZoneLabel()
+	{
+		return zoneLabel;
+	}
+
+	public SpoutPlayer getSpoutPlayer()
+	{
+		if (spoutPlayer == null)
+		{
+			spoutPlayer = SpoutManager.getPlayer(this.player);
+		}
+		return spoutPlayer;
+	}
+
+	public EpicZone getCurrentZone()
+	{
+		return currentZone;
+	}
+
+	public int getEntityID()
+	{
+		return entityID;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public Location getCurrentLocation()
+	{
+		return currentLocation;
+	}
+
+	public Date getLastWarned()
+	{
+		return lastWarned;
+	}
+
+	public Date getLastCheck()
+	{
+		return lastCheck;
+	}
+
+	public int getDistanceFromCenter()
+	{
+		return distanceFromCenter;
+	}
+
+	public boolean isTeleporting()
+	{
+		return teleporting;
+	}
+
+	public EpicZoneMode getMode()
+	{
+		return mode;
+	}
+
+	public EpicZone getEditZone()
+	{
+		return editZone;
+	}
+
+	public boolean getPastBorder()
+	{
+		return pastBorder;
+	}
+
+	public Date getEnteredZone()
+	{
+		return enteredZone;
+	}
+
+	public String getPreviousZoneTag()
+	{
+		return previousZoneTag;
+	}
+
+	public boolean getHasMoved()
+	{
+		return hasMoved;
+	}
+
+	public Date getLastMoved()
+	{
+		return lastMoved;
+	}
+
+	public boolean getAdmin()
+	{
+		return admin;
+	}
+
+	public enum EpicZoneMode
+	{
+		None, ZoneDraw, ZoneEdit, ZoneDrawConfirm, ZoneDeleteConfirm
+	}
+
 	public void setHasMoved(boolean value)
 	{
-		this.hasMoved = value;		
+		this.hasMoved = value;
 	}
 
 	public void setPreviousZoneTag(String value)
@@ -90,6 +178,11 @@ private boolean admin = false;
 	public void setPastBorder(boolean value)
 	{
 		this.pastBorder = value;
+	}
+
+	public void setZoneLabel(GenericLabel value)
+	{
+		this.zoneLabel = value;
 	}
 
 	public void setEntityID(int value)
@@ -106,18 +199,19 @@ private boolean admin = false;
 	{
 		this.editZone = value;
 	}
-	
+
 	public void setAdmin(boolean value)
 	{
 		this.admin = value;
 	}
 
-	public EpicZonePlayer(Player player)
+	public EpicZonePlayer(Player newplayer)
 	{
-		this.entityID = player.getEntityId();
-		this.name = player.getName();
-		setCurrentLocation(player.getWorld().getSpawnLocation());
-		setCurrentZone(General.myGlobalZones.get(player.getWorld().getName().toLowerCase()));
+		this.player = newplayer;
+		this.entityID = newplayer.getEntityId();
+		this.name = newplayer.getName();
+		setCurrentLocation(newplayer.getWorld().getSpawnLocation());
+		setCurrentZone(General.myGlobalZones.get(newplayer.getWorld().getName().toLowerCase()));
 	}
 
 	public void setCurrentZone(EpicZone z)

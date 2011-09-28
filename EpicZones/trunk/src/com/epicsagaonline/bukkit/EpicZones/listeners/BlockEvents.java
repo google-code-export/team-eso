@@ -47,6 +47,7 @@ import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
@@ -119,7 +120,7 @@ public class BlockEvents extends BlockListener {
 				{
 					if (ezp.getLastWarned().before(new Date()))
 					{
-						Message.Send(player, 32);
+						Message.Send(player, Message_ID.Warning_00032_Perm_DestroyInZone);
 						ezp.Warn();
 					}
 					event.setCancelled(true);
@@ -129,7 +130,7 @@ public class BlockEvents extends BlockListener {
 			{
 				if (ezp.getLastWarned().before(new Date()))
 				{
-					Message.Send(player, 33);
+					Message.Send(player, Message_ID.Warning_00033_Perm_DestroyOutsideRadius);
 					ezp.Warn();
 				}
 				event.setCancelled(true);
@@ -153,7 +154,7 @@ public class BlockEvents extends BlockListener {
 				if(!hasPerms)
 				{
 					if (ezp.getLastWarned().before(new Date())){
-						Message.Send(player, 32);
+						Message.Send(player, Message_ID.Warning_00032_Perm_DestroyInZone);
 						ezp.Warn();
 					}
 					event.setCancelled(true);
@@ -162,7 +163,7 @@ public class BlockEvents extends BlockListener {
 			else
 			{
 				if (ezp.getLastWarned().before(new Date())){
-					Message.Send(player, 33);
+					Message.Send(player, Message_ID.Warning_00033_Perm_DestroyOutsideRadius);
 					ezp.Warn();
 				}
 				event.setCancelled(true);

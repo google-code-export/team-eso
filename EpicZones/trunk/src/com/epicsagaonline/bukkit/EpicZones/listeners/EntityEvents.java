@@ -40,7 +40,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -156,23 +155,6 @@ public class EntityEvents extends EntityListener
 							if(!sancZone.getExplode().getGhast())
 							{
 								event.setCancelled(true);
-							}
-						}
-					}
-					else if (event instanceof EntityDamageByProjectileEvent)
-					{
-						EntityDamageByEntityEvent sub = (EntityDamageByEntityEvent)event;
-						if(isPlayer(sub.getEntity()) && isPlayer(sub.getDamager()))
-						{
-							Player player = (Player)sub.getEntity();
-							EpicZonePlayer ezp = General.getPlayer(player.getName());
-							EpicZone zone = ezp.getCurrentZone();
-							if(zone != null)
-							{
-								if(!zone.getPVP())
-								{
-									event.setCancelled(true);
-								}
 							}
 						}
 					}

@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 
@@ -55,61 +56,61 @@ public class EZZoneHelp
 		}
 		if(ezp != null)
 		{
-			Message.Send(sender, 1000);
-			Message.Send(sender, 10);
+			Message.Send(sender, Message_ID.Help_01000);
+			Message.Send(sender, Message_ID.Info_00010_Parameter_Description);
 			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 			{
-				Message.Send(sender, 11);
-				Message.Send(sender, 1001);
-				Message.Send(sender, 1002);
-				Message.Send(sender, 1003);
-				Message.Send(sender, 1004);
-				Message.Send(sender, 1005);
-				Message.Send(sender, 1006);
-				Message.Send(sender, 1007);
-				Message.Send(sender, 1008);
-				Message.Send(sender, 1009);
-				Message.Send(sender, 1010);
-				Message.Send(sender, 1011);
-				Message.Send(sender, 1012);
-				Message.Send(sender, 1013);
-				Message.Send(sender, 1014);
-				Message.Send(sender, 1015);
-				Message.Send(sender, 1016);
-				Message.Send(sender, 1017);
-				Message.Send(sender, 1018);
-				Message.Send(sender, 1019);
+				Message.Send(sender, Message_ID.Mode_00011_Edit);
+				Message.Send(sender, Message_ID.Help_01001_Name);
+				Message.Send(sender, Message_ID.Help_01002_Flag);
+				Message.Send(sender, Message_ID.Help_01003_Flag_PVP);
+				Message.Send(sender, Message_ID.Help_01004_Flag_Fire);
+				Message.Send(sender, Message_ID.Help_01005_Flag_Explode);
+				Message.Send(sender, Message_ID.Help_01006_Flag_Mobs);
+				Message.Send(sender, Message_ID.Help_01007_Flag_Regen);
+				Message.Send(sender, Message_ID.Help_01008_Flag_Sanctuary);
+				Message.Send(sender, Message_ID.Help_01009_Flag_FireBunsMobs);
+				Message.Send(sender, Message_ID.Help_01010_Floor);
+				Message.Send(sender, Message_ID.Help_01011_Ceiling);
+				Message.Send(sender, Message_ID.Help_01012_Child);
+				Message.Send(sender, Message_ID.Help_01013_Owner);
+				Message.Send(sender, Message_ID.Help_01014_Message);
+				Message.Send(sender, Message_ID.Help_01015_World);
+				Message.Send(sender, Message_ID.Help_01016_Draw);
+				Message.Send(sender, Message_ID.Help_01017_Cancel);
+				Message.Send(sender, Message_ID.Help_01018_Edit_Delete);
+				Message.Send(sender, Message_ID.Help_01019_Edit_Save);
 			}
 			else if(ezp.getMode() == EpicZoneMode.ZoneDraw)
 			{
-				Message.Send(sender, 12);
-				Message.Send(sender, 1020);
-				Message.Send(sender, 1022);
+				Message.Send(sender, Message_ID.Mode_00012_Draw);
+				Message.Send(sender, Message_ID.Help_01020_Draw_Save);
+				Message.Send(sender, Message_ID.Help_01022_DrawConfirm_Cancel);
 			}
 			else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
 			{
-				Message.Send(sender, 13);
-				Message.Send(sender, 1021);
-				Message.Send(sender, 1022);
+				Message.Send(sender, Message_ID.Mode_00013_DrawConfirm);
+				Message.Send(sender, Message_ID.Help_01021_DrawConfirm_Confirm);
+				Message.Send(sender, Message_ID.Help_01022_DrawConfirm_Cancel);
 			}
 			else if(ezp.getMode() == EpicZoneMode.ZoneDeleteConfirm)
 			{
-				Message.Send(sender, 14);
-				Message.Send(sender, 1021);
-				Message.Send(sender, 1022);
+				Message.Send(sender, Message_ID.Mode_00014_DeleteConfirm);
+				Message.Send(sender, Message_ID.Help_01021_DrawConfirm_Confirm);
+				Message.Send(sender, Message_ID.Help_01022_DrawConfirm_Cancel);
 			}
 			else
 			{
-				Message.Send(sender, 1024);
-				Message.Send(sender, 1025);
-				Message.Send(sender, 1026);
-				Message.Send(sender, 1027);
+				Message.Send(sender, Message_ID.Help_01024_Edit);
+				Message.Send(sender, Message_ID.Help_01025_Create);
+				Message.Send(sender, Message_ID.Help_01026_List);
+				Message.Send(sender, Message_ID.Help_01027_Info);
 			}
 		}
 		else
 		{
-			Message.Send(sender, 1026);
-			Message.Send(sender, 1027);
+			Message.Send(sender, Message_ID.Help_01026_List);
+			Message.Send(sender, Message_ID.Help_01027_Info);
 		}
 	}
 }

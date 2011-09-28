@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZoneDAL;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
@@ -56,12 +57,12 @@ public class EZZoneCancel
 				ezp.setMode(EpicZoneMode.None);
 				ezp.setEditZone(null);
 				EpicZoneDAL.ReloadZone(zoneTag);
-				Message.Send(sender, 16);
+				Message.Send(sender, Message_ID.Info_00016_Cancel_Edit);
 			}
 			else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm || ezp.getMode() == EpicZoneMode.ZoneDeleteConfirm)
 			{
 				ezp.setMode(EpicZoneMode.ZoneEdit);
-				Message.Send(sender, 17);
+				Message.Send(sender, Message_ID.Info_00017_Cancel_Draw);
 			}
 			else
 			{

@@ -44,6 +44,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.integration.EpicSpout;
 import com.epicsagaonline.bukkit.EpicZones.integration.HeroChatIntegration;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone.ZoneType;
@@ -61,7 +62,7 @@ public class General {
 	public static final String NO_PERM_ENTER = "You do not have permission to enter ";
 	public static final String NO_PERM_BORDER = "You have reached the border of the map.";
 	public static EpicZones plugin;
-
+	
 	private static final String ZONE_FILE = "zones.txt";
 	//private static File myFile;
 
@@ -425,6 +426,7 @@ public class General {
 								ezp.setCurrentZone(zone);
 								HeroChatIntegration.joinChat(zone.getTag(), ezp, player);
 								if(zone.getEnterText().length() > 0){Message.Send(player, zone.getEnterText());}
+								EpicSpout.UpdatePlayerZone(ezp, zone);
 								ezp.setCurrentLocation(fromLoc);
 							}							
 						}

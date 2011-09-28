@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
@@ -55,14 +56,14 @@ public class EZZoneList
 				String messageText = "";
 				if(ezp.getAdmin() || zone.isOwner(ezp.getName()))
 				{
-					messageText = Message.get(5, new String[]{zone.getName(), zone.getTag() });
+					messageText = Message.get(Message_ID.Format_KeyValue, new String[]{zone.getName(), zone.getTag() });
 					if(zone.hasChildren())
 					{
-						messageText = messageText + " " + Message.get(123, new String[]{zone.getChildren().size()+""});
+						messageText = messageText + " " + Message.get(Message_ID.Info_00123_Zone_Children, new String[]{zone.getChildren().size()+""});
 					}
 					if(zone.hasParent())
 					{
-						messageText = messageText + " " + Message.get(126, new String[]{zone.getParent().getTag()});
+						messageText = messageText + " " + Message.get(Message_ID.Info_00126_Zone_Parent, new String[]{zone.getParent().getTag()});
 					}
 				}
 				if(messageText.length() > 0)
@@ -75,11 +76,11 @@ public class EZZoneList
 			{
 				if(ezp.getAdmin())
 				{
-					Message.Send(sender, 23);
+					Message.Send(sender, Message_ID.Warning_00023_NoZones);
 				}
 				else
 				{
-					Message.Send(sender, 24);
+					Message.Send(sender, Message_ID.Warning_00024_NoZones_Owner);
 				}
 			}
 		}

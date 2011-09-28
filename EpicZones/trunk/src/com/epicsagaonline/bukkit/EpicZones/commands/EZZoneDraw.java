@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -53,7 +54,7 @@ public class EZZoneDraw
 				if(ezp.getMode() == EpicZoneMode.ZoneEdit)
 				{
 					ezp.setMode(EpicZoneMode.ZoneDrawConfirm);
-					Message.Send(sender, 21);
+					Message.Send(sender, Message_ID.Mode_00021_DrawConfirm_Warning);
 				}
 				else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
 				{
@@ -62,12 +63,12 @@ public class EZZoneDraw
 						if(data[1].equalsIgnoreCase("confirm"))
 						{
 							ezp.setMode(EpicZoneMode.ZoneDraw);
-							Message.Send(sender, 19);
+							Message.Send(sender, Message_ID.Mode_00019_Draw_StartMessage);
 						}
 						else if(data[1].equalsIgnoreCase("deny"))
 						{
 							ezp.setMode(EpicZoneMode.ZoneEdit);
-							Message.Send(sender, 17);
+							Message.Send(sender, Message_ID.Info_00017_Cancel_Draw);
 						}
 					}
 				}

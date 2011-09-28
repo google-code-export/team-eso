@@ -52,6 +52,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
@@ -133,7 +134,7 @@ public class PlayerEvents extends PlayerListener
 				{
 					if (ezp.getLastWarned().before(new Date()))
 					{
-						Message.Send(player, 36);
+						Message.Send(player, Message_ID.Warning_00036_Perm_GenericInZone);
 						ezp.Warn();
 					}
 					event.setCancelled(true);
@@ -161,7 +162,7 @@ public class PlayerEvents extends PlayerListener
 				{
 					if (ezp.getLastWarned().before(new Date()))
 					{
-						Message.Send(player, 36);
+						Message.Send(player, Message_ID.Warning_00036_Perm_GenericInZone);
 						ezp.Warn();
 					}
 					event.setCancelled(true);
@@ -198,7 +199,7 @@ public class PlayerEvents extends PlayerListener
 							{
 								if (ezp.getLastWarned().before(new Date()))
 								{
-									Message.Send(player, 36);
+									Message.Send(player, Message_ID.Warning_00036_Perm_GenericInZone);
 									ezp.Warn();
 								}
 								event.setCancelled(true);
@@ -214,7 +215,7 @@ public class PlayerEvents extends PlayerListener
 							ezp.getEditZone().addPoint(point);
 							ezp.getEditZone().addPillar(event.getClickedBlock());
 							ezp.getEditZone().ShowPillar(point);
-							Message.Send(event.getPlayer(), 112, new String[]{Integer.toString(point.x), Integer.toString(point.y)});
+							Message.Send(event.getPlayer(), Message_ID.Info_00112_Point_XZ_Added, new String[]{Integer.toString(point.x), Integer.toString(point.y)});
 						}
 					}
 				}

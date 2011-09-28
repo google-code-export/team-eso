@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -62,11 +63,11 @@ public class EZZoneFlag
 						}			
 						if(SetFlag(flag.toLowerCase(), ezp, value))
 						{
-							Message.Send(sender, 107, new String[]{flag, value});
+							Message.Send(sender, Message_ID.Info_00107_ZoneFlagUpdated_X_to_Y, new String[]{flag, value});
 						}
 						else
 						{
-							Message.Send(sender, 108, new String[]{flag});
+							Message.Send(sender, Message_ID.Warning_00108_InvalidFlag, new String[]{flag});
 						}
 					}
 				}

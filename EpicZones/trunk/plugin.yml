@@ -1,6 +1,6 @@
 name: EpicZones
 main: com.epicsagaonline.bukkit.EpicZones.EpicZones
-version: 0.25
+version: 0.27
 website: http://code.google.com/p/team-eso/
 author: jblaske@gmail.com
 description: >
@@ -25,3 +25,23 @@ commands:
            /<command> [all]
            Example: /<command> - Lists all players in your current zone.
            Example: /<command> all - Lists all players on the server and shows what zone they are in.
+permissions:
+  epiczones.*:
+    description: Gives access to all EpicZones permissions.
+    children:
+      epiczones.admin: true
+      epiczones.ignoremapradius: true
+      epiczones.ignorepermissions: true
+      epiczones.who: true
+  epiczones.admin:
+    description: Allows a player to have admin access to EpicZones commands.
+    default: op
+  epiczones.ignoremapradius:
+    description: Allows a player to walk and build beyond the set radius of a world.
+    default: op
+  epiczones.ignorepermissions:
+    description: Allows a player to ignore building/destroying restrictions.
+    default: op
+  epiczones.who:
+    description: Allows a player to use the who command to see who is online and where they are.
+    default: true

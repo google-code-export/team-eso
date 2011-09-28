@@ -62,19 +62,23 @@ public class PermissionsManager
 	{
 		boolean permStart = false;
 		this.plugin = plugin;
+		
 		permStart = startPermissions();
+		if(permStart){Log.Write("Using 'Permissions' plugin for permission management.");}
 		if(!permStart)
 		{
 			permStart = startGroupManager();
+			if(permStart){Log.Write("Using 'GroupManager' plugin for permission management.");}	
 		}
 		if(!permStart)
 		{
 			permStart = startLists();
+			if(permStart){Log.Write("Using 'Lists' plugin for permission management.");}
 		}
 		if (!permStart)
 		{
-			Log.Write("[NOTICE] Unable to detect a permissions system, some features will not be available.");
-			isDisabled = true;
+			Log.Write("Using Bukkit Permissions for permission management.");
+			isDisabled = false;
 		}
 	}
 
@@ -106,6 +110,10 @@ public class PermissionsManager
 					}
 				}
 				return false;
+			}
+			else
+			{
+				result = player.hasPermission(permission);
 			}
 		}
 		catch (Exception e)
@@ -153,7 +161,7 @@ public class PermissionsManager
 		}
 		return result;
 	}
-
+	
 	public boolean startPermissions()
 	{
 		Plugin p = plugin.getServer().getPluginManager().getPlugin("Permissions");

@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
@@ -63,14 +64,14 @@ public class EZZoneCreate
 							zone.setTag(tag);
 							zone.setName(tag);
 							zone.setWorld(player.getWorld().getName());
-							
+							zone.setDefaults(General.myGlobalZones.get(player.getWorld()));
 							ezp.setEditZone(zone);
 							ezp.setMode(EpicZoneMode.ZoneDraw);
-							Message.Send(sender, 20);
+							Message.Send(sender, Message_ID.Mode_00020_Draw_StartAfterNew);
 						}
 						else
 						{
-							Message.Send(sender, 103, new String[]{tag});
+							Message.Send(sender, Message_ID.Warning_00103_Zone_X_Exists, new String[]{tag});
 						}
 					}
 					else

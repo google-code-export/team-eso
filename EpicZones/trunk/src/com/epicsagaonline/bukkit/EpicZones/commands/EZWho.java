@@ -40,6 +40,7 @@ import org.bukkit.entity.Player;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
+import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
@@ -99,7 +100,7 @@ public class EZWho implements CommandHandler {
 		if (allZones)
 		{
 			Integer totalPages = ((int)Math.floor((double)playerCount / (double)playersPerPage));
-			Message.Send(sender, 113, new String[]{playerCount.toString(), pageNumber.toString(), totalPages.toString()});
+			Message.Send(sender, Message_ID.Info_00113_PlayersOnline_Global, new String[]{playerCount.toString(), pageNumber.toString(), totalPages.toString()});
 			for(int i = (pageNumber - 1) * playersPerPage; i < (pageNumber * playersPerPage); i++)
 			{
 				if (players.size() > i)
@@ -115,7 +116,7 @@ public class EZWho implements CommandHandler {
 		else
 		{
 			Integer totalPages = ((int)Math.floor((double)playerCount / playersPerPage) + 1); 
-			Message.Send(sender, 114, new String[]{playerCount.toString(), currentZone.getName(), pageNumber.toString(), totalPages.toString()});
+			Message.Send(sender, Message_ID.Info_00114_PlayersOnline_WithinZone_X, new String[]{playerCount.toString(), currentZone.getName(), pageNumber.toString(), totalPages.toString()});
 			for(int i = (pageNumber - 1) * playersPerPage; i < pageNumber * playersPerPage; i++)
 			{
 				if (players.size() > i)
@@ -136,16 +137,16 @@ public class EZWho implements CommandHandler {
 		{
 			if(players.get(index).getCurrentZone() != null)
 			{
-				return Message.get(115, new String[]{players.get(index).getName(), players.get(index).getCurrentZone().getName(), CalcDist(ezp, players.get(index))});
+				return Message.get(Message_ID.Info_00115_PlayerOnlineWithZone, new String[]{players.get(index).getName(), players.get(index).getCurrentZone().getName(), CalcDist(ezp, players.get(index))});
 			}
 			else
 			{
-				return Message.get(116, new String[]{players.get(index).getName(), CalcDist(ezp, players.get(index))});
+				return Message.get(Message_ID.Info_00116_PlayerOnline, new String[]{players.get(index).getName(), CalcDist(ezp, players.get(index))});
 			}
 		}
 		else
 		{
-			return Message.get(116, new String[]{players.get(index).getName(), CalcDist(ezp, players.get(index))});
+			return Message.get(Message_ID.Info_00116_PlayerOnline, new String[]{players.get(index).getName(), CalcDist(ezp, players.get(index))});
 		}
 	}
 

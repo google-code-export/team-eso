@@ -50,7 +50,6 @@ import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
-import com.epicsagaonline.bukkit.EpicZones.Log;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission.PermNode;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission.PermType;
 
@@ -545,6 +544,9 @@ public class EpicZone {
 				mobs.add(CreatureType.SKELETON.toString());
 				mobs.add(CreatureType.SLIME.toString());
 				mobs.add(CreatureType.SPIDER.toString());
+				mobs.add(CreatureType.ENDERMAN.toString());
+				mobs.add(CreatureType.CAVE_SPIDER.toString());
+				mobs.add(CreatureType.SILVERFISH.toString());
 			}
 			else if(mobType.equals("ALL"))
 			{
@@ -871,6 +873,19 @@ public class EpicZone {
 			}
 		}
 		return result;
+	}
+	
+	public void setDefaults(EpicZone parentZone)
+	{
+		this.ceiling = parentZone.ceiling;
+		this.explode = parentZone.explode;
+		this.fire = parentZone.fire;
+		this.fireBurnsMobs = parentZone.fireBurnsMobs;
+		this.floor = parentZone.floor;
+		this.mobs = parentZone.mobs;
+		this.pvp = parentZone.pvp;
+		this.regen = parentZone.regen;
+		this.sanctuary = parentZone.sanctuary;
 	}
 }
 
