@@ -1,0 +1,23 @@
+name: SolarRedstoneTorch
+main: com.epicsagaonline.bukkit.SolarRedstoneTorch.SolarRedstoneTorch
+version: 1.0
+website: http://code.google.com/p/team-eso/
+author: jblaske@gmail.com
+description: >
+             Simple yet powerful redstone triggering light sensitive signs.
+permissions:
+  solarredstonetorch.*:
+    description: Gives access to all SolarRedstoneTorch permissions.
+    children:
+      solarredstonetorch.add: true
+      solarredstonetorch.edit: true
+      solarredstonetorch.delete: true
+  solarredstonetorch.add:
+    description: Allows a player to add light sensitivity to a redstone torch.
+    default: true
+  solarredstonetorch.edit:
+    description: Allows a player to modify the light sensitivity levles for a torch already added.
+    default: true
+  solarredstonetorch.delete:
+    description: Allows a player to remove light sensitivity from a torch.
+    default: true
