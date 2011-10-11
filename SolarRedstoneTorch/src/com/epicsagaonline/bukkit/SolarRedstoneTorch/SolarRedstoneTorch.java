@@ -52,10 +52,10 @@ public class SolarRedstoneTorch extends JavaPlugin
 			PluginManager pm = getServer().getPluginManager();
 			
 			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Event.Priority.Lowest, this);
-			pm.registerEvent(Event.Type.REDSTONE_CHANGE, this.blockListener, Event.Priority.Normal, this);
+			pm.registerEvent(Event.Type.REDSTONE_CHANGE, this.blockListener, Event.Priority.Monitor, this);
 			pm.registerEvent(Event.Type.BLOCK_PHYSICS, this.blockListener, Event.Priority.Monitor, this);
 			
-			pm.registerEvent(Event.Type.PLAYER_INTERACT, this.playerListener, Event.Priority.Normal, this);
+			pm.registerEvent(Event.Type.PLAYER_INTERACT, this.playerListener, Event.Priority.Monitor, this);
 			
 			DAL.LoadTorches(this);
 			
