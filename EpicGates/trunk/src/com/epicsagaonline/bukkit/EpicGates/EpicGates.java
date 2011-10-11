@@ -31,7 +31,6 @@
 
 package com.epicsagaonline.bukkit.EpicGates;
 
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,60 +54,61 @@ import com.epicsagaonline.bukkit.EpicGates.commands.EGWorld;
 
 /**
  * EpicZones for Bukkit
- *
+ * 
  * @author jblaske
  */
-public class EpicGates extends JavaPlugin 
+public class EpicGates extends JavaPlugin
 {
 
 	private final PlayerEvents playerListener = new PlayerEvents(this);
 	private static final String CONFIG_FILE = "config.yml";
 	private Map<String, CommandHandler> handlers = new HashMap<String, CommandHandler>();
-	private static final String[] GATE_COMMANDS = {"eggate", "gate"};
-	private static final String[] RELOAD_COMMANDS = {"egreload", "reload"};
-	private static final String[] WORLD_COMMANDS = {"egworld", "world"};
+	private static final String[] GATE_COMMANDS = { "eggate", "gate" };
+	private static final String[] RELOAD_COMMANDS = { "egreload", "reload" };
+	private static final String[] WORLD_COMMANDS = { "egworld", "world" };
 	private static CommandHandler gateCommandHandler = new EGGate();
 	private static CommandHandler reloadCommandHandler = new EGReload();
 	private static CommandHandler worldCommandHandler = new EGWorld();
-	
+
 	public static PermissionsManager permissions;
 
-	public void onEnable() {
+	public void onEnable()
+	{
 
 		File file = new File(this.getDataFolder() + File.separator + CONFIG_FILE);
 		General.config = new Config(file);
-		
+
 		PluginDescriptionFile pdfFile = this.getDescription();
 
-		try 
+		try
 		{
 
 			PluginManager pm = getServer().getPluginManager();
-			
+
 			pm.registerEvent(Event.Type.PLAYER_MOVE, this.playerListener, Event.Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_LOGIN, this.playerListener, Event.Priority.Monitor, this);
 			pm.registerEvent(Event.Type.PLAYER_QUIT, this.playerListener, Event.Priority.Monitor, this);
-			
+
 			registerCommands();
 			setupEpicGates();
 			setupPermissions();
-			
-			System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled." );
 
-		} 
-		catch (Throwable e) 
+			System.out.println(pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled.");
+
+		}
+		catch (Throwable e)
 		{
-			System.out.println( "["+pdfFile.getName()+"]" + " error starting: "+
-					e.getMessage() +" Disabling plugin" );
+			System.out.println("[" + pdfFile.getName() + "]" + " error starting: " + e.getMessage() + " Disabling plugin");
 			this.getServer().getPluginManager().disablePlugin(this);
 		}
 	}
 
-	public void onDisable() 
+	public void onDisable()
 	{
-		PluginDescriptionFile pdfFile = this.getDescription();	
-		System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is disabled." );
+		PluginDescriptionFile pdfFile = this.getDescription();
+		System.out.println(pdfFile.getName() + " version " + pdfFile.getVersion() + " is disabled.");
 	}
+
 	public void setupPermissions()
 	{
 		EpicGates.permissions = new PermissionsManager(this);
@@ -122,52 +122,51 @@ public class EpicGates extends JavaPlugin
 		General.myPlayers.clear();
 		General.config.load();
 		General.config.save();
-		
-		for(EpicGatesWorld egw : General.config.additionalWorlds)
+
+		for (EpicGatesWorld egw : General.config.additionalWorlds)
 		{
 			this.getServer().createWorld(egw.name, egw.environment);
 			System.out.println("Loaded World [" + egw.name + "]");
 		}
-		
+
 		General.loadGates();
 		General.saveGates();
-		
-		for(Player p:getServer().getOnlinePlayers())
+
+		for (Player p : getServer().getOnlinePlayers())
 		{
 			General.addPlayer(p.getName());
 		}
 	}
-	
-	public void registerCommand(String command, CommandHandler handler) {
+
+	public void registerCommand(String command, CommandHandler handler)
+	{
 		handlers.put(command.toLowerCase(), handler);
 	}
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args)
+	@Override public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args)
 	{
 		CommandHandler handler = handlers.get(commandLabel.toLowerCase());
-		if(handler == null)
+		if (handler == null)
 		{
 			return true;
 		}
 		return handler.onCommand(commandLabel, sender, args);
 	}
-	
+
 	private void registerCommands()
 	{
-		for (String cmd : GATE_COMMANDS) 
+		for (String cmd : GATE_COMMANDS)
 		{
 			registerCommand(cmd, gateCommandHandler);
 		}
-		for (String cmd : RELOAD_COMMANDS) 
+		for (String cmd : RELOAD_COMMANDS)
 		{
 			registerCommand(cmd, reloadCommandHandler);
 		}
-		for (String cmd : WORLD_COMMANDS) 
+		for (String cmd : WORLD_COMMANDS)
 		{
 			registerCommand(cmd, worldCommandHandler);
 		}
 	}
-	
-}
 
+}

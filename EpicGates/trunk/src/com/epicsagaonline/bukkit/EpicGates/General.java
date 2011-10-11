@@ -43,13 +43,13 @@ import java.util.Scanner;
 import com.epicsagaonline.bukkit.EpicGates.objects.EpicGate;
 import com.epicsagaonline.bukkit.EpicGates.objects.EpicGatesPlayer;
 
-
-public class General {
+public class General
+{
 
 	public static Map<String, EpicGate> myGates = new HashMap<String, EpicGate>();
 	public static ArrayList<String> myGateTags = new ArrayList<String>();
 	public static Map<String, EpicGatesPlayer> myPlayers = new HashMap<String, EpicGatesPlayer>();
-	
+
 	public static Config config;
 	public static final String NO_PERM_ENTER = "You do not have permission to enter ";
 	public static final String NO_PERM_BORDER = "You have reached the border of the map.";
@@ -67,40 +67,46 @@ public class General {
 			Scanner scanner = new Scanner(file);
 			myGates.clear();
 			myGateTags.clear();
-			try {
-				while(scanner.hasNext())
+			try
+			{
+				while (scanner.hasNext())
 				{
 					EpicGate newGate;
 					line = scanner.nextLine().trim();
-					if(line.startsWith("#") || line.isEmpty()){continue;}
-					newGate = new EpicGate(line);;
+					if (line.startsWith("#") || line.isEmpty())
+					{
+						continue;
+					}
+					newGate = new EpicGate(line);
+					;
 					General.myGates.put(newGate.getTag(), newGate);
 					General.myGateTags.add(newGate.getTag());
 				}
 
 			}
-			finally {
+			finally
+			{
 				scanner.close();
 			}
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			System.out.println(e.getMessage());
 		}
 
 		LinkGates();
-		
+
 	}
 
 	private static void LinkGates()
 	{
-		
-		for(String gateTag: myGateTags)
+
+		for (String gateTag : myGateTags)
 		{
 			EpicGate gate = myGates.get(gateTag);
-			if(gate.getTargetTag().length() > 0)
+			if (gate.getTargetTag().length() > 0)
 			{
-				if(myGates.get(gate.getTargetTag()) != null)
+				if (myGates.get(gate.getTargetTag()) != null)
 				{
 					myGates.get(gateTag).setTarget(myGates.get(gate.getTargetTag()));
 				}
@@ -111,24 +117,25 @@ public class General {
 			}
 		}
 	}
-	
+
 	public static void saveGates()
 	{
 		File file = new File(plugin.getDataFolder() + File.separator + GATE_FILE);
 
-		try 
+		try
 		{
 			String data = BuildGateData();
 			Writer output = new BufferedWriter(new FileWriter(file, false));
-			try 
+			try
 			{
 				output.write(data);
 			}
-			finally {
+			finally
+			{
 				output.close();
 			}
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			System.out.println(e.getMessage());
 		}
@@ -138,8 +145,8 @@ public class General {
 	{
 		String result = "#Gate Tag|World|X|Y|Z|Target Tag\n";
 		String line = "";
-		
-		for(String gateTag: myGateTags)
+
+		for (String gateTag : myGateTags)
 		{
 			EpicGate gate = myGates.get(gateTag);
 			line = gate.getTag() + ",";
@@ -155,37 +162,37 @@ public class General {
 		}
 		return result;
 	}
-	
+
 	private static String BuildAllowed(EpicGate gate)
 	{
 		String result = "";
-		
-		if(gate.getAllowed().size() > 0)
+
+		if (gate.getAllowed().size() > 0)
 		{
-			for(String value: gate.getAllowed())
+			for (String value : gate.getAllowed())
 			{
 				result = result + value + " ";
 			}
 		}
-		
+
 		return result.trim();
 	}
-	
+
 	private static String BuildNotAllowed(EpicGate gate)
 	{
 		String result = "";
-		
-		if(gate.getNotAllowed().size() > 0)
+
+		if (gate.getNotAllowed().size() > 0)
 		{
-			for(String value: gate.getNotAllowed())
+			for (String value : gate.getNotAllowed())
 			{
 				result = result + value + " ";
 			}
 		}
-		
+
 		return result.trim();
 	}
-	
+
 	public static void addPlayer(String name)
 	{
 		myPlayers.put(name, new EpicGatesPlayer());

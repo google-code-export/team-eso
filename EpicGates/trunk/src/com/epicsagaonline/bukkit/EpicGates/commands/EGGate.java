@@ -31,7 +31,6 @@
 
 package com.epicsagaonline.bukkit.EpicGates.commands;
 
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,421 +42,527 @@ import com.epicsagaonline.bukkit.EpicGates.EpicGates;
 import com.epicsagaonline.bukkit.EpicGates.General;
 import com.epicsagaonline.bukkit.EpicGates.objects.EpicGate;
 
-public class EGGate implements CommandHandler {
+public class EGGate implements CommandHandler
+{
 
-	@Override
-	public boolean onCommand(String command, CommandSender sender, String[] args) {
-		if ((sender instanceof Player && EpicGates.permissions.hasPermission(
-				(Player) sender, "epicgates.admin"))) {
-			Player player = (Player) sender;
-
-			if (args.length > 0) {
-				if (args[0].equalsIgnoreCase("create")) 
-				{
-					Create(args, sender, player);
-				} 
-				else if (args[0].equalsIgnoreCase("link")) 
-				{
-					Link(args, sender, player);
-				} 
-				else if (args[0].equalsIgnoreCase("unlink")) 
-				{
-					Unlink(args, sender, player);
-				} 
-				else if (args[0].equalsIgnoreCase("move")) 
-				{
-					Move(args, sender, player);
-				} 
-				else if (args[0].equalsIgnoreCase("direction")) 
-				{
-					Direction(args, sender, player);
-				} 
-				else if (args[0].equalsIgnoreCase("delete")) 
-				{
-					Delete(args, sender, player);
-				} 
-				else if (args[0].equalsIgnoreCase("info")) 
-				{
-					Info(args, sender, player);
-				}
-				else if (args[0].equalsIgnoreCase("list")) 
-				{
-					List(args, sender, player);
-				} 
-				else if (args[0].equalsIgnoreCase("addallowed")) 
-				{
-					AddAllowed(args, sender, player);
-				} 
-				else if (args[0].equalsIgnoreCase("removeallowed")) 
-				{
-					RemoveAllowed(args, sender, player);
-				}
-				else if (args[0].equalsIgnoreCase("addnotallowed")) 
-				{
-					AddNotAllowed(args, sender, player);
-				}
-				else if (args[0].equalsIgnoreCase("removenotallowed")) 
-				{
-					RemoveNotAllowed(args, sender, player);
-				}
-				else 
-				{
-					Help(sender, "");
-				}
-			} else {
+	@Override public boolean onCommand(String command, CommandSender sender, String[] args)
+	{
+		if (args.length > 0)
+		{
+			if (args[0].equalsIgnoreCase("create"))
+			{
+				Create(args, sender);
+			}
+			else if (args[0].equalsIgnoreCase("link"))
+			{
+				Link(args, sender);
+			}
+			else if (args[0].equalsIgnoreCase("unlink"))
+			{
+				Unlink(args, sender);
+			}
+			else if (args[0].equalsIgnoreCase("move"))
+			{
+				Move(args, sender);
+			}
+			else if (args[0].equalsIgnoreCase("direction"))
+			{
+				Direction(args, sender);
+			}
+			else if (args[0].equalsIgnoreCase("delete"))
+			{
+				Delete(args, sender);
+			}
+			else if (args[0].equalsIgnoreCase("info"))
+			{
+				Info(args, sender);
+			}
+			else if (args[0].equalsIgnoreCase("list"))
+			{
+				List(args, sender);
+			}
+			else if (args[0].equalsIgnoreCase("addallowed"))
+			{
+				AddAllowed(args, sender);
+			}
+			else if (args[0].equalsIgnoreCase("removeallowed"))
+			{
+				RemoveAllowed(args, sender);
+			}
+			else if (args[0].equalsIgnoreCase("addnotallowed"))
+			{
+				AddNotAllowed(args, sender);
+			}
+			else if (args[0].equalsIgnoreCase("removenotallowed"))
+			{
+				RemoveNotAllowed(args, sender);
+			}
+			else
+			{
 				Help(sender, "");
 			}
-			return true;
 		}
-		return false;
+		else
+		{
+			Help(sender, "");
+		}
+		return true;
 	}
 
-	private void Create(String[] args, CommandSender sender, Player player) {
-		if (args.length > 1 && !args[1].equalsIgnoreCase("?")) {
-
-			String tag = args[1];
-
-			EpicGate gate = new EpicGate(tag, player.getLocation().clone(),
-					player.getLocation().getYaw());
-
-			buildGate(gate, player.getWorld());
-			buildLanding(gate, player.getWorld());
-
-			General.myGateTags.add(tag);
-			General.myGates.put(tag, gate);
-
-			General.saveGates();
-			General.loadGates();
-
-		} else {
+	private void Create(String[] args, CommandSender sender)
+	{
+		if (args.length > 1 && !args[1].equalsIgnoreCase("?"))
+		{
+			if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, false))
+			{
+				String tag = args[1];
+				Player player = (Player) sender;
+				EpicGate gate = new EpicGate(tag, player.getLocation().clone(), player.getLocation().getYaw());
+				buildGate(gate, player.getWorld());
+				buildLanding(gate, player.getWorld());
+				General.myGateTags.add(tag);
+				General.myGates.put(tag, gate);
+				General.saveGates();
+				General.loadGates();
+			}
+			else
+			{
+				sender.sendMessage("You do not have permisson to use this command.");
+			}
+		}
+		else
+		{
 			Help(sender, "create");
 		}
 
 	}
 
-	private void Link(String[] args, CommandSender sender, Player player) {
-		if (args.length > 1 && !args[1].equalsIgnoreCase("?")) {
+	private void Link(String[] args, CommandSender sender)
+	{
+		if (args.length > 1 && !args[1].equalsIgnoreCase("?"))
+		{
 
-			if (args.length > 2) {
-
-				EpicGate gate = General.myGates.get(args[1]);
-				if (gate != null) {
-					EpicGate target = General.myGates.get(args[2]);
-					if (target != null) {
-						gate.setTarget(target);
-						General.saveGates();
-						General.loadGates();
-						sender.sendMessage("[" + args[1]
-						                              + "] Now teleports to [" + args[2] + "]");
-					} else {
-						sender.sendMessage("The target gate [" + args[2]
-						                                              + "] does not exist.");
+			if (args.length > 2)
+			{
+				if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, true))
+				{
+					EpicGate gate = General.myGates.get(args[1]);
+					if (gate != null)
+					{
+						EpicGate target = General.myGates.get(args[2]);
+						if (target != null)
+						{
+							gate.setTarget(target);
+							General.saveGates();
+							General.loadGates();
+							sender.sendMessage("[" + args[1] + "] Now teleports to [" + args[2] + "]");
+						}
+						else
+						{
+							sender.sendMessage("The target gate [" + args[2] + "] does not exist.");
+						}
 					}
-				} else {
-					sender.sendMessage("The source gate [" + args[1]
-					                                              + "] does not exist.");
+					else
+					{
+						sender.sendMessage("The source gate [" + args[1] + "] does not exist.");
+					}
 				}
-			} else {
+				else
+				{
+					sender.sendMessage("You do not have permisson to use this command.");
+				}
+			}
+			else
+			{
 				Help(sender, "link");
 			}
 
-		} else {
+		}
+		else
+		{
 			Help(sender, "link");
 		}
 
 	}
 
-	private void Unlink(String[] args, CommandSender sender, Player player) {
-		if (args.length > 1 && !args[1].equalsIgnoreCase("?")) {
-			EpicGate gate = General.myGates.get(args[1]);
-			if (gate != null) {
-				gate.setTarget(null);
-				General.saveGates();
-				General.loadGates();
-				sender.sendMessage("[" + args[1] + "] no longer has a target.");
-			} else {
-				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+	private void Unlink(String[] args, CommandSender sender)
+	{
+		if (args.length > 1 && !args[1].equalsIgnoreCase("?"))
+		{
+			if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, true))
+			{
+				EpicGate gate = General.myGates.get(args[1]);
+				if (gate != null)
+				{
+					gate.setTarget(null);
+					General.saveGates();
+					General.loadGates();
+					sender.sendMessage("[" + args[1] + "] no longer has a target.");
+				}
+				else
+				{
+					sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+				}
 			}
-		} else {
+			else
+			{
+				sender.sendMessage("You do not have permisson to use this command.");
+			}
+		}
+		else
+		{
 			Help(sender, "unlink");
 		}
 	}
 
-	private void Move(String[] args, CommandSender sender, Player player) 
+	private void Move(String[] args, CommandSender sender)
 	{
-		if (args.length > 1 && !args[1].equalsIgnoreCase("?")) 
+		if (args.length > 1 && !args[1].equalsIgnoreCase("?"))
 		{
-
-			EpicGate gate = General.myGates.get(args[1]);
-			if (gate != null) 
+			if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, false))
 			{
+				EpicGate gate = General.myGates.get(args[1]);
+				if (gate != null)
+				{
+					Player player = (Player) sender;
+					clearGate(gate);
+					clearLanding(gate);
 
-				clearGate(gate);
-				clearLanding(gate);
+					gate.setLocation(player.getLocation().clone());
 
-				gate.setLocation(player.getLocation().clone());
+					buildGate(gate, player.getWorld());
+					buildLanding(gate, player.getWorld());
 
-				buildGate(gate, player.getWorld());
-				buildLanding(gate, player.getWorld());
+					General.myGates.put(args[1], gate);
+					General.saveGates();
+					General.loadGates();
 
-				General.myGates.put(args[1], gate);
-				General.saveGates();
-				General.loadGates();
-
-			} 
-			else 
-			{
-				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+				}
+				else
+				{
+					sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+				}
 			}
-
-		} 
-		else 
+			else
+			{
+				sender.sendMessage("You do not have permisson to use this command.");
+			}
+		}
+		else
 		{
 			Help(sender, "move");
 		}
 
 	}
 
-	private void AddAllowed(String[] args, CommandSender sender, Player player) 
+	private void AddAllowed(String[] args, CommandSender sender)
 	{
-		if (args.length > 2 && !args[2].equalsIgnoreCase("?")) 
+		if (args.length > 2 && !args[2].equalsIgnoreCase("?"))
 		{
-
-			EpicGate gate = General.myGates.get(args[1]);
-			if (gate != null) 
+			if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, true))
 			{
-
-				for(int i = 2; i < args.length; i++)
+				EpicGate gate = General.myGates.get(args[1]);
+				if (gate != null)
 				{
-					gate.addAllowed(args[i]);
+
+					for (int i = 2; i < args.length; i++)
+					{
+						gate.addAllowed(args[i]);
+					}
+
+					General.myGates.put(args[1], gate);
+					General.saveGates();
+					General.loadGates();
+
 				}
-				
-				General.myGates.put(args[1], gate);
-				General.saveGates();
-				General.loadGates();
-				
-			} 
-			else 
-			{
-				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+				else
+				{
+					sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+				}
 			}
-		} 
-		else 
+			else
+			{
+				sender.sendMessage("You do not have permisson to use this command.");
+			}
+		}
+		else
 		{
 			Help(sender, "addallowed");
 		}
 	}
-	
-	private void RemoveAllowed(String[] args, CommandSender sender, Player player) 
+
+	private void RemoveAllowed(String[] args, CommandSender sender)
 	{
-		if (args.length > 2 && !args[2].equalsIgnoreCase("?")) 
+		if (args.length > 2 && !args[2].equalsIgnoreCase("?"))
 		{
-
-			EpicGate gate = General.myGates.get(args[1]);
-			if (gate != null) 
+			if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, true))
 			{
-
-				for(int i = 2; i < args.length; i++)
+				EpicGate gate = General.myGates.get(args[1]);
+				if (gate != null)
 				{
-					gate.removeAllowed(args[i]);
+
+					for (int i = 2; i < args.length; i++)
+					{
+						gate.removeAllowed(args[i]);
+					}
+
+					General.myGates.put(args[1], gate);
+					General.saveGates();
+					General.loadGates();
+
 				}
-				
-				General.myGates.put(args[1], gate);
-				General.saveGates();
-				General.loadGates();
-				
-			} 
-			else 
-			{
-				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+				else
+				{
+					sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+				}
 			}
-		} 
-		else 
+			else
+			{
+				sender.sendMessage("You do not have permisson to use this command.");
+			}
+		}
+		else
 		{
 			Help(sender, "removeallowed");
 		}
 	}
-	
-	private void AddNotAllowed(String[] args, CommandSender sender, Player player) 
+
+	private void AddNotAllowed(String[] args, CommandSender sender)
 	{
-		if (args.length > 2 && !args[2].equalsIgnoreCase("?")) 
+		if (args.length > 2 && !args[2].equalsIgnoreCase("?"))
 		{
-
-			EpicGate gate = General.myGates.get(args[1]);
-			if (gate != null) 
+			if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, true))
 			{
-
-				for(int i = 2; i < args.length; i++)
+				EpicGate gate = General.myGates.get(args[1]);
+				if (gate != null)
 				{
-					gate.addNotAllowed(args[i]);
+
+					for (int i = 2; i < args.length; i++)
+					{
+						gate.addNotAllowed(args[i]);
+					}
+
+					General.myGates.put(args[1], gate);
+					General.saveGates();
+					General.loadGates();
+
 				}
-				
-				General.myGates.put(args[1], gate);
-				General.saveGates();
-				General.loadGates();
-				
-			} 
-			else 
-			{
-				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+				else
+				{
+					sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+				}
 			}
-		} 
-		else 
+			else
+			{
+				sender.sendMessage("You do not have permisson to use this command.");
+			}
+		}
+		else
 		{
 			Help(sender, "addnotallowed");
 		}
 	}
-	
-	private void RemoveNotAllowed(String[] args, CommandSender sender, Player player) 
+
+	private void RemoveNotAllowed(String[] args, CommandSender sender)
 	{
-		if (args.length > 2 && !args[2].equalsIgnoreCase("?")) 
+		if (args.length > 2 && !args[2].equalsIgnoreCase("?"))
 		{
-
-			EpicGate gate = General.myGates.get(args[1]);
-			if (gate != null) 
+			if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, true))
 			{
-
-				for(int i = 2; i < args.length; i++)
+				EpicGate gate = General.myGates.get(args[1]);
+				if (gate != null)
 				{
-					gate.removeNotAllowed(args[i]);
+
+					for (int i = 2; i < args.length; i++)
+					{
+						gate.removeNotAllowed(args[i]);
+					}
+
+					General.myGates.put(args[1], gate);
+					General.saveGates();
+					General.loadGates();
+
 				}
-				
-				General.myGates.put(args[1], gate);
-				General.saveGates();
-				General.loadGates();
-				
-			} 
-			else 
-			{
-				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+				else
+				{
+					sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+				}
 			}
-		} 
-		else 
+			else
+			{
+				sender.sendMessage("You do not have permisson to use this command.");
+			}
+		}
+		else
 		{
 			Help(sender, "addnotallowed");
 		}
 	}
-	
-	private void Delete(String[] args, CommandSender sender, Player player) {
-		if (args.length > 1 && !args[1].equalsIgnoreCase("?")) {
-			EpicGate gate = General.myGates.get(args[1]);
-			if (gate != null) {
-				clearGate(gate);
-				clearLanding(gate);
-				General.myGates.remove(args[1]);
-				General.myGateTags.remove(args[1]);
-				General.saveGates();
-				General.loadGates();
-				sender.sendMessage("[" + args[1] + "] has been deleted.");
-			} else {
-				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+
+	private void Delete(String[] args, CommandSender sender)
+	{
+		if (args.length > 1 && !args[1].equalsIgnoreCase("?"))
+		{
+			if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, true))
+			{
+				EpicGate gate = General.myGates.get(args[1]);
+				if (gate != null)
+				{
+					clearGate(gate);
+					clearLanding(gate);
+					General.myGates.remove(args[1]);
+					General.myGateTags.remove(args[1]);
+					General.saveGates();
+					General.loadGates();
+					sender.sendMessage("[" + args[1] + "] has been deleted.");
+				}
+				else
+				{
+					sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+				}
 			}
-		} else {
+			else
+			{
+				sender.sendMessage("You do not have permisson to use this command.");
+			}
+		}
+		else
+		{
 			Help(sender, "delete");
 		}
 
 	}
 
-	private void Info(String[] args, CommandSender sender, Player player) {
-		if (args.length > 1 && !args[1].equalsIgnoreCase("?")) {
-			Help(sender, "info");
-		} else {
-			EpicGate gate = GetGateByLandingForLocation(player.getLocation());
-			if (gate != null) {
+	private void Info(String[] args, CommandSender sender)
+	{
+		if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, false))
+		{
+			Player player = (Player) sender;
+			if (args.length > 1 && !args[1].equalsIgnoreCase("?"))
+			{
+				Help(sender, "info");
+			}
+			else
+			{
+				EpicGate gate = GetGateByLandingForLocation(player.getLocation());
+				if (gate != null)
+				{
+					String message = "";
+					message = ChatColor.GOLD + "[" + gate.getTag() + "]" + ChatColor.GREEN + " in " + ChatColor.GOLD + "[" + gate.getLocation().getWorld().getName() + "]" + ChatColor.GREEN + " at " + ChatColor.GOLD + "[" + gate.getLocation().getBlockX() + "," + gate.getLocation().getBlockY() + "," + gate.getLocation().getBlockZ() + "]";
+					if (gate.getTarget() != null)
+					{
+						message = message + ChatColor.GREEN + " linked to " + ChatColor.GOLD + "[" + gate.getTargetTag() + "].";
+					}
+					else
+					{
+						message = message + ChatColor.GREEN + ".";
+					}
+					sender.sendMessage(message);
+				}
+				else
+				{
+					sender.sendMessage("You are not standing on the landing of a valid gate.");
+				}
+			}
+		}
+		else
+		{
+			sender.sendMessage("You do not have permisson to use this command.");
+		}
+	}
+
+	private void List(String[] args, CommandSender sender)
+	{
+
+		for (String gateTag : General.myGateTags)
+		{
+			if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, true))
+			{
 				String message = "";
-				message = ChatColor.GOLD + "[" + gate.getTag() + "]"
-				+ ChatColor.GREEN + " in " + ChatColor.GOLD + "["
-				+ gate.getLocation().getWorld().getName() + "]"
-				+ ChatColor.GREEN + " at " + ChatColor.GOLD + "["
-				+ gate.getLocation().getBlockX() + ","
-				+ gate.getLocation().getBlockY() + ","
-				+ gate.getLocation().getBlockZ() + "]";
-				if (gate.getTarget() != null) {
-					message = message + ChatColor.GREEN + " linked to "
-					+ ChatColor.GOLD + "[" + gate.getTargetTag() + "].";
-				} else {
-					message = message + ChatColor.GREEN + ".";
+				EpicGate gate = General.myGates.get(gateTag);
+				if (gate != null)
+				{
+					message = ChatColor.GOLD + "[" + gate.getTag() + "]" + ChatColor.GREEN + " in " + ChatColor.GOLD + "[" + gate.getLocation().getWorld().getName() + "]" + ChatColor.GREEN + " at " + ChatColor.GOLD + "[" + gate.getLocation().getBlockX() + "," + gate.getLocation().getBlockY() + "," + gate.getLocation().getBlockZ() + "]";
+					if (gate.getTarget() != null)
+					{
+						message = message + ChatColor.GREEN + " linked to " + ChatColor.GOLD + "[" + gate.getTargetTag() + "].";
+					}
+					else
+					{
+						message = message + ChatColor.GREEN + ".";
+					}
+					sender.sendMessage(message);
 				}
-				sender.sendMessage(message);
-			} else {
-				sender.sendMessage("You are not standing on the landing of a valid gate.");
+			}
+			else
+			{
+				sender.sendMessage("You do not have permisson to use this command.");
 			}
 		}
 	}
 
-	private void List(String[] args, CommandSender sender, Player player) {
-
-		for (String gateTag : General.myGateTags) {
-			String message = "";
-			EpicGate gate = General.myGates.get(gateTag);
-			if (gate != null) {
-				message = ChatColor.GOLD + "[" + gate.getTag() + "]"
-				+ ChatColor.GREEN + " in " + ChatColor.GOLD + "["
-				+ gate.getLocation().getWorld().getName() + "]"
-				+ ChatColor.GREEN + " at " + ChatColor.GOLD + "["
-				+ gate.getLocation().getBlockX() + ","
-				+ gate.getLocation().getBlockY() + ","
-				+ gate.getLocation().getBlockZ() + "]";
-				if (gate.getTarget() != null) {
-					message = message + ChatColor.GREEN + " linked to "
-					+ ChatColor.GOLD + "[" + gate.getTargetTag() + "].";
-				} else {
-					message = message + ChatColor.GREEN + ".";
+	private void Direction(String[] args, CommandSender sender)
+	{
+		if (args.length > 2 && !args[1].equalsIgnoreCase("?"))
+		{
+			if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, true))
+			{
+				EpicGate gate = General.myGates.get(args[1]);
+				if (gate != null)
+				{
+					clearLanding(gate);
+					gate.setDirection(args[2]);
+					buildLanding(gate, gate.getLocation().getWorld());
+					General.saveGates();
+					General.loadGates();
+					sender.sendMessage("The direction of [" + args[1] + "] has been set to [" + gate.getDirection() + "]");
 				}
-				sender.sendMessage(message);
+				else
+				{
+					sender.sendMessage("The gate [" + args[1] + "] does not exist.");
+				}
+			}
+			else
+			{
+				sender.sendMessage("You do not have permisson to use this command.");
 			}
 		}
-	}
-
-	private void Direction(String[] args, CommandSender sender, Player player) {
-		if (args.length > 2 && !args[1].equalsIgnoreCase("?")) {
-
-			EpicGate gate = General.myGates.get(args[1]);
-			if (gate != null) {
-				clearLanding(gate);
-				gate.setDirection(args[2]);
-				buildLanding(gate, player.getWorld());
-				General.saveGates();
-				General.loadGates();
-				sender.sendMessage("The direction of [" + args[1]
-				                                               + "] has been set to [" + gate.getDirection() + "]");
-			} else {
-				sender.sendMessage("The gate [" + args[1] + "] does not exist.");
-			}
-		} else {
+		else
+		{
 			Help(sender, "direction");
 		}
 
 	}
 
-	private void Help(CommandSender sender, String mode) {
+	private void Help(CommandSender sender, String mode)
+	{
 
 		System.out.println(mode);
-		if (mode.equalsIgnoreCase("create")) 
+		if (mode.equalsIgnoreCase("create"))
 		{
 			sender.sendMessage(ChatColor.GOLD + "/gate create " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Gate Name.");
 			sender.sendMessage(ChatColor.GREEN + "Used to create new gates.");
-		} 
-		else if (mode.equalsIgnoreCase("link")) 
+		}
+		else if (mode.equalsIgnoreCase("link"))
 		{
 			sender.sendMessage(ChatColor.GOLD + "/gate link " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Source Gate, " + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Target Gate");
 			sender.sendMessage(ChatColor.GREEN + "Used to link two gates.");
-		} 
-		else if (mode.equalsIgnoreCase("unlink")) 
+		}
+		else if (mode.equalsIgnoreCase("unlink"))
 		{
 			sender.sendMessage(ChatColor.GOLD + "/gate unlink " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
 			sender.sendMessage(ChatColor.GREEN + "Used to remove the supplied gate's target.)");
-		} 
-		else if (mode.equalsIgnoreCase("direction")) 
+		}
+		else if (mode.equalsIgnoreCase("direction"))
 		{
 			sender.sendMessage(ChatColor.GOLD + "/gate direction " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag." + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Direction");
 			sender.sendMessage(ChatColor.GREEN + "Used to change the direction of the landing pad for a gate.");
-		} 
-		else if (mode.equalsIgnoreCase("move")) 
+		}
+		else if (mode.equalsIgnoreCase("move"))
 		{
 			sender.sendMessage(ChatColor.GOLD + "/gate move " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
 			sender.sendMessage(ChatColor.GREEN + "Used to change the location of a gate to where you are currently standing. (Works across worlds)");
-		} 
+		}
 		else if (mode.equalsIgnoreCase("addallowed"))
 		{
 			sender.sendMessage(ChatColor.GOLD + "/gate addallowed " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag" + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Player/Group Names.");
@@ -478,24 +583,25 @@ public class EGGate implements CommandHandler {
 			sender.sendMessage(ChatColor.GOLD + "/gate removenotallowed " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag" + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Player/Group Names.");
 			sender.sendMessage(ChatColor.GREEN + "Used to remove who is not allowed to jump thru the gate, multiple can be specified");
 		}
-		else if (mode.equalsIgnoreCase("delete")) 
+		else if (mode.equalsIgnoreCase("delete"))
 		{
 			sender.sendMessage(ChatColor.GOLD + "/gate delete " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
 			sender.sendMessage(ChatColor.GREEN + "Used to remove a gate.");
-		} 
-		else if (mode.equalsIgnoreCase("info")) 
+		}
+		else if (mode.equalsIgnoreCase("info"))
 		{
 			sender.sendMessage(ChatColor.GOLD + "/gate info " + ChatColor.WHITE + "| " + ChatColor.GREEN + " Get gate info.");
 			sender.sendMessage(ChatColor.GREEN + "Stand on a gate's landing pad and issue this command for info on that gate.");
-		} 
-		else 
+		}
+		else
 		{
 			sender.sendMessage(ChatColor.GOLD + "EpicGates help");
 			sender.sendMessage(ChatColor.GOLD + "/gate create " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = New Gate Name.");
 			sender.sendMessage(ChatColor.GOLD + "/gate link " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Source Gate, " + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Target Gate");
 			sender.sendMessage(ChatColor.GOLD + "/gate unlink " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
 			sender.sendMessage(ChatColor.GOLD + "/gate direction " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag." + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Direction");
-			sender.sendMessage(ChatColor.GOLD + "/gate move " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag."); sender.sendMessage(ChatColor.GOLD + "/gate delete " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
+			sender.sendMessage(ChatColor.GOLD + "/gate move " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
+			sender.sendMessage(ChatColor.GOLD + "/gate delete " + ChatColor.AQUA + "[1] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag.");
 			sender.sendMessage(ChatColor.GOLD + "/gate addallowed " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag" + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Player/Group Names.");
 			sender.sendMessage(ChatColor.GOLD + "/gate removeallowed " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag" + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Player/Group Names.");
 			sender.sendMessage(ChatColor.GOLD + "/gate addnotallowed " + ChatColor.AQUA + "[1] [2] " + ChatColor.WHITE + "| " + ChatColor.AQUA + "[1]" + ChatColor.GREEN + " = Gate Tag" + ChatColor.AQUA + "[2]" + ChatColor.GREEN + " = Player/Group Names.");
@@ -503,7 +609,8 @@ public class EGGate implements CommandHandler {
 		}
 	}
 
-	private void buildGate(EpicGate gate, World world) {
+	private void buildGate(EpicGate gate, World world)
+	{
 
 		Location floor = gate.getLocation().clone();
 		Location bottom = gate.getLocation().clone();
@@ -518,7 +625,8 @@ public class EGGate implements CommandHandler {
 
 	}
 
-	private void buildLanding(EpicGate gate, World world) {
+	private void buildLanding(EpicGate gate, World world)
+	{
 
 		Location floor = gate.getLanding().clone();
 		Location bottom = gate.getLanding().clone();
@@ -533,7 +641,8 @@ public class EGGate implements CommandHandler {
 
 	}
 
-	private void clearGate(EpicGate gate) {
+	private void clearGate(EpicGate gate)
+	{
 
 		World world = gate.getLocation().getWorld();
 		Location floor = gate.getLocation().clone();
@@ -549,7 +658,8 @@ public class EGGate implements CommandHandler {
 
 	}
 
-	private void clearLanding(EpicGate gate) {
+	private void clearLanding(EpicGate gate)
+	{
 
 		World world = gate.getLocation().getWorld();
 		Location floor = gate.getLanding().clone();
@@ -565,14 +675,19 @@ public class EGGate implements CommandHandler {
 
 	}
 
-	private EpicGate GetGateByLandingForLocation(Location loc) {
-		for (String gateTag : General.myGateTags) {
+	private EpicGate GetGateByLandingForLocation(Location loc)
+	{
+		for (String gateTag : General.myGateTags)
+		{
 			EpicGate gate = General.myGates.get(gateTag);
-			if (gate != null) {
-				if (gate.getLocation().getWorld().getName()
-						.equalsIgnoreCase(loc.getWorld().getName())) {
-					if (gate.getTargetTag().length() > 0) {
-						if (PlayerWithinGateLanding(gate, loc)) {
+			if (gate != null)
+			{
+				if (gate.getLocation().getWorld().getName().equalsIgnoreCase(loc.getWorld().getName()))
+				{
+					if (gate.getTargetTag().length() > 0)
+					{
+						if (PlayerWithinGateLanding(gate, loc))
+						{
 							return gate;
 						}
 					}
@@ -582,16 +697,17 @@ public class EGGate implements CommandHandler {
 		return null;
 	}
 
-	private boolean PlayerWithinGateLanding(EpicGate gate, Location playerLoc) {
+	private boolean PlayerWithinGateLanding(EpicGate gate, Location playerLoc)
+	{
 
 		boolean result = false;
 
-		if ((int) gate.getLanding().getBlockY() == (int) playerLoc.getBlockY()) {
-			if (playerLoc.getX() <= Math.ceil(gate.getLanding().getX())
-					&& playerLoc.getX() >= Math.floor(gate.getLanding().getX())) {
-				if (playerLoc.getZ() <= Math.ceil(gate.getLanding().getZ())
-						&& playerLoc.getZ() >= Math.floor(gate.getLanding()
-								.getZ())) {
+		if ((int) gate.getLanding().getBlockY() == (int) playerLoc.getBlockY())
+		{
+			if (playerLoc.getX() <= Math.ceil(gate.getLanding().getX()) && playerLoc.getX() >= Math.floor(gate.getLanding().getX()))
+			{
+				if (playerLoc.getZ() <= Math.ceil(gate.getLanding().getZ()) && playerLoc.getZ() >= Math.floor(gate.getLanding().getZ()))
+				{
 					result = true;
 				}
 			}

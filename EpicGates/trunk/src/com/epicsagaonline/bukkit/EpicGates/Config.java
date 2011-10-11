@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import org.bukkit.World.Environment;
 import org.bukkit.util.config.Configuration;
 import org.bukkit.util.config.ConfigurationNode;
@@ -50,10 +49,12 @@ import org.yaml.snakeyaml.Yaml;
 
 import com.epicsagaonline.bukkit.EpicGates.objects.EpicGatesWorld;
 
-public class Config extends Configuration {
+public class Config extends Configuration
+{
 	private static final Yaml yaml;
 
-	static {
+	static
+	{
 		DumperOptions options = new DumperOptions();
 		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 		yaml = new Yaml(options);
@@ -71,7 +72,7 @@ public class Config extends Configuration {
 
 		this.file = file;
 
-		if(file == null)
+		if (file == null)
 			throw new IllegalArgumentException("file cannot be null");
 	}
 
@@ -81,39 +82,42 @@ public class Config extends Configuration {
 		permissionSystem = "GroupManager";
 	}
 
-	@Override
-	public void load() {
+	@Override public void load()
+	{
 		// make sure there is always known values in case absent in config file
 		setDefaults();
 
-		if(file == null)
+		if (file == null)
 			throw new IllegalArgumentException("file cannot be null");
 
-		//System.out.println(file.toString());
+		// System.out.println(file.toString());
 
-		if(!file.exists()) {
-			try {
+		if (!file.exists())
+		{
+			try
+			{
 				file.createNewFile();
 				save();
 			}
-			catch(IOException e) {
+			catch (IOException e)
+			{
 
 			}
 		}
 		else
 		{
 			super.load();
-			reteleportDelay = getInt("reteleportDelay", reteleportDelay);	
+			reteleportDelay = getInt("reteleportDelay", reteleportDelay);
 			permissionSystem = getString("permissionSystem");
 
 			additionalWorlds = new ArrayList<EpicGatesWorld>();
 			Map<String, ConfigurationNode> nodes = getNodes("additionalWorlds");
-			if(nodes != null)
+			if (nodes != null)
 			{
-				for(String worldName: nodes.keySet())
+				for (String worldName : nodes.keySet())
 				{
 					EpicGatesWorld egw = new EpicGatesWorld(worldName);
-					if(nodes.get(worldName).getString("environment").equalsIgnoreCase("nether"))
+					if (nodes.get(worldName).getString("environment").equalsIgnoreCase("nether"))
 					{
 						egw.environment = Environment.NETHER;
 					}
@@ -125,7 +129,7 @@ public class Config extends Configuration {
 				}
 			}
 
-			if(permissionSystem == null || permissionSystem.trim().length() == 0)
+			if (permissionSystem == null || permissionSystem.trim().length() == 0)
 			{
 				permissionSystem = "GroupManager";
 			}
@@ -145,7 +149,7 @@ public class Config extends Configuration {
 		root.put("permissionSystem", permissionSystem);
 
 		Map<String, Object> worldMap = new HashMap<String, Object>();
-		for(EpicGatesWorld egw : additionalWorlds)
+		for (EpicGatesWorld egw : additionalWorlds)
 		{
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("environment", egw.environment.toString());
@@ -154,7 +158,7 @@ public class Config extends Configuration {
 
 		root.put("additionalWorlds", worldMap);
 
-		try 
+		try
 		{
 			stream = new FileOutputStream(file);
 			stream.getChannel().truncate(0);
@@ -164,13 +168,13 @@ public class Config extends Configuration {
 			{
 				writer.write(yaml.dump(root));
 			}
-			finally 
+			finally
 			{
 				writer.close();
 			}
 
 		}
-		catch(IOException e)
+		catch (IOException e)
 		{
 			return false;
 		}

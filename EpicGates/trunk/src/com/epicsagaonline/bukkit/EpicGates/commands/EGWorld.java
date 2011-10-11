@@ -31,7 +31,6 @@
 
 package com.epicsagaonline.bukkit.EpicGates.commands;
 
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -43,109 +42,148 @@ import com.epicsagaonline.bukkit.EpicGates.EpicGates;
 import com.epicsagaonline.bukkit.EpicGates.General;
 import com.epicsagaonline.bukkit.EpicGates.objects.EpicGatesWorld;
 
-public class EGWorld implements CommandHandler {
+public class EGWorld implements CommandHandler
+{
 
-	@Override
-	public boolean onCommand(String command, CommandSender sender, String[] args)
+	@Override public boolean onCommand(String command, CommandSender sender, String[] args)
 	{
-		if((sender instanceof Player && EpicGates.permissions.hasPermission((Player)sender, "epicgates.admin")))
+		if (args.length > 0)
 		{
-			Player player = (Player)sender;
-
-			if(args.length > 0)
+			if (args[0].equalsIgnoreCase("create"))
 			{
-				if(args[0].equalsIgnoreCase("create")){Create(args, sender, player);}
-				else if(args[0].equalsIgnoreCase("delete")){Delete(args, sender, player);}
-				else if(args[0].equalsIgnoreCase("visit")){Visit(args, sender, player);}
-				else if(args[0].equalsIgnoreCase("list")){List(args, sender, player);}
-				else {Help(sender);}
+				Create(args, sender);
 			}
-			else 
+			else if (args[0].equalsIgnoreCase("delete"))
 			{
-				Help(sender);
+				Delete(args, sender);
 			}
-			return true;
-		}
-		return false;
-	}
-
-	private void Create(String[] args, CommandSender sender, Player player)
-	{				
-		if(args.length > 1)
-		{
-			EpicGatesWorld egw = new EpicGatesWorld(args[1]);
-			if(args.length > 2 && args[2].equalsIgnoreCase("nether"))
+			else if (args[0].equalsIgnoreCase("visit"))
 			{
-				General.plugin.getServer().createWorld(args[1], Environment.NETHER);
-				egw.environment = Environment.NETHER;
+				Visit(args, sender);
+			}
+			else if (args[0].equalsIgnoreCase("list"))
+			{
+				List(args, sender);
 			}
 			else
 			{
-				General.plugin.getServer().createWorld(args[1], Environment.NORMAL);
-				egw.environment = Environment.NORMAL;
-			}
-			sender.sendMessage("New World Created: " + args[1]);
-			General.config.additionalWorlds.add(egw);
-			General.config.save();
-		}
-		else
-		{
-			Help(sender);
-		}
-	}
-
-	private void Visit(String[] args, CommandSender sender, Player player)
-	{				
-		if(args.length > 1)
-		{
-			World world = General.plugin.getServer().getWorld(args[1]);
-			if(world != null)
-			{
-				Location newLoc = player.getLocation().clone();
-				newLoc.setWorld(world);
-				player.teleport(newLoc);
+				Help(sender);
 			}
 		}
 		else
 		{
 			Help(sender);
 		}
+		return true;
 	}
 
-	private void List(String[] args, CommandSender sender, Player player)
-	{		
-		for(EpicGatesWorld egw : General.config.additionalWorlds)
-		{			
-			sender.sendMessage(ChatColor.GREEN + "World " + ChatColor.GOLD + "[" + egw.name + "]" + ChatColor.GREEN + " Environment " + ChatColor.GOLD + "[" + egw.environment.toString() + "]" + ChatColor.GREEN + ".");
-		}
-	}
-
-	private void Delete(String[] args, CommandSender sender, Player player)
-	{				
-		if(args.length > 1)
+	private void Create(String[] args, CommandSender sender)
+	{
+		if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, true))
 		{
-
-			int index = 0;
-			int delIndex = -1;
-
-			for(EpicGatesWorld egw: General.config.additionalWorlds)
+			if (args.length > 1)
 			{
-				if(egw.name.equalsIgnoreCase(args[1]))
+				EpicGatesWorld egw = new EpicGatesWorld(args[1]);
+				sender.sendMessage("Creating New World: " + args[1]);
+				if (args.length > 2 && args[2].equalsIgnoreCase("nether"))
 				{
-					delIndex = index;
-					break;
+					General.plugin.getServer().createWorld(args[1], Environment.NETHER);
+					egw.environment = Environment.NETHER;
 				}
-				index ++;
+				else
+				{
+					General.plugin.getServer().createWorld(args[1], Environment.NORMAL);
+					egw.environment = Environment.NORMAL;
+				}
+				sender.sendMessage("New World Created: " + args[1]);
+				General.config.additionalWorlds.add(egw);
+				General.config.save();
 			}
-
-			if(delIndex > -1)
+			else
 			{
-				General.config.additionalWorlds.remove(delIndex);
+				Help(sender);
 			}
+		}
+		else
+		{
+			Help(sender);
+		}
+	}
 
-			General.config.save();
-			sender.sendMessage(args[1] + " will no longer load on server start. World files have NOT been deleted.");
-			sender.sendMessage("You must restart your server for [" + args[1] + "] to unload.");
+	private void Visit(String[] args, CommandSender sender)
+	{
+		if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, false))
+		{
+			if (args.length > 1)
+			{
+				Player player = (Player) sender;
+				World world = General.plugin.getServer().getWorld(args[1]);
+				if (world != null)
+				{
+					Location newLoc = player.getLocation().clone();
+					newLoc.setWorld(world);
+					player.teleport(newLoc);
+				}
+			}
+			else
+			{
+				Help(sender);
+			}
+		}
+		else
+		{
+			Help(sender);
+		}
+	}
+
+	private void List(String[] args, CommandSender sender)
+	{
+		if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, true))
+		{
+			for (EpicGatesWorld egw : General.config.additionalWorlds)
+			{
+				sender.sendMessage(ChatColor.GREEN + "World " + ChatColor.GOLD + "[" + egw.name + "]" + ChatColor.GREEN + " Environment " + ChatColor.GOLD + "[" + egw.environment.toString() + "]" + ChatColor.GREEN + ".");
+			}
+		}
+		else
+		{
+			Help(sender);
+		}
+	}
+
+	private void Delete(String[] args, CommandSender sender)
+	{
+		if (EpicGates.permissions.hasPermission(sender, "epicgates.admin", true, true))
+		{
+			if (args.length > 1)
+			{
+
+				int index = 0;
+				int delIndex = -1;
+
+				for (EpicGatesWorld egw : General.config.additionalWorlds)
+				{
+					if (egw.name.equalsIgnoreCase(args[1]))
+					{
+						delIndex = index;
+						break;
+					}
+					index++;
+				}
+
+				if (delIndex > -1)
+				{
+					General.config.additionalWorlds.remove(delIndex);
+				}
+
+				General.config.save();
+				sender.sendMessage(args[1] + " will no longer load on server start. World files have NOT been deleted.");
+				sender.sendMessage("You must restart your server for [" + args[1] + "] to unload.");
+			}
+			else
+			{
+				Help(sender);
+			}
 		}
 		else
 		{

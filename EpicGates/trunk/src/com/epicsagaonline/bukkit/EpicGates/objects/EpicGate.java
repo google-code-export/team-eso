@@ -39,7 +39,8 @@ import org.bukkit.entity.Player;
 import com.epicsagaonline.bukkit.EpicGates.EpicGates;
 import com.epicsagaonline.bukkit.EpicGates.General;
 
-public class EpicGate {
+public class EpicGate
+{
 
 	private String tag = "";
 	private Location location = null;
@@ -55,7 +56,7 @@ public class EpicGate {
 		this.tag = tag;
 		this.location = loc;
 		this.direction = getDirection(yaw);
-		setLanding();	
+		setLanding();
 	}
 
 	public EpicGate(String data)
@@ -68,15 +69,29 @@ public class EpicGate {
 
 		this.tag = split[0].trim();
 
-		if(IsNumeric(split[1]))
+		if (IsNumeric(split[1]))
 		{
 
 			x = Double.parseDouble(split[1].trim());
-			y =	Double.parseDouble(split[2].trim());
-			z =	Double.parseDouble(split[3].trim());
+			y = Double.parseDouble(split[2].trim());
+			z = Double.parseDouble(split[3].trim());
 
-			if(x > 0){x += 0.5;}else{x -= 0.5;}
-			if(z > 0){z += 0.5;}else{z -= 0.5;}
+			if (x > 0)
+			{
+				x += 0.5;
+			}
+			else
+			{
+				x -= 0.5;
+			}
+			if (z > 0)
+			{
+				z += 0.5;
+			}
+			else
+			{
+				z -= 0.5;
+			}
 
 			this.location = new Location(General.plugin.getServer().getWorlds().get(0), x, y, z);
 		}
@@ -84,11 +99,11 @@ public class EpicGate {
 		{
 
 			x = Double.parseDouble(split[2].trim());
-			y =	Double.parseDouble(split[3].trim());
-			z =	Double.parseDouble(split[4].trim());
+			y = Double.parseDouble(split[3].trim());
+			z = Double.parseDouble(split[4].trim());
 
-			//if(x > 0){x += 0.5;}else{x -= 0.5;}
-			//if(z > 0){z += 0.5;}else{z -= 0.5;}
+			// if(x > 0){x += 0.5;}else{x -= 0.5;}
+			// if(z > 0){z += 0.5;}else{z -= 0.5;}
 			x += 0.5;
 			z += 0.5;
 			this.location = new Location(General.plugin.getServer().getWorld(split[1].trim()), x, y, z);
@@ -96,19 +111,19 @@ public class EpicGate {
 
 		this.targetTag = split[5].trim();
 
-		if(split.length > 6)
+		if (split.length > 6)
 		{
-			if(!IsNumeric(split[6]))
+			if (!IsNumeric(split[6]))
 			{
 				this.direction = split[6].toUpperCase().trim().charAt(0);
 			}
 
-			if(split.length > 7)
+			if (split.length > 7)
 			{
 				BuildAllowed(split[7]);
 			}
 
-			if(split.length > 8)
+			if (split.length > 8)
 			{
 				BuildNotAllowed(split[8]);
 			}
@@ -116,19 +131,53 @@ public class EpicGate {
 
 		setLanding();
 
-		System.out.println("Gate Loaded [" + this.tag + "]");// X:" + this.location.getX() + " Y:" + this.location.getY() + " Z:" + this.location.getZ());
+		System.out.println("Gate Loaded [" + this.tag + "]");// X:" + this.location.getX() + "
+																// Y:" + this.location.getY() + "
+																// Z:" +
+																// this.location.getZ());
 
 	}
 
-	public String getTag(){return tag;}
-	public Location getLocation(){return location;}
-	public String getTargetTag(){return targetTag;}
-	public EpicGate getTarget(){return target;}
-	public Location getLanding(){return landing;}
-	public char getDirection(){return direction;}
-	public ArrayList<String> getAllowed(){return allowed;}
-	public ArrayList<String> getNotAllowed(){return notAllowed;}
-	
+	public String getTag()
+	{
+		return tag;
+	}
+
+	public Location getLocation()
+	{
+		return location;
+	}
+
+	public String getTargetTag()
+	{
+		return targetTag;
+	}
+
+	public EpicGate getTarget()
+	{
+		return target;
+	}
+
+	public Location getLanding()
+	{
+		return landing;
+	}
+
+	public char getDirection()
+	{
+		return direction;
+	}
+
+	public ArrayList<String> getAllowed()
+	{
+		return allowed;
+	}
+
+	public ArrayList<String> getNotAllowed()
+	{
+		return notAllowed;
+	}
+
 	public boolean isAllowed(Player player)
 	{
 
@@ -136,16 +185,16 @@ public class EpicGate {
 		String playerName = player.getName();
 		ArrayList<String> groupNames = EpicGates.permissions.getGroupNames(player);
 
-		if(!notAllowed.contains(playerName) && !groupMatch(notAllowed, groupNames))
-		{	
-			if(allowed.size() == 0)
+		if (!notAllowed.contains(playerName) && !groupMatch(notAllowed, groupNames))
+		{
+			if (allowed.size() == 0)
 			{
 				result = true;
 			}
-			else if(allowed.contains(playerName) || groupMatch(allowed, groupNames))
+			else if (allowed.contains(playerName) || groupMatch(allowed, groupNames))
 			{
 				result = true;
-			} 
+			}
 		}
 
 		return result;
@@ -158,7 +207,7 @@ public class EpicGate {
 
 	public void removeAllowed(String value)
 	{
-		allowed.remove(value.toLowerCase());	
+		allowed.remove(value.toLowerCase());
 	}
 
 	public void addNotAllowed(String value)
@@ -175,9 +224,9 @@ public class EpicGate {
 	{
 		boolean result = false;
 
-		for(String item2: list2)
+		for (String item2 : list2)
 		{
-			if(list1.contains(item2.toLowerCase()))
+			if (list1.contains(item2.toLowerCase()))
 			{
 				result = true;
 				break;
@@ -190,7 +239,7 @@ public class EpicGate {
 	public void setTarget(EpicGate value)
 	{
 		this.target = value;
-		if(value != null)
+		if (value != null)
 		{
 			this.targetTag = value.getTag();
 		}
@@ -211,19 +260,19 @@ public class EpicGate {
 
 		char dir;
 
-		if(value.equalsIgnoreCase("n") || value.equalsIgnoreCase("north"))
+		if (value.equalsIgnoreCase("n") || value.equalsIgnoreCase("north"))
 		{
 			dir = 'N';
 		}
-		else if(value.equalsIgnoreCase("e") || value.equalsIgnoreCase("east"))
+		else if (value.equalsIgnoreCase("e") || value.equalsIgnoreCase("east"))
 		{
 			dir = 'E';
 		}
-		else if(value.equalsIgnoreCase("s") || value.equalsIgnoreCase("south"))
+		else if (value.equalsIgnoreCase("s") || value.equalsIgnoreCase("south"))
 		{
 			dir = 'S';
 		}
-		else if(value.equalsIgnoreCase("w") || value.equalsIgnoreCase("west"))
+		else if (value.equalsIgnoreCase("w") || value.equalsIgnoreCase("west"))
 		{
 			dir = 'W';
 		}
@@ -241,9 +290,9 @@ public class EpicGate {
 		String[] split = data.split(" ");
 		this.allowed = new ArrayList<String>();
 
-		if(split != null && split.length > 0)
+		if (split != null && split.length > 0)
 		{
-			for(String member: split)
+			for (String member : split)
 			{
 				this.allowed.add(member.toLowerCase());
 			}
@@ -255,9 +304,9 @@ public class EpicGate {
 		String[] split = data.split(" ");
 		this.notAllowed = new ArrayList<String>();
 
-		if(split != null && split.length > 0)
+		if (split != null && split.length > 0)
 		{
-			for(String member: split)
+			for (String member : split)
 			{
 				this.notAllowed.add(member.toLowerCase());
 			}
@@ -266,23 +315,29 @@ public class EpicGate {
 
 	private boolean IsNumeric(String data)
 	{
-		if (data.matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+")){return true;}
-		else {return false;} 
+		if (data.matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+"))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	private char getDirection(float yaw)
 	{
 		yaw = Math.abs(yaw);
 		yaw = (float) (yaw - (360 * Math.abs(Math.floor(yaw / 360))));
-		if( yaw >= 45 && yaw <= 105)
+		if (yaw >= 45 && yaw <= 105)
 		{
 			return 'N';
 		}
-		else if( yaw >= 105 && yaw <= 195)
+		else if (yaw >= 105 && yaw <= 195)
 		{
 			return 'E';
 		}
-		else if( yaw >= 195 && yaw <= 285)
+		else if (yaw >= 195 && yaw <= 285)
 		{
 			return 'S';
 		}
@@ -295,24 +350,24 @@ public class EpicGate {
 	private void setLanding()
 	{
 		this.landing = this.location.clone();
-		if(this.direction == 'N') //X - 1
+		if (this.direction == 'N') // X - 1
 		{
-			this.landing.setX(this.landing.getX()-1);
+			this.landing.setX(this.landing.getX() - 1);
 			this.landing.setYaw(90);
 		}
-		if(this.direction == 'E') //Z - 1
+		if (this.direction == 'E') // Z - 1
 		{
-			this.landing.setZ(this.landing.getZ()-1);
+			this.landing.setZ(this.landing.getZ() - 1);
 			this.landing.setYaw(180);
 		}
-		if(this.direction == 'S') //X + 1
+		if (this.direction == 'S') // X + 1
 		{
-			this.landing.setX(this.landing.getX()+1);
+			this.landing.setX(this.landing.getX() + 1);
 			this.landing.setYaw(270);
 		}
-		if(this.direction == 'W') //Z + 1
+		if (this.direction == 'W') // Z + 1
 		{
-			this.landing.setZ(this.landing.getZ()+1);
+			this.landing.setZ(this.landing.getZ() + 1);
 			this.landing.setYaw(0);
 		}
 	}

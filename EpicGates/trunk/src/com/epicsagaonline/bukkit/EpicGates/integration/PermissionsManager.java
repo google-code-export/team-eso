@@ -32,90 +32,157 @@ THE SOFTWARE.
 package com.epicsagaonline.bukkit.EpicGates.integration;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 import org.anjocaido.groupmanager.GroupManager;
+import org.anjocaido.groupmanager.data.Group;
 import org.anjocaido.groupmanager.dataholder.worlds.WorldsHolder;
 import org.bukkit.plugin.Plugin;
 
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicGates.EpicGates;
-import com.epicsagaonline.bukkit.EpicGates.General;
+import com.epicsagaonline.bukkit.EpicGates.Log;
+import com.herocraftonline.dthielke.lists.Lists;
+import com.herocraftonline.dthielke.lists.PrivilegedList;
+import com.herocraftonline.dthielke.lists.PrivilegedList.PrivilegeLevel;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
-/**
- * PermissionsManager for EpicZones for Bukkit
- *
- * Original Author: phaed
- * Modified By: jblaske
- */
 public class PermissionsManager
 {
-	private WorldsHolder GroupManager_Perms;
-	private PermissionHandler Permissions_Perms;
+	private WorldsHolder GroupManager_Perms = null;
+	private PermissionHandler Permissions_Perms = null;
+	private Lists Lists_Perms = null;
 	private EpicGates plugin;
 
 	public PermissionsManager(EpicGates plugin)
 	{
 		boolean permStart = false;
 		this.plugin = plugin;
-
-		if(General.config.permissionSystem.equalsIgnoreCase("GroupManager"))
-		{
-			permStart = startGroupManager();	
-		}
-		else if (General.config.permissionSystem.equalsIgnoreCase("Permissions"))
-		{
-			permStart = startPermissions();
-		}
-
+		permStart = startPermissions();
 		if (!permStart)
 		{
-			System.out.println("[" + plugin.getDescription().getName() + "] Permission system [" + General.config.permissionSystem + "] not found. Disabling plugin.");
-			plugin.getServer().getPluginManager().disablePlugin(plugin);
+			permStart = startGroupManager();
+		}
+		if (!permStart)
+		{
+			permStart = startLists();
 		}
 	}
 
-	public boolean hasPermission(Player player, String permission)
-	{		
-		if(General.config.permissionSystem.equalsIgnoreCase("GroupManager"))
+	public boolean hasPermission(CommandSender sender, String permission, boolean opRequired, boolean consoleAllowed)
+	{
+		boolean result = false;
+		try
 		{
-			return (GroupManager_Perms != null && GroupManager_Perms.getWorldData(player).getPermissionsHandler().has(player, permission));	
+			if (sender instanceof Player)
+			{
+				Player player = (Player) sender;
+				if (Permissions_Perms != null)
+				{
+					result = (Permissions_Perms.has(player, permission));
+				}
+				else if (GroupManager_Perms != null)
+				{
+					result = (GroupManager_Perms.getWorldData(player).getPermissionsHandler().has(player, permission));
+				}
+				else if (Lists_Perms != null)
+				{
+					PrivilegedList lst = Lists_Perms.getList(permission.replace("epicgates.", ""));
+					if (lst != null)
+					{
+						Map<String, PrivilegeLevel> users = lst.getUsers();
+						if (users != null)
+						{
+							if (users.get(player.getName().toLowerCase()) != null)
+							{
+								return true;
+							}
+						}
+					}
+					return false;
+				}
+				else
+				{
+					if (opRequired)
+					{
+						return player.isOp();
+					}
+					else
+					{
+						return true; // If OP is not required, and no
+										// permissions system, then allow.
+					}
+				}
+			}
+			else if (sender instanceof ConsoleCommandSender)
+			{
+				return consoleAllowed;
+			}
 		}
-		else if (General.config.permissionSystem.equalsIgnoreCase("Permissions"))
+		catch (Exception e)
 		{
-			return (Permissions_Perms != null && Permissions_Perms.has(player, permission));
+			Log.Write(e.getMessage());
 		}
-		return false;
+		return result;
 	}
 
 	public ArrayList<String> getGroupNames(Player player)
 	{
 		ArrayList<String> result = new ArrayList<String>();
-
-		if(General.config.permissionSystem.equalsIgnoreCase("GroupManager"))
+		if (Permissions_Perms != null)
 		{
-			if(GroupManager_Perms != null)
+			String[] grps = Permissions_Perms.getGroups(player.getWorld().getName(), player.getName());
+			if (grps != null)
 			{
-				for(org.anjocaido.groupmanager.data.Group grp: GroupManager_Perms.getWorldData(player).getGroupList())
+				for (String grp : grps)
+				{
+					result.add(0, grp);
+				}
+			}
+		}
+		else if (GroupManager_Perms != null)
+		{
+			Collection<Group> grps = GroupManager_Perms.getWorldData(player).getGroupList();
+			if (grps != null)
+			{
+				for (Group grp : grps)
 				{
 					result.add(grp.getName());
 				}
 			}
 		}
-		else if (General.config.permissionSystem.equalsIgnoreCase("Permissions"))
+		else if (Lists_Perms != null)
 		{
-			if(Permissions_Perms != null )
+			PrivilegedList[] lst = Lists_Perms.getLists(player.getName());
+			if (lst != null)
 			{
-				for(String grp: Permissions_Perms.getGroups(player.getWorld().getName(), player.getName()))
+				for (PrivilegedList prv : lst)
 				{
-					result.add(grp);	 
+					result.add(prv.getName());
 				}
 			}
 		}
-
 		return result;
+	}
+
+	public boolean startPermissions()
+	{
+		Plugin p = plugin.getServer().getPluginManager().getPlugin("Permissions");
+		if (p != null)
+		{
+			if (!p.isEnabled())
+			{
+				plugin.getServer().getPluginManager().enablePlugin(p);
+			}
+			Permissions_Perms = ((Permissions) p).getHandler();
+			return Permissions_Perms != null;
+		}
+		return false;
 	}
 
 	public boolean startGroupManager()
@@ -129,22 +196,22 @@ public class PermissionsManager
 			}
 			GroupManager gm = (GroupManager) p;
 			GroupManager_Perms = gm.getWorldsHolder();
-			return true;
+			return GroupManager_Perms != null;
 		}
 		return false;
 	}
 
-	public boolean startPermissions()
+	private boolean startLists()
 	{
-		Plugin p = plugin.getServer().getPluginManager().getPlugin("Permissions");
+		Plugin p = plugin.getServer().getPluginManager().getPlugin("Lists");
 		if (p != null)
 		{
 			if (!p.isEnabled())
 			{
 				plugin.getServer().getPluginManager().enablePlugin(p);
 			}
-			Permissions_Perms = ((Permissions)p).getHandler();
-			return true;
+			Lists_Perms = (Lists) p;
+			return Lists_Perms != null;
 		}
 		return false;
 	}

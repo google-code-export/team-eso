@@ -32,23 +32,26 @@
 package com.epicsagaonline.bukkit.EpicGates.commands;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicGates.EpicGates;
 import com.epicsagaonline.bukkit.EpicGates.General;
 
-public class EGReload implements CommandHandler {
+public class EGReload implements CommandHandler
+{
 
-	public boolean onCommand(String command, CommandSender sender, String[] args) {
-
-		if((sender instanceof Player && EpicGates.permissions.hasPermission((Player)sender, "epiczones.admin")) || !(sender instanceof Player))
+	public boolean onCommand(String command, CommandSender sender, String[] args)
+	{
+		if (EpicGates.permissions.hasPermission(sender, "epiczones.admin", true, true))
 		{
 			General.plugin.setupPermissions();
 			General.plugin.setupEpicGates();
 			sender.sendMessage("EpicGates Reloaded.");
-			return true;
 		}
-		return false;
+		else
+		{
+			sender.sendMessage("You do not have permission to excecute this command.");
+		}
+		return true;
 	}
 
 }

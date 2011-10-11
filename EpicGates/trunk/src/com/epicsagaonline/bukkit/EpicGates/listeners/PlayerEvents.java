@@ -31,7 +31,6 @@
 
 package com.epicsagaonline.bukkit.EpicGates.listeners;
 
-
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerListener;
@@ -47,31 +46,32 @@ import com.epicsagaonline.bukkit.EpicGates.objects.EpicGatesPlayer;
 
 /**
  * Handle events for all Player related events
+ * 
  * @author jblaske
  */
 public class PlayerEvents extends PlayerListener
 {
-	//private final EpicGates plugin;
+	// private final EpicGates plugin;
 
 	public PlayerEvents(EpicGates instance)
 	{
-		//plugin = instance;
+		// plugin = instance;
 	}
 
 	public @Override void onPlayerMove(PlayerMoveEvent event)
 	{
 
 		Player player = event.getPlayer();
-		EpicGatesPlayer egp = General.myPlayers.get(player.getName()); 
-		if(egp != null)
+		EpicGatesPlayer egp = General.myPlayers.get(player.getName());
+		if (egp != null)
 		{
-			if(egp.shouldCheck())
+			if (egp.shouldCheck())
 			{
 				egp.Check();
 				EpicGate gate = GetGateForPlayerLocation(event.getTo());
-				if(gate != null)
+				if (gate != null)
 				{
-					if(gate.isAllowed(player))
+					if (gate.isAllowed(player))
 					{
 						Warp(event, gate, egp);
 						egp.Teleported();
@@ -83,9 +83,9 @@ public class PlayerEvents extends PlayerListener
 
 	public @Override void onPlayerLogin(PlayerLoginEvent event)
 	{
-		if(event.getResult() == Result.ALLOWED)
+		if (event.getResult() == Result.ALLOWED)
 		{
-			General.addPlayer( event.getPlayer().getName());
+			General.addPlayer(event.getPlayer().getName());
 		}
 	}
 
@@ -95,8 +95,8 @@ public class PlayerEvents extends PlayerListener
 	}
 
 	private void Warp(PlayerMoveEvent event, EpicGate gate, EpicGatesPlayer egp)
-	{	
-		if(gate != null && gate.getTarget() != null)
+	{
+		if (gate != null && gate.getTarget() != null)
 		{
 			event.getPlayer().teleport(gate.getTarget().getLanding());
 			event.setTo(gate.getTarget().getLanding());
@@ -106,16 +106,16 @@ public class PlayerEvents extends PlayerListener
 
 	private EpicGate GetGateForPlayerLocation(Location loc)
 	{
-		for(String gateTag: General.myGateTags)
+		for (String gateTag : General.myGateTags)
 		{
 			EpicGate gate = General.myGates.get(gateTag);
-			if(gate != null)
+			if (gate != null)
 			{
-				if(gate.getLocation().getWorld().getName().equalsIgnoreCase(loc.getWorld().getName()))
+				if (gate.getLocation().getWorld().getName().equalsIgnoreCase(loc.getWorld().getName()))
 				{
-					if(gate.getTargetTag().length() > 0)
+					if (gate.getTargetTag().length() > 0)
 					{
-						if(PlayerWithinGate(gate, loc))
+						if (PlayerWithinGate(gate, loc))
 						{
 							return gate;
 						}
@@ -131,11 +131,12 @@ public class PlayerEvents extends PlayerListener
 
 		boolean result = false;
 
-		if ((int)gate.getLocation().getBlockY() == (int)playerLoc.getBlockY())
+		if ((int) gate.getLocation().getBlockY() == (int) playerLoc.getBlockY())
 		{
-			if(playerLoc.getX() <= Math.ceil(gate.getLocation().getX()) && playerLoc.getX() >= Math.floor(gate.getLocation().getX()))
+			if (playerLoc.getX() <= Math.ceil(gate.getLocation().getX()) && playerLoc.getX() >= Math.floor(gate.getLocation().getX()))
 			{
-				if(playerLoc.getZ() <= Math.ceil(gate.getLocation().getZ()) && playerLoc.getZ() >= Math.floor(gate.getLocation().getZ()))					{
+				if (playerLoc.getZ() <= Math.ceil(gate.getLocation().getZ()) && playerLoc.getZ() >= Math.floor(gate.getLocation().getZ()))
+				{
 					result = true;
 				}
 			}
