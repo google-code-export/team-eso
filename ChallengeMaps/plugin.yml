@@ -1,0 +1,30 @@
+name: ChallengeMaps
+main: com.epicsagaonline.bukkit.ChallengeMaps.ChallengeMaps
+version: 0.1
+website: http://code.google.com/p/team-eso/
+author: jblaske@gmail.com
+description: >
+             Provide servers with instanceable challenge maps.
+commands:
+  cm:
+    aliases: [challengemaps, leave]
+    description: Houses all of the commands for ChallengeMaps.
+    usage: |
+           /<command> <subcommand> [Value] [Value] [Value]
+           Example: /<command> leave - Leaves the current challenge map.
+permissions:
+  challengemaps.*:
+    description: Gives access to all ChallengeMaps permissions.
+    children:
+      challengemaps.admin: true
+      challengemaps.enter: true
+      challengemaps.reset: true
+  challengemaps.admin:
+    description: Allows a player to have admin access to EpicZones commands.
+    default: op
+  challengemaps.enter:
+    description: Allows a player to walk and build beyond the set radius of a world.
+    default: true
+  challengemaps.reset:
+    description: Allows a player to ignore building/destroying restrictions.
+    default: true
