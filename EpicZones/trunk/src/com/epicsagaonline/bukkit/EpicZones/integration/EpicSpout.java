@@ -31,12 +31,13 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.integration;
 
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.getspout.spout.Spout;
 import org.getspout.spoutapi.gui.*;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
-import com.epicsagaonline.bukkit.EpicZones.Log;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
@@ -44,42 +45,86 @@ public class EpicSpout
 {
 
 	private static GenericLabel lblZoneName;
+	private static GenericLabel lblXYZ;
+
 	private static Spout spoutPlugin = null;
 
 	public static void Init(Spout spout)
 	{
 		spoutPlugin = spout;
+
 		lblZoneName = new GenericLabel(spoutPlugin.toString());
 		lblZoneName.shiftYPos(2);
 		lblZoneName.shiftXPos(-2);
 		lblZoneName.setAuto(true);
+
+		lblXYZ = new GenericLabel(spoutPlugin.toString());
+		lblXYZ.shiftYPos(2);
+		lblXYZ.setVisible(false);
+		lblXYZ.setAuto(true);
 	}
 
 	public static void UpdatePlayerZone(EpicZonePlayer ezp, EpicZone zone)
 	{
-		SpoutPlayer sp = ezp.getSpoutPlayer();
-		if (sp != null && zone != null)
+		if (General.SpoutEnabled)
 		{
-			if (sp.isSpoutCraftEnabled())
+			SpoutPlayer sp = ezp.getSpoutPlayer();
+			if (sp != null && zone != null)
 			{
-				if (ezp.getZoneLabel() == null)
+				if (sp.isSpoutCraftEnabled())
 				{
-					ezp.setZoneLabel((GenericLabel) lblZoneName.copy());
+					if (ezp.UI.getZoneLabel() == null)
+					{
+						ezp.UI.setZoneLabel((GenericLabel) lblZoneName.copy());
+					}
+					if (sp.getMainScreen().containsWidget(ezp.UI.getZoneLabel()))
+					{
+						ezp.UI.getZoneLabel().setText(zone.getName());
+						ezp.UI.getZoneLabel().setAnchor(WidgetAnchor.TOP_RIGHT);
+						ezp.UI.getZoneLabel().setAlign(WidgetAnchor.TOP_RIGHT);
+						ezp.UI.getZoneLabel().setDirty(true);
+					}
+					else if (sp.getMainScreen().canAttachWidget(lblZoneName))
+					{
+						ezp.UI.getZoneLabel().setText(zone.getName());
+						ezp.UI.getZoneLabel().setAnchor(WidgetAnchor.TOP_RIGHT);
+						ezp.UI.getZoneLabel().setAlign(WidgetAnchor.TOP_RIGHT);
+						sp.getMainScreen().attachWidget(General.plugin, ezp.UI.getZoneLabel());
+					}
 				}
+			}
+		}
+	}
 
-				if (sp.getMainScreen().containsWidget(ezp.getZoneLabel()))
+	public static void UpdatePlayerXYZ(Player player)
+	{
+		if (General.SpoutEnabled)
+		{
+			EpicZonePlayer ezp = General.getPlayer(player.getName());
+			SpoutPlayer sp = ezp.getSpoutPlayer();
+			if (sp != null)
+			{
+				if (sp.isSpoutCraftEnabled())
 				{
-					ezp.getZoneLabel().setText(zone.getName());
-					ezp.getZoneLabel().setAnchor(WidgetAnchor.TOP_RIGHT);
-					ezp.getZoneLabel().setAlign(WidgetAnchor.TOP_RIGHT);
-					ezp.getZoneLabel().setDirty(true);
-				}
-				else if (sp.getMainScreen().canAttachWidget(lblZoneName))
-				{
-					ezp.getZoneLabel().setText(zone.getName());
-					ezp.getZoneLabel().setAnchor(WidgetAnchor.TOP_RIGHT);
-					ezp.getZoneLabel().setAlign(WidgetAnchor.TOP_RIGHT);
-					sp.getMainScreen().attachWidget(General.plugin, ezp.getZoneLabel());
+					Location loc = player.getLocation();
+					if (ezp.UI.getXYZLabel() == null)
+					{
+						ezp.UI.setXYZLabel((GenericLabel) lblXYZ.copy());
+					}
+					if (sp.getMainScreen().containsWidget(ezp.UI.getXYZLabel()))
+					{
+						ezp.UI.getXYZLabel().setText("X:" + loc.getBlockX() + " Y:" + loc.getBlockY() + " Z:" + loc.getBlockZ());
+						ezp.UI.getXYZLabel().setAnchor(WidgetAnchor.TOP_CENTER);
+						ezp.UI.getXYZLabel().setAlign(WidgetAnchor.TOP_CENTER);
+						ezp.UI.getXYZLabel().setDirty(true);
+					}
+					else if (sp.getMainScreen().canAttachWidget(lblZoneName))
+					{
+						ezp.UI.getXYZLabel().setText("X:" + loc.getBlockX() + " Y:" + loc.getBlockY() + " Z:" + loc.getBlockZ());
+						ezp.UI.getXYZLabel().setAnchor(WidgetAnchor.TOP_CENTER);
+						ezp.UI.getXYZLabel().setAlign(WidgetAnchor.TOP_CENTER);
+						sp.getMainScreen().attachWidget(General.plugin, ezp.UI.getXYZLabel());
+					}
 				}
 			}
 		}

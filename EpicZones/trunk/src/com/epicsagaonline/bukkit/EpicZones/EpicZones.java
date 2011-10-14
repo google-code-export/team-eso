@@ -32,8 +32,11 @@ THE SOFTWARE.
 package com.epicsagaonline.bukkit.EpicZones;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -52,7 +55,10 @@ import com.epicsagaonline.bukkit.EpicZones.integration.PermissionsManager;
 import com.epicsagaonline.bukkit.EpicZones.listeners.BlockEvents;
 import com.epicsagaonline.bukkit.EpicZones.listeners.EntityEvents;
 import com.epicsagaonline.bukkit.EpicZones.listeners.PlayerEvents;
+import com.epicsagaonline.bukkit.EpicZones.listeners.SpoutEvents;
+import com.epicsagaonline.bukkit.EpicZones.listeners.SpoutInputEvents;
 import com.epicsagaonline.bukkit.EpicZones.listeners.VehicleEvents;
+import com.epicsagaonline.bukkit.EpicZones.listeners.WorldEvents;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 import com.herocraftonline.dthielke.herochat.HeroChat;
@@ -67,6 +73,9 @@ public class EpicZones extends JavaPlugin
 	private final BlockEvents blockListener = new BlockEvents(this);
 	private final EntityEvents entityListener = new EntityEvents(this);
 	private final VehicleEvents vehicleListener = new VehicleEvents(this);
+	private final WorldEvents worldListener = new WorldEvents();
+	private SpoutEvents spoutListener = null;
+	private SpoutInputEvents spoutInputListener = null;
 
 	private final Regen regen = new Regen(this);
 	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
@@ -75,11 +84,11 @@ public class EpicZones extends JavaPlugin
 	private static final String[] ZONE_COMMANDS = { "ezzone", "zone" };
 	private static final String[] WHO_COMMANDS = { "ezwho", "who", "online", "whois" };
 	private static final String[] RELOAD_COMMANDS = { "ezreload", "reload" };
-	private static final String CONFIG_FILE = "config.yml";
 
 	private static CommandHandler reloadCommandHandler = new EZReload();
 	private static CommandHandler zoneCommandHandler = new EZZone();
 	private static CommandHandler whoCommandHandler = new EZWho();
+	private static int scheduleID = -1;
 
 	public static HeroChat heroChat = null;
 	public static Spout spout = null;
@@ -88,13 +97,7 @@ public class EpicZones extends JavaPlugin
 	public void onEnable()
 	{
 
-		File file = new File(this.getDataFolder() + File.separator + CONFIG_FILE);
-		if (!this.getDataFolder().exists())
-		{
-			this.getDataFolder().mkdir();
-		}
-
-		General.config = new Config(file);
+		Config.Load(this);
 
 		PluginDescriptionFile pdfFile = this.getDescription();
 
@@ -122,16 +125,18 @@ public class EpicZones extends JavaPlugin
 			pm.registerEvent(Event.Type.ENTITY_EXPLODE, this.entityListener, Event.Priority.Normal, this);
 
 			pm.registerEvent(Event.Type.VEHICLE_MOVE, this.vehicleListener, Event.Priority.Normal, this);
+			
+			pm.registerEvent(Event.Type.WORLD_LOAD, this.worldListener, Event.Priority.Highest, this);
 
-			getServer().getScheduler().scheduleAsyncRepeatingTask(this, regen, 10, 10);
+			scheduleID = getServer().getScheduler().scheduleAsyncRepeatingTask(this, regen, 10, 10);
 
 			registerCommands();
 
-			setupMultiWorld();
+			//setupMultiWorld();
 			setupPermissions();
 			setupEpicZones();
 			setupHeroChat();
-			setupSpout();
+			setupSpout(pm);
 
 			Log.Write("version " + pdfFile.getVersion() + " is enabled.");
 
@@ -145,6 +150,11 @@ public class EpicZones extends JavaPlugin
 
 	public void onDisable()
 	{
+
+		while (getServer().getScheduler().isCurrentlyRunning(scheduleID))
+		{}
+		getServer().getScheduler().cancelTask(scheduleID);
+
 		PluginDescriptionFile pdfFile = this.getDescription();
 		for (String playerName : General.myPlayers.keySet())
 		{
@@ -157,6 +167,8 @@ public class EpicZones extends JavaPlugin
 				}
 			}
 		}
+		General.HeroChatEnabled = false;
+		General.SpoutEnabled = false;
 		Log.Write("version " + pdfFile.getVersion() + " is disabled.");
 	}
 
@@ -197,19 +209,19 @@ public class EpicZones extends JavaPlugin
 		EpicZones.permissions = new PermissionsManager(this);
 	}
 
-	public void setupMultiWorld()
-	{
-		EnablePlugin("EpicGates", "Multi World");
-		EnablePlugin("MultiVerse", "Multi World");
-		EnablePlugin("WorldWarp", "Multi World");
-		EnablePlugin("WormholeXTremeWorlds", "Multi World");
-		EnablePlugin("NetherPlugin", "Multi World");
-		EnablePlugin("Nethrar", "Multi World");
-		EnablePlugin("NetherPortal", "Multi World");
-		EnablePlugin("Nether", "Multi World");
-		EnablePlugin("NetherGate", "Multi World");
-		EnablePlugin("Stargate", "Multi World");
-	}
+//	public void setupMultiWorld()
+//	{
+//		EnablePlugin("EpicGates", "Multi World");
+//		EnablePlugin("MultiVerse", "Multi World");
+//		EnablePlugin("WorldWarp", "Multi World");
+//		EnablePlugin("WormholeXTremeWorlds", "Multi World");
+//		EnablePlugin("NetherPlugin", "Multi World");
+//		EnablePlugin("Nethrar", "Multi World");
+//		EnablePlugin("NetherPortal", "Multi World");
+//		EnablePlugin("Nether", "Multi World");
+//		EnablePlugin("NetherGate", "Multi World");
+//		EnablePlugin("Stargate", "Multi World");
+//	}
 
 	private void EnablePlugin(String pluginName, String pluginType)
 	{
@@ -234,25 +246,32 @@ public class EpicZones extends JavaPlugin
 
 	public void setupHeroChat()
 	{
-		if (General.config.enableHeroChat)
+		if (Config.enableHeroChat)
 		{
 			Plugin test = this.getServer().getPluginManager().getPlugin("HeroChat");
 			if (test != null)
 			{
 				heroChat = (HeroChat) test;
+				General.HeroChatEnabled = true;
 				Log.Write("HeroChat Integration Enabled.");
 			}
 		}
 	}
 
-	private void setupSpout()
+	public void setupSpout(PluginManager pm)
 	{
-		if (General.config.enableSpout)
+		if (Config.enableSpout)
 		{
 			Plugin test = this.getServer().getPluginManager().getPlugin("Spout");
 			if (test != null)
 			{
+				EnablePlugin("Spout", "Spout");
 				EpicSpout.Init((Spout) test);
+				this.spoutListener = new SpoutEvents();
+				this.spoutInputListener = new SpoutInputEvents();
+				pm.registerEvent(Event.Type.CUSTOM_EVENT, this.spoutListener, Event.Priority.Normal, this);
+				pm.registerEvent(Event.Type.CUSTOM_EVENT, this.spoutInputListener, Event.Priority.Normal, this);
+				General.SpoutEnabled = true;
 				Log.Write("Spout Integration Enabled.");
 			}
 			else
@@ -284,15 +303,163 @@ public class EpicZones extends JavaPlugin
 	{
 		General.plugin = this;
 		General.myZones.clear();
+		General.myGlobalZones.clear();
 		General.myPlayers.clear();
-		General.config.load();
-		General.config.save();
+		Config.Load(this);
 		General.version = this.getDescription().getVersion();
-		Message.LoadMessageList();
+		LoadMessageList();
 		General.LoadZones();
+		General.addPlayer(null);
 		for (Player p : getServer().getOnlinePlayers())
 		{
 			General.addPlayer(p);
 		}
 	}
+
+	public void LoadMessageList()
+	{
+		String line;
+		File file = new File(General.plugin.getDataFolder() + File.separator + "Language" + File.separator + Config.language + ".txt");
+		Message.messageList = new HashMap<Integer, String>();
+		boolean updateNeeded = false;
+		boolean foundVersion = false;
+		try
+		{
+
+			InitMessageList();
+
+			Scanner scanner = new Scanner(file);
+			try
+			{
+				while (scanner.hasNext())
+				{
+					line = scanner.nextLine().trim();
+					if (!line.isEmpty())
+					{
+						if (line.startsWith("#"))
+						{
+							int versionIndex = line.indexOf("VERSION");
+							if (versionIndex > -1)
+							{
+								foundVersion = true;
+								String version = line.substring(line.indexOf(":") + 1, line.length());
+								if (version != null && version.length() > 0)
+								{
+									if (!version.trim().equalsIgnoreCase(General.version))
+									{
+										updateNeeded = true;
+										break;
+									}
+								}
+								else
+								{
+									updateNeeded = true;
+									break;
+								}
+							}
+						}
+						else
+						{
+							Integer id;
+							String message;
+							id = Integer.parseInt(line.substring(0, line.indexOf(":")).trim());
+							message = line.substring(line.indexOf(":") + 1, line.length());
+							Message.messageList.put(id, message);
+						}
+					}
+				}
+			}
+			finally
+			{
+				scanner.close();
+			}
+
+			if (updateNeeded || !foundVersion)
+			{
+				BuildLanguageFile(Config.language.toUpperCase(), true);
+				LoadMessageList();
+			}
+			else
+			{
+				Log.Write("Language File Loaded [" + Config.language + ".txt" + "].");
+			}
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+		}
+	}
+
+	private void InitMessageList()
+	{
+		File file = new File(General.plugin.getDataFolder() + File.separator + "Language");
+
+		if (!General.plugin.getDataFolder().exists())
+		{
+			General.plugin.getDataFolder().mkdir();
+		}
+		if (!file.exists())
+		{
+			file.mkdir();
+		}
+		BuildLanguageFiles();
+	}
+
+	private void BuildLanguageFiles()
+	{
+		BuildLanguageFile("EN_US", false);
+		BuildLanguageFile("FR_FR", false);
+		BuildLanguageFile("DE_DE", false);
+	}
+
+	private void BuildLanguageFile(String FileName, boolean force)
+	{
+		File file = new File(General.plugin.getDataFolder() + File.separator + "Language" + File.separator + FileName + ".txt");
+		if (!file.exists() || force)
+		{
+			InputStream jarURL;
+			Log.Write("Deploying Language File: " + FileName);
+			jarURL = getClass().getResourceAsStream("/com/epicsagaonline/bukkit/EpicZones/resources/" + FileName + ".txt");
+			try
+			{
+				copyFile(jarURL, file);
+
+			}
+			catch (Exception ex)
+			{
+				Log.Write(ex.getMessage());
+			}
+		}
+	}
+
+	public void copyFile(InputStream in, File out) throws Exception
+	{
+		InputStream fis = in;
+		FileOutputStream fos = new FileOutputStream(out);
+		try
+		{
+			byte[] buf = new byte[1024];
+			int i = 0;
+			while ((i = fis.read(buf)) != -1)
+			{
+				fos.write(buf, 0, i);
+			}
+		}
+		catch (Exception e)
+		{
+			Log.Write(e.getMessage());
+		}
+		finally
+		{
+			if (fis != null)
+			{
+				fis.close();
+			}
+			if (fos != null)
+			{
+				fos.close();
+			}
+		}
+	}
+
 }

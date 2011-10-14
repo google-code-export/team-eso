@@ -28,47 +28,40 @@ package com.epicsagaonline.bukkit.EpicZones.objects;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.bukkit.util.config.Configuration;
-import org.bukkit.util.config.ConfigurationNode;
-import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Log;
+import com.epicsagaonline.bukkit.EpicZones.Util;
 
-public class EpicZoneDAL{
-	private static final Yaml yaml;
-	private static final String PATH = "Zones"; 
-	static {
-		DumperOptions options = new DumperOptions();
-		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-		yaml = new Yaml(options);
-	}
+public class EpicZoneDAL
+{
+	private static final String PATH = "Zones";
 
-	public static Map<String, EpicZone> Load() 
+	public static Map<String, EpicZone> Load()
 	{
 
 		File file = new File(General.plugin.getDataFolder() + File.separator + PATH);
 		Map<String, EpicZone> result = new HashMap<String, EpicZone>();
 
-		if(!file.exists())
+		if (!file.exists())
 		{
 			file.mkdir();
 		}
 
-
 		String fileNames[] = file.list();
 
-		for(int i = 0; i < fileNames.length; i++)
+		for (int i = 0; i < fileNames.length; i++)
 		{
 			EpicZone zone = Load(new File(file.getAbsolutePath() + File.separator + fileNames[i]));
 			result.put(zone.getTag(), zone);
@@ -80,216 +73,255 @@ public class EpicZoneDAL{
 
 	public static void ReloadZone(String zoneTag)
 	{
-		File file = new File(General.plugin.getDataFolder() + File.separator + PATH  + File.separator + zoneTag);
-		if(file.exists())
+		File file = new File(General.plugin.getDataFolder() + File.separator + PATH + File.separator + zoneTag);
+		if (file.exists())
 		{
 			General.myZones.put(zoneTag, Load(file));
 		}
 	}
 
-	private static EpicZone Load(File file)
+	private static void Init()
+	{
+		if (!General.plugin.getDataFolder().exists())
+		{
+			General.plugin.getDataFolder().mkdir();
+		}
+
+		File file = new File(General.plugin.getDataFolder() + File.separator + PATH);
+		if (!file.exists())
+		{
+			file.mkdir();
+		}
+	}
+
+	@SuppressWarnings("unchecked") private static EpicZone Load(File file)
 	{
 
-		Map<String, ConfigurationNode> nodes;
-		List<Object> list;
-		String tag = file.getName().substring(0, file.getName().indexOf("."));		
 		EpicZone result = new EpicZone();
-		Configuration config = new Configuration(file);
+		String tag = file.getName().substring(0, file.getName().indexOf(".yml"));
 		boolean mobsAdded = false;
 
-		config.load();
-		result.setTag(tag);
-		result.setName(config.getString("name"));
-		result.setType(config.getString("type"));
-		result.setRadius(config.getInt("radius", 0));
-		result.setWorld(config.getString("world"));
-		result.setEnterText(config.getString("entertext"));
-		result.setExitText(config.getString("exittext"));
-		result.setFloor(config.getInt("floor", 0));
-		result.setCeiling(config.getInt("ceiling", 128));
-		result.setPVP(config.getBoolean("pvp", false));
-		result.setFire(getFire(config));
-		result.setExplode(getExplode(config));
-		result.setSanctuary(config.getBoolean("sanctuary", false));
-		result.setFireBurnsMobs(config.getBoolean("fireburnsmobs", true));
-		result.setPolygon(config.getString("points"));
-		result.setRegen(getRegen(config));
+		Init();
 
-		list = config.getList("mobs");
-		if(list != null)
+		if (file.exists())
 		{
-			for(Object mob: list)
+			Yaml yaml = new Yaml();
+			HashMap<String, Object> root = new HashMap<String, Object>();
+			FileInputStream stream;
+			try
 			{
-				if(mob instanceof String)
+				stream = new FileInputStream(file);
+				root = (HashMap<String, Object>) yaml.load(stream);
+
+				result.setTag(tag);
+				result.setName(Util.getStringValueFromHashSet("name", root));
+				result.setType(Util.getStringValueFromHashSet("type", root));
+				result.setRadius(Util.getIntegerValueFromHashSet("radius", root));
+				result.setWorld(Util.getStringValueFromHashSet("world", root));
+				result.setEnterText(Util.getStringValueFromHashSet("entertext", root));
+				result.setExitText(Util.getStringValueFromHashSet("exittext", root));
+				result.setFloor(Util.getIntegerValueFromHashSet("floor", root));
+				result.setCeiling(Util.getIntegerValueFromHashSet("ceiling", root, 128));
+				result.setPVP(Util.getBooleanValueFromHashSet("pvp", root));
+				result.setFire(getFire(root));
+				result.setExplode(getExplode(root));
+				result.setSanctuary(Util.getBooleanValueFromHashSet("sanctuary", root));
+				result.setFireBurnsMobs(Util.getBooleanValueFromHashSet("fireburnsmobs", root));
+				result.setPolygon(Util.getStringValueFromHashSet("points", root));
+				result.setRegen(getRegen(root));
+
+				ArrayList<String> mobList = (ArrayList<String>) Util.getObjectValueFromHashSet("mobs", root);
+				if (mobList != null)
 				{
-					result.addMob((String)mob);
-					mobsAdded = true;
+					for (String mob : mobList)
+					{
+						if (mob instanceof String)
+						{
+							result.addMob(mob);
+							mobsAdded = true;
+						}
+					}
 				}
+				if (!mobsAdded)
+				{
+					result.addMob("ALL");
+				}
+
+				ArrayList<String> ownerList = (ArrayList<String>) Util.getObjectValueFromHashSet("owners", root);
+				if (ownerList != null)
+				{
+					for (String playerName : ownerList)
+					{
+						if (playerName instanceof String)
+						{
+							result.addOwner(playerName);
+						}
+					}
+				}
+
+				ArrayList<String> childZoneList = (ArrayList<String>) Util.getObjectValueFromHashSet("childzones", root);
+				if (childZoneList != null)
+				{
+					for (String zoneName : childZoneList)
+					{
+						if (zoneName instanceof String)
+						{
+							result.addChildTag(zoneName);
+						}
+					}
+				}
+
+				HashMap<String, Object> permissionsList = (HashMap<String, Object>) Util.getObjectValueFromHashSet("permissions", root);
+				if (permissionsList != null)
+				{
+					HashMap<String, Object> innerPermission;
+					for (String key : permissionsList.keySet())
+					{
+
+						innerPermission = (HashMap<String, Object>) permissionsList.get(key);
+						String value;
+
+						value = Util.getStringValueFromHashSet("build", innerPermission);
+						if (value != null && value.length() > 0)
+						{
+							result.addPermission(key, "BUILD", value);
+						}
+
+						value = Util.getStringValueFromHashSet("destroy", innerPermission);
+						if (value != null && value.length() > 0)
+						{
+							result.addPermission(key, "DESTROY", value);
+						}
+
+						value = Util.getStringValueFromHashSet("entry", innerPermission);
+						if (value != null && value.length() > 0)
+						{
+							result.addPermission(key, "ENTRY", value);
+						}
+
+						value = "";
+
+					}
+				}
+
+				result.rebuildBoundingBox();
+
+				Log.Write("Loaded " + result.getType().toString() + " Zone [" + result.getName() + "]");
+
+			}
+			catch (FileNotFoundException e)
+			{
+				Log.Write(e.getMessage());
 			}
 		}
-		if(!mobsAdded)
-		{
-			result.addMob("ALL");
-		}
 
-		list = config.getList("owners");
-		if(list != null)
-		{
-			for(Object playerName: list)
-			{
-				if(playerName instanceof String)
-				{
-					result.addOwner((String)playerName);
-				}
-			}
-		}
-
-		list = config.getList("childzones");
-		if(list != null)
-		{
-			for(Object zoneName: list)
-			{
-				if(zoneName instanceof String)
-				{
-					result.addChildTag((String)zoneName);
-				}
-			}
-		}
-
-		nodes = config.getNodes("permissions");
-		if(nodes != null)
-		{
-			ConfigurationNode innerNodes;
-			for(String nodeName: nodes.keySet())
-			{
-				innerNodes = nodes.get(nodeName);
-				if(innerNodes.getString("build") != null);
-				{
-					result.addPermission(
-							nodeName, 
-							"BUILD", 
-							innerNodes.getString("build"));
-				}
-
-				if(innerNodes.getString("destroy") != null);
-				{
-					result.addPermission(
-							nodeName, 
-							"DESTROY", 
-							innerNodes.getString("destroy"));
-				}
-
-				if(innerNodes.getString("entry") != null);
-				{
-					result.addPermission(
-							nodeName, 
-							"ENTRY", 
-							innerNodes.getString("entry"));
-				}
-			}
-		}
-
-		result.rebuildBoundingBox();
-
-		Log.Write("Loaded " + result.getType().toString() + " Zone [" + result.getName() + "]");
-
+		Save(result);
+		
 		return result;
 
 	}
 
-
-	private static String getRegen(Configuration config)
+	@SuppressWarnings("unchecked") private static String getRegen(HashMap<String, Object> root)
 	{
 		String result = "";
 
-		result += config.getString("regen.amount") + ":";
-		result += config.getString("regen.delay") + ":";
-		result += config.getString("regen.interval") + ":";
-		result += config.getString("regen.maxregen") + ":";
-		result += config.getString("regen.mindegen") + ":";
-		result += config.getString("regen.restdelay") + ":";
-		result += config.getString("regen.bedbonus");
+		HashMap<String, Object> regen = (HashMap<String, Object>) Util.getObjectValueFromHashSet("regen", root);
+
+		result += Util.getStringValueFromHashSet("amount", regen) + ":";
+		result += Util.getStringValueFromHashSet("delay", regen) + ":";
+		result += Util.getStringValueFromHashSet("interval", regen) + ":";
+		result += Util.getStringValueFromHashSet("maxregen", regen) + ":";
+		result += Util.getStringValueFromHashSet("mindegen", regen) + ":";
+		result += Util.getStringValueFromHashSet("restdelay", regen) + ":";
+		result += Util.getStringValueFromHashSet("bedbonus", regen);
 
 		return result;
 	}
-	
-	private static String getExplode(Configuration config)
+
+	@SuppressWarnings("unchecked") private static String getExplode(HashMap<String, Object> root)
 	{
 		String result = "";
 
-		result += config.getString("explode.tnt") + ":";
-		result += config.getString("explode.creeper") + ":";
-		result += config.getString("explode.ghast");
+		HashMap<String, Object> explode = (HashMap<String, Object>) Util.getObjectValueFromHashSet("explode", root);
+
+		result += Util.getStringValueFromHashSet("tnt", explode) + ":";
+		result += Util.getStringValueFromHashSet("creeper", explode) + ":";
+		result += Util.getStringValueFromHashSet("ghast", explode);
 
 		return result;
 	}
-	
-	private static String getFire(Configuration config)
+
+	@SuppressWarnings("unchecked") private static String getFire(HashMap<String, Object> root)
 	{
 		String result = "";
 
-		result += config.getString("fire.ignite") + ":";
-		result += config.getString("fire.spread");
+		HashMap<String, Object> fire = (HashMap<String, Object>) Util.getObjectValueFromHashSet("fire", root);
+
+		result += Util.getStringValueFromHashSet("ignite", fire) + ":";
+		result += Util.getStringValueFromHashSet("spread", fire);
 
 		return result;
 	}
 
-	public static boolean Save(EpicZone zone)
+	public static void Save(EpicZone zone)
 	{
 
-		if(zone != null && zone.getTag().length() > 0)
+		if (zone != null && zone.getTag().length() > 0)
 		{
+
+			Yaml yaml = new Yaml();
+			File file = new File(General.plugin.getDataFolder() + File.separator + PATH + File.separator + zone.getTag() + ".yml");
+			HashMap<String, Object> root = new HashMap<String, Object>();
 			FileOutputStream stream;
 			BufferedWriter writer;
-			File file = new File(General.plugin.getDataFolder() + File.separator + PATH + File.separator + zone.getTag() + ".yml");
-			Map<String, Object> config = new TreeMap<String, Object>();
 
-			config.put("name", zone.getName());
-			config.put("type", zone.getType().toString());
-			config.put("radius", zone.getRadius());
-			config.put("world", zone.getWorld());
-			config.put("entertext", zone.getEnterText());
-			config.put("exittext", zone.getExitText());
-			config.put("floor", zone.getFloor());
-			config.put("ceiling", zone.getCeiling());
-			config.put("pvp", zone.getPVP());
-			config.put("mobs", zone.getMobs().toArray());
-			config.put("fire", zone.getFire());
-			config.put("sanctuary", zone.getSanctuary());
-			config.put("fireburnsmobs", zone.getFireBurnsMobs());
+			root.put("name", zone.getName());
+			root.put("type", zone.getType().toString());
+			root.put("radius", zone.getRadius());
+			root.put("world", zone.getWorld());
+			root.put("entertext", zone.getEnterText());
+			root.put("exittext", zone.getExitText());
+			root.put("floor", zone.getFloor());
+			root.put("ceiling", zone.getCeiling());
+			root.put("pvp", zone.getPVP());
+			root.put("mobs", zone.getMobs().toArray());
+			root.put("fire", zone.getFire());
+			root.put("sanctuary", zone.getSanctuary());
+			root.put("fireburnsmobs", zone.getFireBurnsMobs());
 
 			Map<String, Object> explode = new TreeMap<String, Object>();
-			explode.put("tnt", zone.getExplode().getTNT()); 
-			explode.put("creeper", zone.getExplode().getCreeper()); 
-			explode.put("ghast", zone.getExplode().getGhast()); 
-			config.put("explode", explode);
-			
+			explode.put("tnt", zone.getExplode().getTNT());
+			explode.put("creeper", zone.getExplode().getCreeper());
+			explode.put("ghast", zone.getExplode().getGhast());
+			root.put("explode", explode);
+
 			Map<String, Object> fire = new TreeMap<String, Object>();
-			fire.put("ignite", zone.getFire().getIgnite()); 
-			fire.put("spread", zone.getFire().getSpread());  
-			config.put("fire", fire);
-			
+			fire.put("ignite", zone.getFire().getIgnite());
+			fire.put("spread", zone.getFire().getSpread());
+			root.put("fire", fire);
+
 			Map<String, Object> regen = new TreeMap<String, Object>();
-			regen.put("amount", zone.getRegen().getAmount()); 
-			regen.put("delay", zone.getRegen().getDelay()); 
-			regen.put("interval", zone.getRegen().getInterval()); 
-			regen.put("maxregen", zone.getRegen().getMaxRegen()); 
-			regen.put("mindegen", zone.getRegen().getMinDegen()); 
+			regen.put("amount", zone.getRegen().getAmount());
+			regen.put("delay", zone.getRegen().getDelay());
+			regen.put("interval", zone.getRegen().getInterval());
+			regen.put("maxregen", zone.getRegen().getMaxRegen());
+			regen.put("mindegen", zone.getRegen().getMinDegen());
 			regen.put("restdelay", zone.getRegen().getRestDelay());
 			regen.put("bedbonus", zone.getRegen().getBedBonus());
-			config.put("regen", regen);
+			root.put("regen", regen);
 
-			config.put("owners", zone.getOwners());
-			config.put("childzones", zone.getChildrenTags().toArray());
-			config.put("points", zone.getPoints());
-			config.put("permissions", BuildPerms(zone.getPermissions()));
+			root.put("owners", zone.getOwners());
+			root.put("childzones", zone.getChildrenTags().toArray());
+			root.put("points", zone.getPoints());
+			root.put("permissions", BuildPerms(zone.getPermissions()));
 
-			try 
+			try
 			{
-				if(!file.exists())
+
+				if (!file.exists())
 				{
 					File dir = new File(General.plugin.getDataFolder() + File.separator + PATH);
-					if(!dir.exists())
+					if (!dir.exists())
 					{
 						dir.mkdir();
 					}
@@ -302,24 +334,18 @@ public class EpicZoneDAL{
 
 				try
 				{
-					writer.write(yaml.dump(config));
+					writer.write(yaml.dump(root));
 				}
-				finally 
+				finally
 				{
 					writer.close();
 				}
-
 			}
-			catch(IOException e)
+			catch (IOException e)
 			{
 				Log.Write(e.getMessage());
-				return false;
 			}
-			return true;
-		}
-		else
-		{
-			return false;
+
 		}
 	}
 
@@ -328,27 +354,27 @@ public class EpicZoneDAL{
 		Map<String, Object> mainMap = new HashMap<String, Object>();
 		ArrayList<String> members = new ArrayList<String>();
 
-		for(String permKey : perms.keySet())
+		for (String permKey : perms.keySet())
 		{
 			EpicZonePermission perm = perms.get(permKey);
-			if(!members.contains(perm.getMember().toLowerCase()))
+			if (!members.contains(perm.getMember().toLowerCase()))
 			{
 				members.add(perm.getMember().toLowerCase());
 			}
 		}
 
-		for(String memberName : members)
+		for (String memberName : members)
 		{
 			Map<String, Object> map = new HashMap<String, Object>();
-			for(String permKey : perms.keySet())
+			for (String permKey : perms.keySet())
 			{
 				EpicZonePermission perm = perms.get(permKey);
-				if(memberName.equals(perm.getMember().toLowerCase()))
+				if (memberName.equals(perm.getMember().toLowerCase()))
 				{
 					map.put(perm.getNode().toString().toLowerCase(), perm.getPermission().toString().toLowerCase());
 				}
 			}
-			if(map.size() > 0)
+			if (map.size() > 0)
 			{
 				mainMap.put(memberName, map);
 			}
@@ -360,12 +386,12 @@ public class EpicZoneDAL{
 	public static void DeleteZone(String zoneTag)
 	{
 		EpicZone zone = General.myZones.get(zoneTag);
-		if(zone != null)
+		if (zone != null)
 		{
 			File file = new File(General.plugin.getDataFolder() + File.separator + PATH + File.separator + zone.getTag() + ".yml");
 			if (file.exists())
 			{
-				if(file.delete())
+				if (file.delete())
 				{
 					General.LoadZones();
 				}

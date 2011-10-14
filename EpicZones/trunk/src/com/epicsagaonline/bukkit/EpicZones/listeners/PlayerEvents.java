@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.listeners;
 
-
 import java.awt.Point;
 import java.util.Date;
 import java.util.HashSet;
@@ -49,52 +48,53 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import com.epicsagaonline.bukkit.EpicZones.Config;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
+import com.epicsagaonline.bukkit.EpicZones.integration.EpicSpout;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 
-
-/**
- * Handle events for all Player related events
- * @author jblaske
- */
 public class PlayerEvents extends PlayerListener
 {
 	private Set<Integer> interactiveItems = new HashSet<Integer>();
 
 	public PlayerEvents(EpicZones instance)
 	{
-		interactiveItems.add(324); //Wood Door
-		interactiveItems.add(330); //Iron Door
-		interactiveItems.add(323); //Painting
-		interactiveItems.add(321); //Sign
-		interactiveItems.add(354); //Bed
-		interactiveItems.add(355); //Cake
-		interactiveItems.add(356); //Redstone Repeater
+		interactiveItems.add(324); // Wood Door
+		interactiveItems.add(330); // Iron Door
+		interactiveItems.add(323); // Painting
+		interactiveItems.add(321); // Sign
+		interactiveItems.add(354); // Bed
+		interactiveItems.add(355); // Cake
+		interactiveItems.add(356); // Redstone Repeater
 	}
 
 	public @Override void onPlayerMove(PlayerMoveEvent event)
 	{
-		if(!event.isCancelled())
+		if (!event.isCancelled())
 		{
-			if(!General.PlayerMovementLogic(event.getPlayer(), event.getFrom(), event.getTo()))
+			if (!General.PlayerMovementLogic(event.getPlayer(), event.getFrom(), event.getTo()))
 			{
 				event.setTo(General.getPlayer(event.getPlayer().getName()).getCurrentLocation());
 				event.setCancelled(true);
+			}
+			if (General.SpoutEnabled)
+			{
+				EpicSpout.UpdatePlayerXYZ(event.getPlayer());
 			}
 		}
 	}
 
 	public @Override void onPlayerTeleport(PlayerTeleportEvent event)
 	{
-		if(!event.isCancelled())
+		if (!event.isCancelled())
 		{
-			if(!General.PlayerMovementLogic(event.getPlayer(), event.getFrom(), event.getTo()))
+			if (!General.PlayerMovementLogic(event.getPlayer(), event.getFrom(), event.getTo()))
 			{
 				event.setTo(General.getPlayer(event.getPlayer().getName()).getCurrentLocation());
 				event.setCancelled(true);
@@ -104,7 +104,7 @@ public class PlayerEvents extends PlayerListener
 
 	public @Override void onPlayerLogin(PlayerLoginEvent event)
 	{
-		if(event.getResult() == Result.ALLOWED)
+		if (event.getResult() == Result.ALLOWED)
 		{
 			General.addPlayer(event.getPlayer());
 		}
@@ -117,7 +117,7 @@ public class PlayerEvents extends PlayerListener
 
 	public @Override void onPlayerBucketEmpty(PlayerBucketEmptyEvent event)
 	{
-		if(!event.isCancelled())
+		if (!event.isCancelled())
 		{
 			Player player = event.getPlayer();
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
@@ -126,11 +126,11 @@ public class PlayerEvents extends PlayerListener
 			int blockHeight = event.getBlockClicked().getLocation().getBlockY();
 			boolean hasPerms = false;
 			EpicZone currentZone = null;
-			if(General.BorderLogic(blockPoint, player))
+			if (General.BorderLogic(blockPoint, player))
 			{
 				currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
 				hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "build");
-				if(!hasPerms)
+				if (!hasPerms)
 				{
 					if (ezp.getLastWarned().before(new Date()))
 					{
@@ -145,7 +145,7 @@ public class PlayerEvents extends PlayerListener
 
 	public @Override void onPlayerBucketFill(PlayerBucketFillEvent event)
 	{
-		if(!event.isCancelled())
+		if (!event.isCancelled())
 		{
 			Player player = event.getPlayer();
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
@@ -154,11 +154,11 @@ public class PlayerEvents extends PlayerListener
 			int blockHeight = event.getBlockClicked().getLocation().getBlockY();
 			boolean hasPerms = false;
 			EpicZone currentZone = null;
-			if(General.BorderLogic(blockPoint, player))
+			if (General.BorderLogic(blockPoint, player))
 			{
 				currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
 				hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "destroy");
-				if(!hasPerms)
+				if (!hasPerms)
 				{
 					if (ezp.getLastWarned().before(new Date()))
 					{
@@ -171,13 +171,13 @@ public class PlayerEvents extends PlayerListener
 		}
 	}
 
-	public @Override void onPlayerInteract(PlayerInteractEvent event) 
+	public @Override void onPlayerInteract(PlayerInteractEvent event)
 	{
-		if(!event.isCancelled())
+		if (!event.isCancelled())
 		{
-			if(event.getAction() == Action.RIGHT_CLICK_BLOCK)
+			if (event.getAction() == Action.RIGHT_CLICK_BLOCK)
 			{
-				if(event.getPlayer() != null)
+				if (event.getPlayer() != null)
 				{
 					if (interactiveItems.contains((event.getPlayer().getItemInHand().getTypeId())))
 					{
@@ -190,12 +190,12 @@ public class PlayerEvents extends PlayerListener
 						boolean hasPerms = false;
 
 						EpicZone currentZone = null;
-						if(General.BorderLogic(blockPoint, player))
+						if (General.BorderLogic(blockPoint, player))
 						{
 							currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
 							hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "build");
 
-							if(!hasPerms)
+							if (!hasPerms)
 							{
 								if (ezp.getLastWarned().before(new Date()))
 								{
@@ -206,16 +206,16 @@ public class PlayerEvents extends PlayerListener
 							}
 						}
 					}
-					else if(event.getPlayer().getItemInHand().getTypeId() == General.config.zoneTool)
+					else if (event.getPlayer().getItemInHand().getTypeId() == Config.zoneTool)
 					{
-						if(General.getPlayer(event.getPlayer().getName()).getMode() == EpicZoneMode.ZoneDraw)
+						if (General.getPlayer(event.getPlayer().getName()).getMode() == EpicZoneMode.ZoneDraw)
 						{
 							Point point = new Point(event.getClickedBlock().getLocation().getBlockX(), event.getClickedBlock().getLocation().getBlockZ());
 							EpicZonePlayer ezp = General.getPlayer(event.getPlayer().getName());
 							ezp.getEditZone().addPoint(point);
 							ezp.getEditZone().addPillar(event.getClickedBlock());
 							ezp.getEditZone().ShowPillar(point);
-							Message.Send(event.getPlayer(), Message_ID.Info_00112_Point_XZ_Added, new String[]{Integer.toString(point.x), Integer.toString(point.y)});
+							Message.Send(event.getPlayer(), Message_ID.Info_00112_Point_XZ_Added, new String[] { Integer.toString(point.x), Integer.toString(point.y) });
 						}
 					}
 				}

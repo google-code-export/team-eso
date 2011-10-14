@@ -33,101 +33,104 @@ package com.epicsagaonline.bukkit.EpicZones;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
 
-import org.bukkit.util.config.Configuration;
-import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
-public class Config extends Configuration {
-	private static final Yaml yaml;
+public class Config
+{
+	private static File file;
+	public static boolean enableRadius;
+	public static boolean enableHeroChat;
+	public static boolean globalZoneDefaultAllow;
+	public static int zoneTool = 280; // Default Tool Is Stick
+	public static String language = "EN_US";
+	public static boolean enableSpout;
+	private static final String CONFIG_FILE = "config.yml";
 
-	static {
-		DumperOptions options = new DumperOptions();
-		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-		yaml = new Yaml(options);
-	}
-
-	private File file;
-
-	public boolean enableRadius;
-	public boolean enableHeroChat;
-	public boolean globalZoneDefaultAllow;
-	public int zoneTool = 280; //Default Tool Is Stick
-	public String language = "EN_US";
-	public boolean enableSpout;
-
-	public Config(File file)
+	public static void Init(EpicZones plugin)
 	{
-		super(file);
 
-		this.file = file;
-
-		if(file == null)
-			throw new IllegalArgumentException("file cannot be null");
-	}
-
-	public void setDefaults()
-	{
 		enableRadius = true;
 		enableHeroChat = false;
 		globalZoneDefaultAllow = true;
 		zoneTool = 280;
 		language = "EN_US";
 		enableSpout = true;
-	}
 
-	@Override
-	public void load() {
-		// make sure there is always known values in case absent in config file
-		setDefaults();
-
-		if(file == null)
-			throw new IllegalArgumentException("file cannot be null");
-
-		if(!file.exists()) {
-			try {
-				file.createNewFile();
-				save();
-			}
-			catch(IOException e) {
-
-			}
-		}
-		else
+		if (!plugin.getDataFolder().exists())
 		{
-			super.load();
+			plugin.getDataFolder().mkdir();
+		}
 
-			enableRadius = getBoolean("enableRadius", true);
-			enableHeroChat = getBoolean("enableHeroChat", false);
-			globalZoneDefaultAllow = getBoolean("globalZoneDefaultAllow", true);
-			zoneTool = getInt("zoneTool", zoneTool);
-			language = getString("language", language).toUpperCase();
-			enableSpout = getBoolean("enableSpout", true);
+		file = new File(plugin.getDataFolder() + File.separator + CONFIG_FILE);
+		if (!file.exists())
+		{
+			try
+			{
+				file.createNewFile();
+			}
+			catch (IOException e)
+			{
+				Log.Write(e.getMessage());
+			}
+			Save();
+		}
 
+	}
+
+	@SuppressWarnings("unchecked") public static void Load(EpicZones plugin)
+	{
+		Init(plugin);
+
+		if (file.exists())
+		{
+			Yaml yaml = new Yaml();
+			HashMap<String, Object> root = new HashMap<String, Object>();
+			FileInputStream stream;
+			try
+			{
+				stream = new FileInputStream(file);
+				root = (HashMap<String, Object>) yaml.load(stream);
+
+				enableRadius = Util.getBooleanValueFromHashSet("enableRadius", root);
+				enableHeroChat = Util.getBooleanValueFromHashSet("enableHeroChat", root);
+				globalZoneDefaultAllow = Util.getBooleanValueFromHashSet("globalZoneDefaultAllow", root);
+				zoneTool = Util.getIntegerValueFromHashSet("zoneTool", root);
+				language = Util.getStringValueFromHashSet("language", root);
+				enableSpout = Util.getBooleanValueFromHashSet("enableSpout", root);
+
+			}
+			catch (FileNotFoundException e)
+			{
+				Log.Write(e.getMessage());
+			}
 		}
 	}
 
-	/**
-	 * Save settings to config file. File errors are ignored like load.
-	 * @return 
-	 */
-	public boolean save()
+	public static void Save()
 	{
+
+		Yaml yaml = new Yaml();
+		HashMap<String, Object> root = new HashMap<String, Object>();
 		FileOutputStream stream;
 		BufferedWriter writer;
 
 		root.put("enableRadius", enableRadius);
-		root.put("zoneTool", zoneTool);
 		root.put("enableHeroChat", enableHeroChat);
 		root.put("globalZoneDefaultAllow", globalZoneDefaultAllow);
+		root.put("zoneTool", zoneTool);
 		root.put("language", language);
 		root.put("enableSpout", enableSpout);
 
-		try 
+		try
 		{
+
 			stream = new FileOutputStream(file);
 			stream.getChannel().truncate(0);
 			writer = new BufferedWriter(new OutputStreamWriter(stream));
@@ -136,15 +139,15 @@ public class Config extends Configuration {
 			{
 				writer.write(yaml.dump(root));
 			}
-			finally 
+			finally
 			{
 				writer.close();
 			}
 		}
-		catch(IOException e)
+		catch (IOException e)
 		{
-			return false;
+			Log.Write(e.getMessage());
 		}
-		return true;
+
 	}
 }

@@ -44,10 +44,10 @@ public class EZReload implements CommandHandler {
 
 		if((sender instanceof Player && (EpicZones.permissions.hasPermission((Player)sender, "epiczones.admin")) || ((Player)sender).isOp()) || !(sender instanceof Player))
 		{
-			General.plugin.setupEpicZones();
 			General.plugin.setupPermissions();
+			General.plugin.setupEpicZones();
 			General.plugin.setupHeroChat();
-			General.plugin.setupMultiWorld();
+			General.plugin.setupSpout(General.plugin.getServer().getPluginManager());
 			Message.Send(sender, Message_ID.Info_00015_Reloaded);
 			return true;
 		}

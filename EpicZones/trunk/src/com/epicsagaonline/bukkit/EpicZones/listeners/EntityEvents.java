@@ -144,7 +144,7 @@ public class EntityEvents extends EntityListener
 							}
 							else
 							{
-								if(!General.myGlobalZones.get(e.getWorld().getName()).getPVP())
+								if(!General.myGlobalZones.get(e.getWorld().getName().toLowerCase()).getPVP())
 								{
 									event.setCancelled(true);
 								}

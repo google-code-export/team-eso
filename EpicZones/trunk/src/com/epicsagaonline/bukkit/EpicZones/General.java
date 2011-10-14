@@ -45,26 +45,28 @@ import org.bukkit.entity.Player;
 import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.integration.EpicSpout;
-import com.epicsagaonline.bukkit.EpicZones.integration.HeroChatIntegration;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone.ZoneType;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZoneDAL;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 
-public class General {
+public class General
+{
 
 	public static Map<String, EpicZone> myZones = new HashMap<String, EpicZone>();
 	public static Map<String, EpicZone> myGlobalZones = new HashMap<String, EpicZone>();
 	public static Map<String, EpicZonePlayer> myPlayers = new HashMap<String, EpicZonePlayer>();
-	public static Config config;
 	public static String version;
 	public static final String NO_PERM_ENTER = "You do not have permission to enter ";
 	public static final String NO_PERM_BORDER = "You have reached the border of the map.";
 	public static EpicZones plugin;
-	
+	public static boolean SpoutEnabled = false;
+	public static boolean HeroChatEnabled = false;
+
 	private static final String ZONE_FILE = "zones.txt";
-	//private static File myFile;
+
+	// private static File myFile;
 
 	public static EpicZonePlayer getPlayer(String name)
 	{
@@ -73,8 +75,18 @@ public class General {
 
 	public static void addPlayer(Player player)
 	{
-		myPlayers.put(player.getName().toLowerCase(), new EpicZonePlayer(player));
-		Security.UpdatePlayerSecurity(player);
+		if (player != null)
+		{
+			if (!myPlayers.containsKey(player.getName().toLowerCase()))
+			{
+				myPlayers.put(player.getName().toLowerCase(), new EpicZonePlayer(player));
+			}
+			Security.UpdatePlayerSecurity(player);
+		}
+		else
+		{
+			myPlayers.put("console", new EpicZonePlayer("console"));
+		}
 	}
 
 	public static void removePlayer(String playerName)
@@ -82,9 +94,9 @@ public class General {
 		EpicZonePlayer ezp = myPlayers.get(playerName.toLowerCase());
 		if (ezp != null)
 		{
-			if(ezp.getMode() != EpicZoneMode.None)
+			if (ezp.getMode() != EpicZoneMode.None)
 			{
-				if(ezp.getEditZone() != null)
+				if (ezp.getEditZone() != null)
 				{
 					ezp.getEditZone().HidePillars();
 				}
@@ -123,7 +135,7 @@ public class General {
 			String line;
 			File file = new File(plugin.getDataFolder() + File.separator + ZONE_FILE);
 
-			if(file.exists())
+			if (file.exists())
 			{
 				try
 				{
@@ -131,22 +143,28 @@ public class General {
 					Scanner scanner = new Scanner(file);
 					myZones.clear();
 
-					try {
-						while(scanner.hasNext())
+					try
+					{
+						while (scanner.hasNext())
 						{
 							EpicZone newZone;
 							line = scanner.nextLine().trim();
-							if(line.startsWith("#") || line.isEmpty()){continue;}
-							newZone = new EpicZone(line);;
+							if (line.startsWith("#") || line.isEmpty())
+							{
+								continue;
+							}
+							newZone = new EpicZone(line);
+							;
 							General.myZones.put(newZone.getTag(), newZone);
 						}
 
 					}
-					finally {
+					finally
+					{
 						scanner.close();
 					}
 				}
-				catch(Exception e)
+				catch (Exception e)
 				{
 					Log.Write(e.getMessage());
 				}
@@ -158,7 +176,7 @@ public class General {
 			}
 
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			Log.Write(e.getMessage());
 		}
@@ -168,7 +186,7 @@ public class General {
 
 	public static void SaveZones()
 	{
-		for(String zoneTag : myZones.keySet())
+		for (String zoneTag : myZones.keySet())
 		{
 			EpicZoneDAL.Save(myZones.get(zoneTag));
 		}
@@ -176,54 +194,59 @@ public class General {
 
 	public static void reconsileGlobalZones()
 	{
-		for(String zoneTag : myZones.keySet())
+		for (String zoneTag : myZones.keySet())
 		{
 			EpicZone zone = myZones.get(zoneTag);
-			if(zone.getType() == ZoneType.GLOBAL)
+			if (zone.getType() == ZoneType.GLOBAL)
 			{
-				myGlobalZones.put(zone.getTag(), zone);
+				myGlobalZones.put(zone.getTag().toLowerCase(), zone);
 			}
 		}
 
 		for (World world : plugin.getServer().getWorlds())
 		{
-			if (myGlobalZones.get(world.getName().toLowerCase()) == null)
-			{
-
-				EpicZone newGlobal = new EpicZone();
-
-				newGlobal.setTag(world.getName().toLowerCase());
-				newGlobal.setName(world.getName());
-				newGlobal.setRadius(1000);
-				newGlobal.setType("GLOBAL");
-				newGlobal.setMobs("all");
-				newGlobal.setWorld(world.getName());
-
-				for(String zoneTag : myZones.keySet())
-				{
-					EpicZone zone = myZones.get(zoneTag);
-					if(zone.getWorld().equalsIgnoreCase(world.getName()))
-					{
-						newGlobal.addChild(zone);	
-					}
-				}
-
-				myZones.put(newGlobal.getTag(), newGlobal);
-				myGlobalZones.put(world.getName(), newGlobal);
-
-				EpicZoneDAL.Save(myZones.get(newGlobal.getTag()));
-
-				Log.Write("Global Zone Created For World [" + world.getName() + "]");
-
-			}
-			else
-			{
-				myGlobalZones.put(world.getName(), myGlobalZones.get(world.getName()));
-			}
+			AddWorld(world);
+			// else
+			// {
+			// myGlobalZones.put(world.getName().toLowerCase(),
+			// myGlobalZones.get(world.getName().toLowerCase()));
+			// }
 		}
 
+	}
 
+	public static void AddWorld(World world)
+	{
+		Log.Write("Adding World: " + world.getName().toLowerCase());
+		if (myGlobalZones.get(world.getName().toLowerCase()) == null)
+		{
 
+			EpicZone newGlobal = new EpicZone();
+
+			newGlobal.setTag(world.getName().toLowerCase());
+			newGlobal.setName(world.getName());
+			newGlobal.setRadius(1000);
+			newGlobal.setType("GLOBAL");
+			newGlobal.setMobs("all");
+			newGlobal.setWorld(world.getName());
+
+			for (String zoneTag : myZones.keySet())
+			{
+				EpicZone zone = myZones.get(zoneTag);
+				if (zone.getWorld().equalsIgnoreCase(world.getName()))
+				{
+					newGlobal.addChild(zone);
+				}
+			}
+
+			myZones.put(newGlobal.getTag(), newGlobal);
+			myGlobalZones.put(world.getName().toLowerCase(), newGlobal);
+
+			EpicZoneDAL.Save(myZones.get(newGlobal.getTag()));
+
+			Log.Write("Global Zone Created For World [" + world.getName() + "]");
+
+		}
 	}
 
 	private static void reconcileChildren()
@@ -233,15 +256,15 @@ public class General {
 
 		try
 		{
-			for(String zoneTag: myZones.keySet())
+			for (String zoneTag : myZones.keySet())
 			{
 				EpicZone zone = myZones.get(zoneTag);
-				if(zone.hasChildren())
-				{			
-					for(String child: zone.getChildrenTags())
+				if (zone.hasChildren())
+				{
+					for (String child : zone.getChildrenTags())
 					{
 						EpicZone childZone = myZones.get(child);
-						if(childZone != null)
+						if (childZone != null)
 						{
 							childZone.setParent(zone);
 							zone.addChild(childZone);
@@ -255,7 +278,7 @@ public class General {
 					if (badChildren.size() > 0)
 					{
 						Log.Write("Removing invalid children from [" + zoneTag + "]");
-						for(String badChild: badChildren)
+						for (String badChild : badChildren)
 						{
 							zone.removeChild(badChild);
 						}
@@ -264,7 +287,7 @@ public class General {
 				}
 			}
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			Log.Write(e.getMessage());
 		}
@@ -282,7 +305,7 @@ public class General {
 	public static boolean ShouldCheckPlayer(EpicZonePlayer ezp)
 	{
 		boolean result = false;
-		if(ezp!= null)
+		if (ezp != null)
 		{
 			if (ezp.getLastCheck().before(new Date()))
 			{
@@ -294,30 +317,36 @@ public class General {
 
 	public static boolean IsNumeric(String data)
 	{
-		if (data.matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+")){return true;}
-		else {return false;} 
+		if (data.matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+"))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	public static boolean BorderLogic(Point point, Player player)
 	{
 
-		if(General.config.enableRadius)
+		if (Config.enableRadius)
 		{
 
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			EpicZone globalZone = myGlobalZones.get(player.getWorld().getName());
+			EpicZone globalZone = myGlobalZones.get(player.getWorld().getName().toLowerCase());
 
 			double xsquared = point.x * point.x;
 			double ysquared = point.y * point.y;
 			double distanceFromCenter = Math.sqrt(xsquared + ysquared);
 
-			ezp.setDistanceFromCenter((int)distanceFromCenter);
+			ezp.setDistanceFromCenter((int) distanceFromCenter);
 
-			if(globalZone != null)
+			if (globalZone != null)
 			{
-				if(distanceFromCenter <= globalZone.getRadius())
+				if (distanceFromCenter <= globalZone.getRadius())
 				{
-					if(ezp.getPastBorder())
+					if (ezp.getPastBorder())
 					{
 						WarnPlayer(player, ezp, "You are inside the map radius border.");
 						ezp.setPastBorder(false);
@@ -326,9 +355,9 @@ public class General {
 				}
 				else
 				{
-					if(EpicZones.permissions.hasPermission(player, "epiczones.ignoremapradius"))
+					if (EpicZones.permissions.hasPermission(player, "epiczones.ignoremapradius"))
 					{
-						if(!ezp.getPastBorder())
+						if (!ezp.getPastBorder())
 						{
 							WarnPlayer(player, ezp, "You are outside the map radius border.");
 							ezp.setPastBorder(true);
@@ -337,11 +366,12 @@ public class General {
 					}
 					else
 					{
-						return false;	
+						return false;
 					}
 				}
 			}
-			else //No border defined for the world in config.
+			else
+			// No border defined for the world in config.
 			{
 				return true;
 			}
@@ -354,45 +384,48 @@ public class General {
 
 	public static EpicZone GetZoneForPlayer(Player player, String worldName, int playerHeight, Point playerPoint)
 	{
-		EpicZone result = null; 
-		if(player != null)
+		EpicZone result = null;
+		if (player != null)
 		{
 			EpicZonePlayer ezp = getPlayer(player.getName());
-			if(ezp.getCurrentZone() != null)
+			if (ezp.getCurrentZone() != null)
 			{
 				result = IsPlayerWithinZone(ezp.getCurrentZone(), worldName, playerHeight, playerPoint);
 			}
 		}
-		if(result == null)
+		if (result == null)
 		{
-			for(String zoneTag : myZones.keySet())
+			for (String zoneTag : myZones.keySet())
 			{
 				EpicZone zone = myZones.get(zoneTag);
 				result = IsPlayerWithinZone(zone, worldName, playerHeight, playerPoint);
-				if(result != null){break;}
+				if (result != null)
+				{
+					break;
+				}
 			}
 		}
-		return result;	
+		return result;
 	}
 
 	private static EpicZone IsPlayerWithinZone(EpicZone zone, String worldName, int playerHeight, Point playerPoint)
 	{
 		EpicZone result = null;
-		if(zone.IsPointWithin(worldName, playerHeight, playerPoint))
+		if (zone.IsPointWithin(worldName, playerHeight, playerPoint))
 		{
 			result = zone;
-			if(zone.hasChildren())
+			if (zone.hasChildren())
 			{
 				EpicZone childResult = null;
-				for(String zoneTag : zone.getChildren().keySet())
+				for (String zoneTag : zone.getChildren().keySet())
 				{
 					childResult = IsPlayerWithinZone(myZones.get(zoneTag), worldName, playerHeight, playerPoint);
-					if(childResult != null)
+					if (childResult != null)
 					{
 						result = childResult;
 						break;
 					}
-				}				
+				}
 			}
 		}
 		return result;
@@ -401,34 +434,42 @@ public class General {
 	public static boolean PlayerMovementLogic(Player player, Location fromLoc, Location toLoc)
 	{
 		boolean result = true;
-		EpicZonePlayer ezp = General.getPlayer(player.getName());	
-		if(General.ShouldCheckPlayer(ezp))
+		EpicZonePlayer ezp = General.getPlayer(player.getName());
+		if (General.ShouldCheckPlayer(ezp))
 		{
-			if(!ezp.isTeleporting())
+			if (!ezp.isTeleporting())
 			{
 				int playerHeight = toLoc.getBlockY();
 				Point playerPoint = new Point(toLoc.getBlockX(), toLoc.getBlockZ());
 				EpicZone zone = null;
-				if(General.BorderLogic(playerPoint, player))
+				if (General.BorderLogic(playerPoint, player))
 				{
 					zone = General.GetZoneForPlayer(player, toLoc.getWorld().getName(), playerHeight, playerPoint);
-					if(zone != null)
+					if (zone != null)
 					{
-						if(ZonePermissionsHandler.hasPermissions(player, zone, "entry"))
+						if (ZonePermissionsHandler.hasPermissions(player, zone, "entry"))
 						{
-							if((ezp.getCurrentZone() != null && !ezp.getCurrentZone().getTag().equals(zone.getTag())) || ezp.getCurrentZone() == null)
+							if ((ezp.getCurrentZone() != null && !ezp.getCurrentZone().getTag().equals(zone.getTag())) || ezp.getCurrentZone() == null)
 							{
-								if(ezp.getCurrentZone() != null)
+								if (ezp.getCurrentZone() != null)
 								{
 									ezp.setPreviousZoneTag(ezp.getCurrentZone().getTag());
-									if(ezp.getCurrentZone().getExitText().length() > 0){Message.Send(player, ezp.getCurrentZone().getExitText());}	
+									if (ezp.getCurrentZone().getExitText().length() > 0)
+									{
+										Message.Send(player, ezp.getCurrentZone().getExitText());
+									}
 								}
 								ezp.setCurrentZone(zone);
-								HeroChatIntegration.joinChat(zone.getTag(), ezp, player);
-								if(zone.getEnterText().length() > 0){Message.Send(player, zone.getEnterText());}
-								EpicSpout.UpdatePlayerZone(ezp, zone);
+								if (zone.getEnterText().length() > 0)
+								{
+									Message.Send(player, zone.getEnterText());
+								}
+								if (General.SpoutEnabled)
+								{
+									EpicSpout.UpdatePlayerZone(ezp, zone);
+								}
 								ezp.setCurrentLocation(fromLoc);
-							}							
+							}
 						}
 						else
 						{

@@ -35,6 +35,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Log;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
@@ -42,36 +43,39 @@ import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 
-public class EZZoneCreate 
+public class EZZoneCreate
 {
 	public EZZoneCreate(String[] data, CommandSender sender)
 	{
-		if(sender instanceof Player)
+		if (sender instanceof Player)
 		{
-			Player player = (Player)sender;
+			Player player = (Player) sender;
 			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			if(ezp.getAdmin()) //Only admins can create zones
+			if (ezp.getAdmin()) // Only admins can create zones
 			{
-				if(ezp.getMode() == EpicZoneMode.None)
+				if (ezp.getMode() == EpicZoneMode.None)
 				{
-					if(data.length > 1 && data[1].length() > 0)
+					if (data.length > 1 && data[1].length() > 0)
 					{
 						String tag = data[1].replaceAll("[^a-zA-Z0-9_]", "");
-						if(General.myZones.get(tag) == null)
+						if (General.myZones.get(tag) == null)
 						{
+
 							EpicZone zone = new EpicZone();
 
 							zone.setTag(tag);
 							zone.setName(tag);
 							zone.setWorld(player.getWorld().getName());
-							zone.setDefaults(General.myGlobalZones.get(player.getWorld()));
+							Log.Write(player.getWorld().getName());
+							Log.Write(General.myGlobalZones.get(player.getWorld().getName().toLowerCase()).getName());
+							zone.setDefaults(General.myGlobalZones.get(player.getWorld().getName().toLowerCase()));
 							ezp.setEditZone(zone);
 							ezp.setMode(EpicZoneMode.ZoneDraw);
 							Message.Send(sender, Message_ID.Mode_00020_Draw_StartAfterNew);
 						}
 						else
 						{
-							Message.Send(sender, Message_ID.Warning_00103_Zone_X_Exists, new String[]{tag});
+							Message.Send(sender, Message_ID.Warning_00103_Zone_X_Exists, new String[] { tag });
 						}
 					}
 					else
@@ -84,6 +88,6 @@ public class EZZoneCreate
 			{
 				new EZZoneHelp(ZoneCommand.CREATE, sender, ezp);
 			}
-		}		
+		}
 	}
 }

@@ -34,14 +34,13 @@ package com.epicsagaonline.bukkit.EpicZones.objects;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.getspout.spoutapi.SpoutManager;
-import org.getspout.spoutapi.gui.GenericLabel;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.integration.HeroChatIntegration;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.UUID;
 
 public class EpicZonePlayer
 {
@@ -64,13 +63,27 @@ public class EpicZonePlayer
 	private Date lastMoved = new Date();
 	private boolean admin = false;
 	private SpoutPlayer spoutPlayer = null;
-	private GenericLabel zoneLabel = null;
+	public EpicZonePlayerUI UI = new EpicZonePlayerUI();
 
-	public GenericLabel getZoneLabel()
+	public EpicZonePlayer(Player newplayer)
 	{
-		return zoneLabel;
+		this.player = newplayer;
+		this.entityID = newplayer.getEntityId();
+		this.name = newplayer.getName();
+		setCurrentLocation(newplayer.getWorld().getSpawnLocation());
+		setCurrentZone(General.myGlobalZones.get(newplayer.getWorld().getName().toLowerCase()));
 	}
 
+	public EpicZonePlayer(String username)
+	{
+		this.player = null;
+		this.entityID = -9999;
+		this.name = username;
+		this.admin = true;
+		setCurrentLocation(General.plugin.getServer().getWorlds().get(0).getSpawnLocation());
+		setCurrentZone(General.myGlobalZones.get(General.plugin.getServer().getWorlds().get(0).getName().toLowerCase()));
+	}
+	
 	public SpoutPlayer getSpoutPlayer()
 	{
 		if (spoutPlayer == null)
@@ -180,11 +193,6 @@ public class EpicZonePlayer
 		this.pastBorder = value;
 	}
 
-	public void setZoneLabel(GenericLabel value)
-	{
-		this.zoneLabel = value;
-	}
-
 	public void setEntityID(int value)
 	{
 		this.entityID = value;
@@ -205,19 +213,15 @@ public class EpicZonePlayer
 		this.admin = value;
 	}
 
-	public EpicZonePlayer(Player newplayer)
-	{
-		this.player = newplayer;
-		this.entityID = newplayer.getEntityId();
-		this.name = newplayer.getName();
-		setCurrentLocation(newplayer.getWorld().getSpawnLocation());
-		setCurrentZone(General.myGlobalZones.get(newplayer.getWorld().getName().toLowerCase()));
-	}
-
 	public void setCurrentZone(EpicZone z)
 	{
+		if (this.currentZone != null)
+		{
+			HeroChatIntegration.leaveChat(this.currentZone.getTag(), this);
+		}
 		this.currentZone = z;
 		this.enteredZone = new Date();
+		HeroChatIntegration.joinChat(z.getTag(), this);
 	}
 
 	public void setDistanceFromCenter(int distance)

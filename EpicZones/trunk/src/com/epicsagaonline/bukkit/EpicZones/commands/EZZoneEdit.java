@@ -35,6 +35,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Log;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
@@ -43,54 +44,59 @@ import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone.ZoneType;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 
-public class EZZoneEdit 
+public class EZZoneEdit
 {
 	public EZZoneEdit(String[] data, CommandSender sender)
 	{
-		if(sender instanceof Player)
+		EpicZonePlayer ezp;
+		if (sender instanceof Player)
 		{
-			Player player = (Player)sender;
-			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			if(ezp.getMode() == EpicZoneMode.None)
+			ezp = General.getPlayer(((Player) sender).getName());
+		}
+		else
+		{
+			ezp = General.getPlayer("console");
+		}
+		Log.Write((ezp == null) + "");
+		if (ezp.getMode() == EpicZoneMode.None)
+		{
+			if (data.length > 1)
 			{
-				if(data.length > 1)
+				if (data[1].length() > 0)
 				{
-					if(data[1].length() > 0)
+					if (General.myZones.get(data[1]) != null)
 					{
-						if(General.myZones.get(data[1]) != null)
+						String tag = data[1].replaceAll("[^a-zA-Z0-9_]", "");
+						EpicZone zone = General.myZones.get(tag);
+						if (zone.getType() != ZoneType.GLOBAL)
 						{
-							String tag = data[1].replaceAll("[^a-zA-Z0-9_]", "");
-							EpicZone zone = General.myZones.get(tag);
-							if(zone.getType() != ZoneType.GLOBAL)
+							if (ezp.getAdmin() || zone.isOwner(ezp.getName()))
 							{
-								if(ezp.getAdmin() || zone.isOwner(ezp.getName()))
-								{
-									ezp.setEditZone(new EpicZone(zone));
-									ezp.setMode(EpicZoneMode.ZoneEdit);
-									ezp.getEditZone().ShowPillars();
-									Message.Send(sender, Message_ID.Info_00105_Mode_Edit, new String[]{tag});
-								}
-								else
-								{
-									Message.Send(sender, Message_ID.Warning_00106_Perm_EditZone, new String[]{tag});	
-								}
+								ezp.setEditZone(new EpicZone(zone));
+								ezp.setMode(EpicZoneMode.ZoneEdit);
+								ezp.getEditZone().ShowPillars();
+								Message.Send(sender, Message_ID.Info_00105_Mode_Edit, new String[] { tag });
 							}
 							else
 							{
-								Message.Send(sender, Message_ID.Warning_00022_CannotDeleteGlobalZones);
+								Message.Send(sender, Message_ID.Warning_00106_Perm_EditZone, new String[] { tag });
 							}
 						}
 						else
 						{
-							new EZZoneCreate(data, sender);
+							Message.Send(sender, Message_ID.Warning_00022_CannotDeleteGlobalZones);
 						}
+					}
+					else
+					{
+						new EZZoneCreate(data, sender);
 					}
 				}
 			}
-			else
-			{
-				new EZZoneHelp(ZoneCommand.EDIT, sender, ezp);
-			}
+		}
+		else
+		{
+			new EZZoneHelp(ZoneCommand.EDIT, sender, ezp);
 		}
 	}
 }

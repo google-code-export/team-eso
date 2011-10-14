@@ -61,6 +61,7 @@ public class EZZone implements CommandHandler
 			else if(subCommand.equals("list")){new EZZoneList(args, sender);}
 			else if(subCommand.equals("info")){new EZZoneInfo(args, sender);}
 			else if(subCommand.equals("perm")){new EZZonePerm(args, sender);}
+			else if(subCommand.equals("debug")){new EZZoneDebug(args, sender);}
 			else {new EZZoneHelp(ZoneCommand.NONE, sender, null);}
 		}
 		else
