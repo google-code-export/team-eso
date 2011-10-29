@@ -1,0 +1,105 @@
+#VERSION: 0.28.3
+#Author: jblaske@gmail.com
+#--------------------------
+#Formatting Strings
+00000: ###,###,###
+00002: &B(0): &AON
+00003: &B(0): &COFF
+00005: &A(0)&6 (1)
+
+#Static Strings
+00010: &B[] &6Required Parameter &B<> &6Optional Parameter @@&B... &6 Indicates repeatable. &B| &6 Indicates either/or
+00011: &6You are currently in Edit mode.
+00012: &6You are currently in Draw mode.
+00013: &6You are currently in Draw Confirm mode.
+00014: &6You are currently in Delete Confirm mode.
+00015: EpicZones Reloaded.
+00016: Zone modification cancelled, no changes were saved.
+00017: Draw Mode canceled, back in Edit Mode. type /zone for more options.
+00018: Zone children updated.
+00019: Start drawing your zone with the zone edit tool. Type /zone save when you are done drawing.
+00020: Zone Created. Start drawing your zone with the zone edit tool. Type /zone save when you are done drawing.
+00021: WARNING! Entering draw mode will erase all points for the zone! Type /zone draw confirm or /zone draw deny.
+00022: Global zones cannot be edited.
+00023: No zones to list.
+00024: You don't own any zones.
+00025: You did not specify if you wanted to edit the 'enter' or 'exit' text.
+00026: Zone Owners Updated.
+00027: Zone Parents Updated.
+00028: You must specify a single center point, before setting the radius.
+00029: Drawing Complete.
+00030: You must draw at least 3 points or 1 point and set a radius, before you can move on.
+00031: Zone Saved.
+00032: You do not have permission to destroy in this zone.;
+00033: You do not have permission to destroy outside the border of the map.;
+00034: You do not have permission to build in this zone.;
+00035: You do not have permission to build outside the border of the map.;
+00036: You do not have permission to do that in this zone.
+00037: You do not have permission to use this command.
+00038: &6Zone Flags:
+00039: &6Permissions:
+00040: Permissions cleared.
+00041: Debug Information Generated.
+
+#Variable Strings
+00100: Zone Updated. Set (0) to [(1)]
+00101: (0) is not a numerical value.
+00102: Zone [(0)] has been deleted.
+00103: A zone already exists with the tag [(0)]
+00104: To continue deleting the zone [(0)] type /zone confirm.
+00105: You are now editing zone [(0)]
+00106: You do not have permission to edit the zone [(0)].
+00107: Zone Updated. Set flag [(0)] to [(1)].
+00108: [(0)] is not a valid flag.@@Valid flags are: pvp, mobs, regen, fire, explode, sanctuary
+00109: Permission Added: [(0)] > [(1)] : [(2)]
+00110: [(0)] is not a valid permission type.
+00111: [(0)] is not a valid permission node.
+00112: Point X: (0)  Y: (1) added.
+00113: (0) players online [Page (1) of (2)]
+00114: (0) players online in (1) [Page (2) of (3)]
+00115: (0) - (1) - Distance: (2)
+00116: (0) - Distance: (1)
+00117: No zone with the tag [(0)] exists.
+00118: &BREGEN: &ADelay (0) Amount (1) Interval (2)
+00119: &BMOBS: &A(0)
+00120: &B(0) &F> &A[(1)] &F: &A[(2)]
+00121: &6Shape: &ACircle &F| &6Radius:&F (0)
+00122: &6Shape: &APolygon &F| &6Points:&F (0)
+00123: &6Children:&A (0)
+00124: &6Enter Text:&A (0)
+00125: &6Exit Text:&A (0)
+00126: &6Parent:&A (0)
+00127: &6Owners:&A (0)
+00128: Successfully copied permissions from &A[(0)]
+00129: Permissions cleared for &A[(0)]
+00130: You do not have permission to enter &A[(0)]
+
+#Help Strings
+01000: &6Help for /zone command.
+01001: &6/zone name &B[name] &A - Sets the name of the zone.
+01002: &6/zone flag &B[flag] [value] &A - Updates the flag to the value.
+01003: &6/zone flag pvp &B[true|false] &A - Updates the pvp flag to the value.
+01004: &6/zone flag fire &B[true|false] &A - Updates the fire flag to the value.
+01005: &6/zone flag explode &B[true|false] &A - Updates the explode flag to the value.
+01006: &6/zone flag mobs &B[MobType]... &A - Sets the allowed mobs.
+01007: &6/zone flag regen &B[Amount] <Delay> <Interval> <MaxRegen> <MinDegen> <RestDelay> <BedBonus> &A - Updates the regen flag to the values.
+01008: &6/zone flag sanctuary &B[true|false] &A - Updates the sanctuary flag to the value.
+01009: &6/zone flag fireburnsmobs &B[true|false] &A - Updates the fireburnsmobs flag to the value.
+01010: &6/zone floor &B[value] &A - Updates the floor to value.
+01011: &6/zone ceiling &B[value] &A - Updates the ceiling to value.
+01012: &6/zone child &B[add|remove] [ZoneTag]... &A - Adds or Removes the entered ZoneTags.
+01013: &6/zone owner &B[add|remove] [PlayerName|GroupName]... &A - Adds or Removes the entered names.
+01014: &6/zone message &B[enter|exit] [Message] &A - Updates the enter|exit message.
+01015: &6/zone world &B[WorldName] &A - Updates the world the zone is in.
+01016: &6/zone draw &A - Prompts you to go into Draw mode.
+01017: &6/zone cancel &A - Discards all current changes.
+01018: &6/zone delete &A - Deletes the zone you are currently editing.
+01019: &6/zone save &A - Saves the zone to file.
+01020: &6/zone save &A - Saves the point data you have drawn.
+01021: &6/zone confirm &A - Clears point data and puts you into Draw mode.
+01022: &6/zone cancel &A - Puts you back into Edit mode.
+01023: &6/zone confirm &A - Deletes the zone you are currently editing.
+01024: &6/zone edit &B[ZoneTag] &A - Begin editing the specified zone.
+01025: &6/zone create &B[ZoneTag] &A - Create new zone with the specified tag.
+01026: &6/zone list &A - Lists existing zones.
+01027: &6/zone info &B[ZoneTag] &A - Detailed info for specified zone.

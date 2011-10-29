@@ -1,0 +1,105 @@
+#VERSION: 0.28.3
+#Author: antoine301191@hotmail.fr 
+#--------------------------
+#Formatting Strings
+00000: ###,###,###
+00002: &B(0): &AON
+00003: &B(0): &COFF
+00005: &A(0) &6[(1)]
+
+#Static Strings
+00010: &B[] &6Required Parameter &B<> &6Optional Parameter &B... &6 Indicates repeatable. &B| &6 Indicates either/or
+00011: &6Vous �tes actuellement en mode Edition.
+00012: &6Vous �tes actuellement en mode Dessin.
+00013: &6Vous �tes actuellement en mode Confirmation de Dessin.
+00014: &6Vous �tes actuellement en mode Confirmation de Supression.
+00015: EpicZones Recharg�.
+00016: Modification de zone annul�e, aucun changement sauvegard�.
+00017: Mode dessin annul�, retour au mode �dition. Tapez &6/zone &Fpour plus d'options.
+00018: Zone enfant mise � jour.
+00019: Commencez � dessiner votre zone avec l'outil d'�dition de zone. Tapez /zone save quand vous aurez fini la d�limitation.
+00020: Zone Cr��e. &Commencez � dessiner votre zone avec l'outil d'�dition de zone. Tapez &6/zone save &Fquand vous aurez fini la d�limitation.
+00021: ATTENTION! Passer en mode Dessin effacera toutes les limites de la zone! Tapez &6/zone draw confirm &F(accepter) ou &6/zone draw deny&F (refuser).
+00022: Les zones globales ne peuvent pas �tre �dit�es.
+00023: Aucune zone � lister.
+00024: Vous ne poss�dez aucune zone.
+00025: Vous n'avez pas pr�cis� si vous vouliez modifier les messages 'enter' ou 'exit'.
+00026: Propri�taires de la Zone Mis � Jour.
+00027: Parents de la zone Mis � Jour.
+00028: Vous devez sp�cifier un seul point, avant de d�finir le rayon.
+00029: Dessin Termin�.
+00030: Vous devez dessiner au moins 3 points ou 1 point et d�finir un rayon, avant de pouvoir continuer.
+00031: Zone Sauvegard�e.
+00032: Vous n'�tes pas autoris� � d�truire dans cette zone.;
+00033: Vous n'�tes pas autoris� � d�truire en dehors des bords de la map.;
+00034: Vous n'�tes pas autoris� � construire dans cette zone.;
+00035: Vous n'�tes pas autoris� � construire en dehors des bords de la map.;
+00036: Vous n'�tes pas autoris� � faire cela dans cette zone.
+00037: Vous n'�tes pas autoris� � utiliser cette commande.
+00038: &6Zone Flags:
+00039: &6Permissions:
+00040: Permissions cleared.
+00041: Debug Information Generated.
+
+#Variable Strings
+00100: Zone Mise � Jour. Chang� (0) en [(1)]
+00101: (0) n'est pas une valeur num�rique.
+00102: La Zone [(0)] a �t� �ffac�e.
+00103: Une zone [(0)] existe d�j�.
+00104: Pour proc�der � la suppresion de cette zone [(0)] tapez &6/zone confirm&F.
+00105: Vous �diter actuellement la zone [(0)]
+00106: Vous n'�tes pas autoris� � �diter la zone [(0)].
+00107: Zone Mise � Jour. Param�tre [(0)] chang� en [(1)].
+00108: [(0)] n'est pas un param�tre valide.@@param�tres valides: pvp, mobs, regen, fire, explode, sanctuary
+00109: Permission Ajout�e: [(0)] > [(1)] : [(2)]
+00110: [(0)] n'est pas un type de permission valide.
+00111: [(0)] is not a valid permission node.
+00112: Point X: (0) Y: (1) ajout� � la zone [(2)].
+00113: (0) joueurs en ligne [Page (1) sur (2)]
+00114: (0) joueurs en ligne dans (1) [Page (2) sur (3)]
+00115: (0) - (1) - Distance: (2)
+00116: (0) - Distance: (1)
+00117: Aucune zone du nom de [(0)] n'existe.
+00118: &BREGEN: &ADelay [(0)] Amount[(0)] Interval[(0)];
+00119: &BMOBS: &A(0)
+00120: &B(0) &F> &A[(1)] &F: &A[(2)]
+00121: &6Shape: &ACircle &F| &6Radius:&F (0)
+00122: &6Shape: &APolygon &F| &6Points:&F (0)
+00123: &6Children:&A (0)
+00124: &6Enter Text:&A (0)
+00125: &6Exit Text:&A (0)
+00126: &6Parent:&A (0)
+00127: &6Owners:&A (0)
+00128: Successfully copied permissions from &A[(0)]
+00129: Permissions cleared for &A[(0)]
+00130: You do not have permission to enter &A[(0)]
+
+#Help Strings
+01000: &6Aide pour les commandes /zone.
+01001: &6/zone name &B[nom] &A - D�finir le nom de la zone.
+01002: &6/zone flag &B[param�tre] [valeur] &A - Mettre � jour la valeur d'un param�tre.
+01003: &6/zone flag pvp &B[true|false] &A - Mettre � jour la valeur du param�tre pvp.
+01004: &6/zone flag fire &B[true|false] &A - Mettre � jour la valeur du param�tre incendies.
+01005: &6/zone flag explode &B[true|false] &A - Mettre � jour la valeur du param�tre explosions.
+01006: &6/zone flag mobs &B[MobType]... &A - D�finir les monstres autoris�s.
+01007: &6/zone flag regen &B[Quantit�] <Delay> <Intervale> <MaxRegen> <MinDegen> <RestDelay> <BedBonus> &A - Mettre � jour la valeur du param�tre r�g�n�ration.
+01008: &6/zone flag sanctuary &B[true|false] &A - Mettre � jour la valeur du param�tre sanctuaire.
+01009: &6/zone flag fireburnsmobs &B[true|false] &A - Mettre � jour la valeur du param�tre monstres sensibles au feu.
+01010: &6/zone floor &B[value] &A - Mettre � jour la valeur du param�tre plancher.
+01011: &6/zone ceiling &B[value] &A - Mettre � jour la valeur du param�tre plafond.
+01012: &6/zone child &B[add|remove] [NomDeZone]... &A - Ajouter ou supprimer les zones concern�es.
+01013: &6/zone owner &B[add|remove] [PlayerName|GroupName]... &A - Ajouter ou supprimer les noms concern�s.
+01014: &6/zone message &B[enter|exit] [Message] &A - Mettre � jour le message d'entr�e|sortie.
+01015: &6/zone world &B[WorldName] &A - Mettre � jour le monde dans lequel se trouve la zone.
+01016: &6/zone draw &A - Demande confirmation d'utiliser le mode Dessin.
+01017: &6/zone cancel &A - Annule tout les changements en cours.
+01018: &6/zone delete &A - Supprime la zone actuellement �dit�e.
+01019: &6/zone save &A - Sauvegarde les donn�es de la zone.
+01020: &6/zone save &A - Sauvegarde le p�rim�tre de la zone dessin�e.
+01021: &6/zone confirm &A - Efface les donn�es de p�rim�tre et vous place en mode Dessin.
+01022: &6/zone cancel &A - Vous replace en mode Edition.
+01023: &6/zone confirm &A - Supprime la zone actuellement �dit�e.
+01024: &6/zone edit &B[NomDeZone] &A - Commencer l'�dition de la zone sp�cifi�e.
+01025: &6/zone create &B[NomDeZone] &A - Cr�er une nouvelle zone.
+01026: &6/zone list &A - Lister les zones existantes.
+01027: &6/zone info &B[NomDeZone] &A - Informations d�taill�es sur la zone sp�cifi�e.
