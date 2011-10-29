@@ -31,122 +31,122 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones;
 
-import java.util.ArrayList;
-
-
-import org.bukkit.entity.Player;
-
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
+import org.bukkit.entity.Player;
 
-public class Regen implements Runnable {
+import java.util.ArrayList;
 
-	private final EpicZones plugin;
-	private final int MAX_HEALTH = 20;
-	private final int MIN_HEALTH = 0;
+public class Regen implements Runnable
+{
 
-	Regen(final EpicZones instance)
-	{
-		this.plugin = instance;
-	}
+    private final EpicZones plugin;
 
-	public void run() {
+    Regen(final EpicZones instance)
+    {
+        this.plugin = instance;
+    }
 
-		ArrayList<String> regenZoneTags = new ArrayList<String>();
+    public void run()
+    {
 
-		for(Player player: plugin.getServer().getOnlinePlayers())
-		{
-			if(player.getHealth() <= MAX_HEALTH && player.getHealth() > MIN_HEALTH)
-			{
-				EpicZonePlayer ezp = General.getPlayer(player.getName());
-				if(ezp != null)
-				{
-					EpicZone zone = ezp.getCurrentZone();
-					if(zone != null)
-					{
-						if(zone.timeToRegen())
-						{
-							if(ezp.getEnteredZone().before(zone.getAdjustedRegenDelay()))
-							{
-								if(zone.getRegen().getRestDelay() == 0 || (zone.getRegen().getRestDelay() > 0 && ezp.getLastMoved().before(zone.getAdjustedRestDelay())))
-								{
-									if(zone.getRegen().getAmount() >= 0)
-									{
-										int bonus = 0;
-										if(player.isSleeping())
-										{
-											bonus = zone.getRegen().getBedBonus();
-										}
+        ArrayList<String> regenZoneTags = new ArrayList<String>();
 
-										if(zone.getRegen().getMaxRegen() > 0)
-										{
-											if(player.getHealth() < zone.getRegen().getMaxRegen())
-											{
-												if(player.getHealth() + zone.getRegen().getAmount() + bonus > zone.getRegen().getMaxRegen())
-												{
-													player.setHealth(zone.getRegen().getMaxRegen());
-												}	
-												else
-												{
-													player.setHealth(((player.getHealth() + zone.getRegen().getAmount() + bonus)));
-												}	
-											}
-										}
-										else
-										{
-											if(player.getHealth() + zone.getRegen().getAmount() + bonus > MAX_HEALTH)
-											{
-												player.setHealth(MAX_HEALTH);
-											}	
-											else
-											{
-												player.setHealth(((player.getHealth() + zone.getRegen().getAmount() + bonus)));
-											}
-										}
-									}
-									else
-									{
-										if(zone.getRegen().getMinDegen() > 0)
-										{
-											if(player.getHealth() > zone.getRegen().getMinDegen())
-											{
-												if(player.getHealth() + zone.getRegen().getAmount() < zone.getRegen().getMinDegen())
-												{
-													player.setHealth(zone.getRegen().getMinDegen());
-												}	
-												else
-												{
-													player.setHealth(((player.getHealth() + zone.getRegen().getAmount())));
-												}
-											}
-										}
-										else
-										{
-											if(player.getHealth() + zone.getRegen().getAmount() < MIN_HEALTH)
-											{
-												player.setHealth(MIN_HEALTH);
-											}	
-											else
-											{
-												player.setHealth(((player.getHealth() + zone.getRegen().getAmount())));
-											}
-										}
-									}
-								}
-							}
-							if(!regenZoneTags.contains(zone.getTag()))
-							{
-								regenZoneTags.add(zone.getTag());
-							}
-						}
-					}
-				}
-			}
-		}
+        for (Player player : plugin.getServer().getOnlinePlayers())
+        {
+            int MAX_HEALTH = 20;
+            int MIN_HEALTH = 0;
+            if (player.getHealth() <= MAX_HEALTH && player.getHealth() > MIN_HEALTH)
+            {
+                EpicZonePlayer ezp = General.getPlayer(player.getName());
+                if (ezp != null)
+                {
+                    EpicZone zone = ezp.getCurrentZone();
+                    if (zone != null)
+                    {
+                        if (zone.timeToRegen())
+                        {
+                            if (ezp.getEnteredZone().before(zone.getAdjustedRegenDelay()))
+                            {
+                                if (zone.getRegen().getRestDelay() == 0 || (zone.getRegen().getRestDelay() > 0 && ezp.getLastMoved().before(zone.getAdjustedRestDelay())))
+                                {
+                                    if (zone.getRegen().getAmount() >= 0)
+                                    {
+                                        int bonus = 0;
+                                        if (player.isSleeping())
+                                        {
+                                            bonus = zone.getRegen().getBedBonus();
+                                        }
 
-		for(int i = 0; i < regenZoneTags.size(); i++)
-		{
-			General.myZones.get(regenZoneTags.get(i)).Regen();
-		}
-	}
+                                        if (zone.getRegen().getMaxRegen() > 0)
+                                        {
+                                            if (player.getHealth() < zone.getRegen().getMaxRegen())
+                                            {
+                                                if (player.getHealth() + zone.getRegen().getAmount() + bonus > zone.getRegen().getMaxRegen())
+                                                {
+                                                    player.setHealth(zone.getRegen().getMaxRegen());
+                                                }
+                                                else
+                                                {
+                                                    player.setHealth(((player.getHealth() + zone.getRegen().getAmount() + bonus)));
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (player.getHealth() + zone.getRegen().getAmount() + bonus > MAX_HEALTH)
+                                            {
+                                                player.setHealth(MAX_HEALTH);
+                                            }
+                                            else
+                                            {
+                                                player.setHealth(((player.getHealth() + zone.getRegen().getAmount() + bonus)));
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (zone.getRegen().getMinDegen() > 0)
+                                        {
+                                            if (player.getHealth() > zone.getRegen().getMinDegen())
+                                            {
+                                                if (player.getHealth() + zone.getRegen().getAmount() < zone.getRegen().getMinDegen())
+                                                {
+                                                    player.setHealth(zone.getRegen().getMinDegen());
+                                                }
+                                                else
+                                                {
+                                                    player.setHealth(((player.getHealth() + zone.getRegen().getAmount())));
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (player.getHealth() + zone.getRegen().getAmount() < MIN_HEALTH)
+                                            {
+                                                player.setHealth(MIN_HEALTH);
+                                            }
+                                            else
+                                            {
+                                                player.setHealth(((player.getHealth() + zone.getRegen().getAmount())));
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (!regenZoneTags.contains(zone.getTag()))
+                            {
+                                regenZoneTags.add(zone.getTag());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (String regenZoneTag : regenZoneTags)
+        {
+            General.myZones.get(regenZoneTag).Regen();
+        }
+    }
 }

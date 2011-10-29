@@ -31,52 +31,51 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class EZZoneDraw 
+public class EZZoneDraw
 {
-	public EZZoneDraw(String[] data, CommandSender sender)
-	{
-		if(sender instanceof Player)
-		{
-			Player player = (Player)sender;
-			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			if(ezp.getAdmin()) //Owners are not allowed to change the size of their zone.
-			{
-				if(ezp.getMode() == EpicZoneMode.ZoneEdit)
-				{
-					ezp.setMode(EpicZoneMode.ZoneDrawConfirm);
-					Message.Send(sender, Message_ID.Mode_00021_DrawConfirm_Warning);
-				}
-				else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
-				{
-					if(data.length > 1)
-					{
-						if(data[1].equalsIgnoreCase("confirm"))
-						{
-							ezp.setMode(EpicZoneMode.ZoneDraw);
-							Message.Send(sender, Message_ID.Mode_00019_Draw_StartMessage);
-						}
-						else if(data[1].equalsIgnoreCase("deny"))
-						{
-							ezp.setMode(EpicZoneMode.ZoneEdit);
-							Message.Send(sender, Message_ID.Info_00017_Cancel_Draw);
-						}
-					}
-				}
-			}
-			else
-			{
-				new EZZoneHelp(ZoneCommand.DRAW, sender, ezp);
-			}
-		}
-	}
+    public EZZoneDraw(String[] data, CommandSender sender)
+    {
+        if (sender instanceof Player)
+        {
+            Player player = (Player) sender;
+            EpicZonePlayer ezp = General.getPlayer(player.getName());
+            if (ezp.getAdmin()) //Owners are not allowed to change the size of their zone.
+            {
+                if (ezp.getMode() == EpicZoneMode.ZoneEdit)
+                {
+                    ezp.setMode(EpicZoneMode.ZoneDrawConfirm);
+                    Message.Send(sender, Message_ID.Mode_00021_DrawConfirm_Warning);
+                }
+                else if (ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
+                {
+                    if (data.length > 1)
+                    {
+                        if (data[1].equalsIgnoreCase("confirm"))
+                        {
+                            ezp.setMode(EpicZoneMode.ZoneDraw);
+                            Message.Send(sender, Message_ID.Mode_00019_Draw_StartMessage);
+                        }
+                        else if (data[1].equalsIgnoreCase("deny"))
+                        {
+                            ezp.setMode(EpicZoneMode.ZoneEdit);
+                            Message.Send(sender, Message_ID.Info_00017_Cancel_Draw);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                new EZZoneHelp(ZoneCommand.DRAW, sender, ezp);
+            }
+        }
+    }
 }

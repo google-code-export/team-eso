@@ -31,67 +31,66 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class EZZoneMessage 
+public class EZZoneMessage
 {
-	public EZZoneMessage(String[] data, CommandSender sender)
-	{
-		if(sender instanceof Player)
-		{
-			Player player = (Player)sender;
-			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			
-			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
-			{
-				if(data.length > 2)
-				{
-					String message = "";
-					String cmd = data[1];
-					for(int i = 2; i < data.length; i++)
-					{
-						message = message + data[i] + " ";
-					}
-					message = message.trim();
-					if(message.length() > 0)
-					{
-						if(cmd.equalsIgnoreCase("enter"))
-						{
-							if(message.equalsIgnoreCase("clear"))
-							{
-								message = "";
-							}
-							ezp.getEditZone().setEnterText(message);
-							Message.Send(sender, Message_ID.Info_00100_ZoneUpdatedSet_X_to_Y, new String[]{"enter message", message});
-						}
-						else if(cmd.equalsIgnoreCase("exit"))
-						{
-							if(message.equalsIgnoreCase("clear"))
-							{
-								message = "";
-							}
-							ezp.getEditZone().setExitText(message);
-							Message.Send(sender, Message_ID.Info_00100_ZoneUpdatedSet_X_to_Y, new String[]{"exit message", message});
-						}
-						else
-						{
-							Message.Send(sender, Message_ID.Warning_00025_NoEnter_NoExit);
-						}
-					}
-				}
-			}
-			else
-			{
-				new EZZoneHelp(ZoneCommand.MESSAGE, sender, ezp);
-			}
-		}
-	}
+    public EZZoneMessage(String[] data, CommandSender sender)
+    {
+        if (sender instanceof Player)
+        {
+            Player player = (Player) sender;
+            EpicZonePlayer ezp = General.getPlayer(player.getName());
+
+            if (ezp.getMode() == EpicZoneMode.ZoneEdit)
+            {
+                if (data.length > 2)
+                {
+                    String message = "";
+                    String cmd = data[1];
+                    for (int i = 2; i < data.length; i++)
+                    {
+                        message = message + data[i] + " ";
+                    }
+                    message = message.trim();
+                    if (message.length() > 0)
+                    {
+                        if (cmd.equalsIgnoreCase("enter"))
+                        {
+                            if (message.equalsIgnoreCase("clear"))
+                            {
+                                message = "";
+                            }
+                            ezp.getEditZone().setEnterText(message);
+                            Message.Send(sender, Message_ID.Info_00100_ZoneUpdatedSet_X_to_Y, new String[]{"enter message", message});
+                        }
+                        else if (cmd.equalsIgnoreCase("exit"))
+                        {
+                            if (message.equalsIgnoreCase("clear"))
+                            {
+                                message = "";
+                            }
+                            ezp.getEditZone().setExitText(message);
+                            Message.Send(sender, Message_ID.Info_00100_ZoneUpdatedSet_X_to_Y, new String[]{"exit message", message});
+                        }
+                        else
+                        {
+                            Message.Send(sender, Message_ID.Warning_00025_NoEnter_NoExit);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                new EZZoneHelp(ZoneCommand.MESSAGE, sender, ezp);
+            }
+        }
+    }
 }

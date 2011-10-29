@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.listeners;
 
+import com.epicsagaonline.bukkit.EpicZones.General;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -39,37 +40,31 @@ import org.bukkit.event.vehicle.VehicleListener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
-import com.epicsagaonline.bukkit.EpicZones.EpicZones;
-import com.epicsagaonline.bukkit.EpicZones.General;
-
-public class VehicleEvents extends VehicleListener 
+public class VehicleEvents extends VehicleListener
 {
 
-	//private final EpicZones plugin;
-	private final Vector zero = new Vector(0,0,0);
+    //private final EpicZones plugin;
+    private final Vector zero = new Vector(0, 0, 0);
 
-	public VehicleEvents(EpicZones instance)
-	{
-		//plugin = instance;
-	}
-
-	public @Override void onVehicleMove(VehicleMoveEvent event)
-	{
-		Vehicle vehicle = event.getVehicle();
-		Entity passenger = vehicle.getPassenger();
-		if(passenger != null)
-		{
-			if( passenger instanceof Player)
-			{
-				Player player = (Player) passenger;
-				if(!General.PlayerMovementLogic(player, event.getFrom(), event.getTo()))
-				{
-					Location loc = General.getPlayer(player.getName()).getCurrentLocation();
-					loc.setY(loc.getY()+1);
-					vehicle.teleport(loc);
-					vehicle.setVelocity(zero);
-				}
-			}
-		}
-	}
+    public
+    @Override
+    void onVehicleMove(VehicleMoveEvent event)
+    {
+        Vehicle vehicle = event.getVehicle();
+        Entity passenger = vehicle.getPassenger();
+        if (passenger != null)
+        {
+            if (passenger instanceof Player)
+            {
+                Player player = (Player) passenger;
+                if (!General.PlayerMovementLogic(player, event.getFrom(), event.getTo()))
+                {
+                    Location loc = General.getPlayer(player.getName()).getCurrentLocation();
+                    loc.setY(loc.getY() + 1);
+                    vehicle.teleport(loc);
+                    vehicle.setVelocity(zero);
+                }
+            }
+        }
+    }
 }

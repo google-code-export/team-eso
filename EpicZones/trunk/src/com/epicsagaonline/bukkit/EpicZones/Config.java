@@ -31,123 +31,115 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.HashMap;
-
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.*;
+import java.util.HashMap;
+
+@SuppressWarnings({"ResultOfMethodCallIgnored"})
 public class Config
 {
-	private static File file;
-	public static boolean enableRadius;
-	public static boolean enableHeroChat;
-	public static boolean globalZoneDefaultAllow;
-	public static int zoneTool = 280; // Default Tool Is Stick
-	public static String language = "EN_US";
-	public static boolean enableSpout;
-	private static final String CONFIG_FILE = "config.yml";
+    private static File file;
+    public static boolean enableRadius;
+    public static boolean enableHeroChat;
+    public static boolean globalZoneDefaultAllow;
+    public static int zoneTool = 280; // Default Tool Is Stick
+    public static String language = "EN_US";
+    public static boolean enableSpout;
+    private static final String CONFIG_FILE = "config.yml";
 
-	public static void Init(EpicZones plugin)
-	{
+    public static void Init(EpicZones plugin)
+    {
 
-		enableRadius = true;
-		enableHeroChat = false;
-		globalZoneDefaultAllow = true;
-		zoneTool = 280;
-		language = "EN_US";
-		enableSpout = true;
+        enableRadius = true;
+        enableHeroChat = false;
+        globalZoneDefaultAllow = true;
+        zoneTool = 280;
+        language = "EN_US";
+        enableSpout = true;
 
-		if (!plugin.getDataFolder().exists())
-		{
-			plugin.getDataFolder().mkdir();
-		}
+        if (!plugin.getDataFolder().exists())
+        {
+            plugin.getDataFolder().mkdir();
+        }
 
-		file = new File(plugin.getDataFolder() + File.separator + CONFIG_FILE);
-		if (!file.exists())
-		{
-			try
-			{
-				file.createNewFile();
-			}
-			catch (IOException e)
-			{
-				Log.Write(e.getMessage());
-			}
-			Save();
-		}
+        file = new File(plugin.getDataFolder() + File.separator + CONFIG_FILE);
+        if (!file.exists())
+        {
+            try
+            {
+                file.createNewFile();
+            } catch (IOException e)
+            {
+                Log.Write(e.getMessage());
+            }
+            Save();
+        }
 
-	}
+    }
 
-	@SuppressWarnings("unchecked") public static void Load(EpicZones plugin)
-	{
-		Init(plugin);
+    @SuppressWarnings("unchecked")
+    public static void Load(EpicZones plugin)
+    {
+        Init(plugin);
 
-		if (file.exists())
-		{
-			Yaml yaml = new Yaml();
-			HashMap<String, Object> root = new HashMap<String, Object>();
-			FileInputStream stream;
-			try
-			{
-				stream = new FileInputStream(file);
-				root = (HashMap<String, Object>) yaml.load(stream);
+        if (file.exists())
+        {
+            Yaml yaml = new Yaml();
+            HashMap<String, Object> root;
+            FileInputStream stream;
+            try
+            {
+                stream = new FileInputStream(file);
+                root = (HashMap<String, Object>) yaml.load(stream);
 
-				enableRadius = Util.getBooleanValueFromHashSet("enableRadius", root);
-				enableHeroChat = Util.getBooleanValueFromHashSet("enableHeroChat", root);
-				globalZoneDefaultAllow = Util.getBooleanValueFromHashSet("globalZoneDefaultAllow", root);
-				zoneTool = Util.getIntegerValueFromHashSet("zoneTool", root);
-				language = Util.getStringValueFromHashSet("language", root);
-				enableSpout = Util.getBooleanValueFromHashSet("enableSpout", root);
+                enableRadius = Util.getBooleanValueFromHashSet("enableRadius", root);
+                enableHeroChat = Util.getBooleanValueFromHashSet("enableHeroChat", root);
+                globalZoneDefaultAllow = Util.getBooleanValueFromHashSet("globalZoneDefaultAllow", root);
+                zoneTool = Util.getIntegerValueFromHashSet("zoneTool", root);
+                language = Util.getStringValueFromHashSet("language", root);
+                enableSpout = Util.getBooleanValueFromHashSet("enableSpout", root);
 
-			}
-			catch (FileNotFoundException e)
-			{
-				Log.Write(e.getMessage());
-			}
-		}
-	}
+            } catch (FileNotFoundException e)
+            {
+                Log.Write(e.getMessage());
+            }
+        }
+    }
 
-	public static void Save()
-	{
+    public static void Save()
+    {
 
-		Yaml yaml = new Yaml();
-		HashMap<String, Object> root = new HashMap<String, Object>();
-		FileOutputStream stream;
-		BufferedWriter writer;
+        Yaml yaml = new Yaml();
+        HashMap<String, Object> root = new HashMap<String, Object>();
+        FileOutputStream stream;
+        BufferedWriter writer;
 
-		root.put("enableRadius", enableRadius);
-		root.put("enableHeroChat", enableHeroChat);
-		root.put("globalZoneDefaultAllow", globalZoneDefaultAllow);
-		root.put("zoneTool", zoneTool);
-		root.put("language", language);
-		root.put("enableSpout", enableSpout);
+        root.put("enableRadius", enableRadius);
+        root.put("enableHeroChat", enableHeroChat);
+        root.put("globalZoneDefaultAllow", globalZoneDefaultAllow);
+        root.put("zoneTool", zoneTool);
+        root.put("language", language);
+        root.put("enableSpout", enableSpout);
 
-		try
-		{
+        try
+        {
 
-			stream = new FileOutputStream(file);
-			stream.getChannel().truncate(0);
-			writer = new BufferedWriter(new OutputStreamWriter(stream));
+            stream = new FileOutputStream(file);
+            stream.getChannel().truncate(0);
+            writer = new BufferedWriter(new OutputStreamWriter(stream));
 
-			try
-			{
-				writer.write(yaml.dump(root));
-			}
-			finally
-			{
-				writer.close();
-			}
-		}
-		catch (IOException e)
-		{
-			Log.Write(e.getMessage());
-		}
+            try
+            {
+                writer.write(yaml.dump(root));
+            } finally
+            {
+                writer.close();
+            }
+        } catch (IOException e)
+        {
+            Log.Write(e.getMessage());
+        }
 
-	}
+    }
 }

@@ -31,56 +31,55 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
+import com.epicsagaonline.bukkit.EpicZones.integration.PermissionsManager;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class EZZoneChild 
+public class EZZoneChild
 {
-	public EZZoneChild(String[] data, CommandSender sender)
-	{
-		if(sender instanceof Player)
-		{
-			Player player = (Player)sender;
-			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			boolean admin = EpicZones.permissions.hasPermission(player, "epiczones.admin") || player.isOp();
-			if(admin) //Owners are not allowed to modify children.
-			{
-				if(ezp.getMode() == EpicZoneMode.ZoneEdit)
-				{
-					if(data.length > 2)
-					{
-						String cmd = data[1];
-						for(int i = 2; i < data.length; i++)
-						{
-							String tag = data[i].replaceAll("[^a-zA-Z0-9_]", "");
-							if(tag.length() > 0 && General.myZones.get(tag) != null)
-							{
-								if(cmd.equalsIgnoreCase("add"))
-								{
-									ezp.getEditZone().addChildTag(tag);
-								}
-								else if(cmd.equalsIgnoreCase("remove"))
-								{
-									ezp.getEditZone().removeChild(tag);
-								}
-							}
-						}
-						Message.Send(sender, Message_ID.Info_00018_Updated_Children);
-					}
-				}
-			}
-			else
-			{
-				new EZZoneHelp(ZoneCommand.CHILD, sender, ezp);
-			}
-		}
-	}
+    public EZZoneChild(String[] data, CommandSender sender)
+    {
+        if (sender instanceof Player)
+        {
+            Player player = (Player) sender;
+            EpicZonePlayer ezp = General.getPlayer(player.getName());
+            boolean admin = PermissionsManager.hasPermission(player, "epiczones.admin") || player.isOp();
+            if (admin) //Owners are not allowed to modify children.
+            {
+                if (ezp.getMode() == EpicZoneMode.ZoneEdit)
+                {
+                    if (data.length > 2)
+                    {
+                        String cmd = data[1];
+                        for (int i = 2; i < data.length; i++)
+                        {
+                            String tag = data[i].replaceAll("[^a-zA-Z0-9_]", "");
+                            if (tag.length() > 0 && General.myZones.get(tag) != null)
+                            {
+                                if (cmd.equalsIgnoreCase("add"))
+                                {
+                                    ezp.getEditZone().addChildTag(tag);
+                                }
+                                else if (cmd.equalsIgnoreCase("remove"))
+                                {
+                                    ezp.getEditZone().removeChild(tag);
+                                }
+                            }
+                        }
+                        Message.Send(sender, Message_ID.Info_00018_Updated_Children);
+                    }
+                }
+            }
+            else
+            {
+                new EZZoneHelp(ZoneCommand.CHILD, sender, ezp);
+            }
+        }
+    }
 }

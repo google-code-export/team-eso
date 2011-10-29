@@ -31,51 +31,50 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class EZZoneRadius 
+public class EZZoneRadius
 {
-	public EZZoneRadius(String[] data, CommandSender sender)
-	{
-		if(sender instanceof Player)
-		{
-			Player player = (Player)sender;
-			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			if(ezp.getAdmin()) //Owners cannot change the size of their zone.
-			{
-				if(ezp.getMode() == EpicZoneMode.ZoneDraw || ezp.getMode() == EpicZoneMode.ZoneEdit)
-				{
-					if (ezp.getEditZone().getPolygon().npoints == 1)
-					{
-						if(data.length > 1 && General.IsNumeric(data[1]))
-						{
-							Integer value = Integer.parseInt(data[1]);
-							ezp.getEditZone().setRadius(value);
-							Message.Send(sender, Message_ID.Info_00100_ZoneUpdatedSet_X_to_Y, new String[]{"radius", data[1]});
-						}
-						else
-						{
-							Message.Send(sender, Message_ID.Warning_00101_X_IsNotNumeric, new String[]{data[1]});
-						}
-					}
-					else
-					{
-						Message.Send(sender, Message_ID.Warning_00028_Draw_NoCenterOfCircle);
-					}
-				}
-			}
-			else
-			{
-				new EZZoneHelp(ZoneCommand.RADIUS, sender, ezp);
-			}
-		}
-	}
+    public EZZoneRadius(String[] data, CommandSender sender)
+    {
+        if (sender instanceof Player)
+        {
+            Player player = (Player) sender;
+            EpicZonePlayer ezp = General.getPlayer(player.getName());
+            if (ezp.getAdmin()) //Owners cannot change the size of their zone.
+            {
+                if (ezp.getMode() == EpicZoneMode.ZoneDraw || ezp.getMode() == EpicZoneMode.ZoneEdit)
+                {
+                    if (ezp.getEditZone().getPolygon().npoints == 1)
+                    {
+                        if (data.length > 1 && General.IsNumeric(data[1]))
+                        {
+                            Integer value = Integer.parseInt(data[1]);
+                            ezp.getEditZone().setRadius(value);
+                            Message.Send(sender, Message_ID.Info_00100_ZoneUpdatedSet_X_to_Y, new String[]{"radius", data[1]});
+                        }
+                        else
+                        {
+                            Message.Send(sender, Message_ID.Warning_00101_X_IsNotNumeric, new String[]{data[1]});
+                        }
+                    }
+                    else
+                    {
+                        Message.Send(sender, Message_ID.Warning_00028_Draw_NoCenterOfCircle);
+                    }
+                }
+            }
+            else
+            {
+                new EZZoneHelp(ZoneCommand.RADIUS, sender, ezp);
+            }
+        }
+    }
 }

@@ -31,72 +31,71 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class EZZoneSave
 {
-	public EZZoneSave(String[] data, CommandSender sender)
-	{
-		EpicZonePlayer ezp;
-		if (sender instanceof Player)
-		{
-			ezp = General.getPlayer(((Player) sender).getName());
-		}
-		else
-		{
-			ezp = General.getPlayer("console");
-		}
-		if (ezp.getMode() == EpicZoneMode.ZoneDraw)
-		{
-			if (ezp.getEditZone().getPolygon().npoints > 2)
-			{
-				ezp.setMode(EpicZoneMode.ZoneEdit);
-				ezp.getEditZone().rebuildBoundingBox();
-				Message.Send(sender, Message_ID.Info_00029_DrawingComplete);
-			}
-			else if (ezp.getEditZone().getPolygon().npoints == 1 && ezp.getEditZone().getRadius() > 0)
-			{
-				ezp.setMode(EpicZoneMode.ZoneEdit);
-				ezp.getEditZone().rebuildBoundingBox();
-				Message.Send(sender, Message_ID.Info_00029_DrawingComplete);
-			}
-			else
-			{
-				Message.Send(sender, Message_ID.Warning_00030_Draw_Need3Points);
-			}
-		}
-		else if (ezp.getMode() == EpicZoneMode.ZoneEdit)
-		{
-			if (!ezp.getEditZone().hasParent())
-			{ // If a zone does not have a parent, set it's parent to the global
-				// zone the zone is within.
-				ezp.getEditZone().setParent(General.myGlobalZones.get(ezp.getEditZone().getWorld().toLowerCase()));
-			}
-			if (General.myZones.get(ezp.getEditZone().getTag()) == null)
-			{
-				General.myZones.put(ezp.getEditZone().getTag(), ezp.getEditZone());
-			}
-			else
-			{
-				General.myZones.remove(ezp.getEditZone().getTag());
-				General.myZones.put(ezp.getEditZone().getTag(), ezp.getEditZone());
-			}
-			ezp.getEditZone().HidePillars();
-			General.SaveZones();
-			ezp.setMode(EpicZoneMode.None);
-			Message.Send(sender, Message_ID.Info_00031_ZoneSaved);
-		}
-		else
-		{
-			new EZZoneHelp(ZoneCommand.SAVE, sender, ezp);
-		}
-	}
+    public EZZoneSave(CommandSender sender)
+    {
+        EpicZonePlayer ezp;
+        if (sender instanceof Player)
+        {
+            ezp = General.getPlayer(sender.getName());
+        }
+        else
+        {
+            ezp = General.getPlayer("console");
+        }
+        if (ezp.getMode() == EpicZoneMode.ZoneDraw)
+        {
+            if (ezp.getEditZone().getPolygon().npoints > 2)
+            {
+                ezp.setMode(EpicZoneMode.ZoneEdit);
+                ezp.getEditZone().rebuildBoundingBox();
+                Message.Send(sender, Message_ID.Info_00029_DrawingComplete);
+            }
+            else if (ezp.getEditZone().getPolygon().npoints == 1 && ezp.getEditZone().getRadius() > 0)
+            {
+                ezp.setMode(EpicZoneMode.ZoneEdit);
+                ezp.getEditZone().rebuildBoundingBox();
+                Message.Send(sender, Message_ID.Info_00029_DrawingComplete);
+            }
+            else
+            {
+                Message.Send(sender, Message_ID.Warning_00030_Draw_Need3Points);
+            }
+        }
+        else if (ezp.getMode() == EpicZoneMode.ZoneEdit)
+        {
+            if (!ezp.getEditZone().hasParent())
+            { // If a zone does not have a parent, set it's parent to the global
+                // zone the zone is within.
+                ezp.getEditZone().setParent(General.myGlobalZones.get(ezp.getEditZone().getWorld().toLowerCase()));
+            }
+            if (General.myZones.get(ezp.getEditZone().getTag()) == null)
+            {
+                General.myZones.put(ezp.getEditZone().getTag(), ezp.getEditZone());
+            }
+            else
+            {
+                General.myZones.remove(ezp.getEditZone().getTag());
+                General.myZones.put(ezp.getEditZone().getTag(), ezp.getEditZone());
+            }
+            ezp.getEditZone().HidePillars();
+            General.SaveZones();
+            ezp.setMode(EpicZoneMode.None);
+            Message.Send(sender, Message_ID.Info_00031_ZoneSaved);
+        }
+        else
+        {
+            new EZZoneHelp(ZoneCommand.SAVE, sender, ezp);
+        }
+    }
 }

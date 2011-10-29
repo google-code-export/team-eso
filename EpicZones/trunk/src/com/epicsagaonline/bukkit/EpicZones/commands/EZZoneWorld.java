@@ -31,43 +31,42 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class EZZoneWorld 
+public class EZZoneWorld
 {
-	public EZZoneWorld(String[] data, CommandSender sender)
-	{
-		if(sender instanceof Player)
-		{
-			Player player = (Player)sender;
-			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
-			{
-				if(data.length > 1)
-				{
-					if(ezp.getAdmin()) //Owners are not allowed to change the world of their zone.
-					{
-						String worldName = data[1].trim();
-						if(worldName.length() > 0)
-						{
-							ezp.getEditZone().setWorld(worldName);
-							Message.Send(sender, Message_ID.Info_00100_ZoneUpdatedSet_X_to_Y, new String[]{"world", worldName});
-						}
-					}
-				}
-			}
-			else
-			{
-				new EZZoneHelp(ZoneCommand.WORLD, sender, ezp);
-			}
-		}
-	}
+    public EZZoneWorld(String[] data, CommandSender sender)
+    {
+        if (sender instanceof Player)
+        {
+            Player player = (Player) sender;
+            EpicZonePlayer ezp = General.getPlayer(player.getName());
+            if (ezp.getMode() == EpicZoneMode.ZoneEdit)
+            {
+                if (data.length > 1)
+                {
+                    if (ezp.getAdmin()) //Owners are not allowed to change the world of their zone.
+                    {
+                        String worldName = data[1].trim();
+                        if (worldName.length() > 0)
+                        {
+                            ezp.getEditZone().setWorld(worldName);
+                            Message.Send(sender, Message_ID.Info_00100_ZoneUpdatedSet_X_to_Y, new String[]{"world", worldName});
+                        }
+                    }
+                }
+            }
+            else
+            {
+                new EZZoneHelp(ZoneCommand.WORLD, sender, ezp);
+            }
+        }
+    }
 }

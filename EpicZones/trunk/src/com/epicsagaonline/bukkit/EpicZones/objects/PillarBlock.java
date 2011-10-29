@@ -34,14 +34,14 @@ package com.epicsagaonline.bukkit.EpicZones.objects;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-public class PillarBlock 
+public class PillarBlock
 {
-	public PillarBlock(Location loc, Material mat)
-	{
-		this.location = loc;
-		this.material = mat;
-	}
-	
-	public Location location;
-	public Material material;
+    public PillarBlock(Location loc, Material mat)
+    {
+        this.location = loc;
+        this.material = mat;
+    }
+
+    public Location location;
+    public Material material;
 }

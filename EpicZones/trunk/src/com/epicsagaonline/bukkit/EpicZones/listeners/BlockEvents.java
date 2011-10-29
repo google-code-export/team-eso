@@ -31,143 +31,143 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.listeners;
 
-import java.awt.Point;
-import java.util.Date;
-
-
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
-import org.bukkit.event.block.BlockListener;
-import org.bukkit.event.block.BlockPlaceEvent;
-
-import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
-import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
+import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.*;
+import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
+
+import java.awt.*;
+import java.util.Date;
 
 /**
  * EpicZones block listener
+ *
  * @author jblaske
  */
-public class BlockEvents extends BlockListener {
-	//private final EpicZones plugin;
+public class BlockEvents extends BlockListener
+{
 
-	public BlockEvents(final EpicZones plugin) {
-		//this.plugin = plugin;
-	}
+    public
+    @Override
+    void onBlockIgnite(BlockIgniteEvent event)
+    {
+        if (!event.isCancelled())
+        {
+            EpicZone zone = General.GetZoneForPlayer(null, event.getBlock().getLocation().getWorld().getName(), event.getBlock().getLocation().getBlockY(), new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ()));
+            if (zone != null)
+            {
+                if (event.getCause() == IgniteCause.FLINT_AND_STEEL) //Flint and steel
+                {
+                    if (!zone.getFire().getIgnite())
+                    {
+                        event.setCancelled(true);
+                    }
+                }
+                else //Spread and Lava
+                {
+                    if (!zone.getFire().getSpread())
+                    {
+                        event.setCancelled(true);
+                    }
+                }
 
-	public @Override void onBlockIgnite(BlockIgniteEvent event)
-	{
-		if(!event.isCancelled())
-		{
-			EpicZone zone = General.GetZoneForPlayer(null, event.getBlock().getLocation().getWorld().getName(), event.getBlock().getLocation().getBlockY(),new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()));
-			if (zone != null)
-			{
-				if(event.getCause() == IgniteCause.FLINT_AND_STEEL) //Flint and steel
-				{
-					if(!zone.getFire().getIgnite())
-					{
-						event.setCancelled(true);
-					}
-				}
-				else //Spread and Lava
-				{
-					if(!zone.getFire().getSpread())
-					{
-						event.setCancelled(true);
-					}
-				}
+            }
+        }
+    }
 
-			}
-		}
-	}
+    public
+    @Override
+    void onBlockBurn(BlockBurnEvent event)
+    {
+        if (!event.isCancelled())
+        {
+            EpicZone zone = General.GetZoneForPlayer(null, event.getBlock().getLocation().getWorld().getName(), event.getBlock().getLocation().getBlockY(), new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ()));
+            if (zone != null)
+            {
+                if (!zone.getFire().getIgnite())
+                {
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
 
-	public @Override void onBlockBurn(BlockBurnEvent event)
-	{
-		if(!event.isCancelled())
-		{
-			EpicZone zone = General.GetZoneForPlayer(null, event.getBlock().getLocation().getWorld().getName(), event.getBlock().getLocation().getBlockY() ,new Point(event.getBlock().getLocation().getBlockX(),event.getBlock().getLocation().getBlockZ()));
-			if (zone != null)
-			{
-				if(!zone.getFire().getIgnite())
-				{
-					event.setCancelled(true);
-				}
-			}
-		}
-	}
+    public
+    @Override
+    void onBlockBreak(BlockBreakEvent event)
+    {
+        if (!event.isCancelled())
+        {
+            Player player = event.getPlayer();
+            EpicZonePlayer ezp = General.getPlayer(player.getName());
+            Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
+            if (General.BorderLogic(blockPoint, player))
+            {
+                String worldName = player.getWorld().getName();
+                int blockHeight = event.getBlock().getLocation().getBlockY();
+                EpicZone currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
+                boolean hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "destroy");
+                if (!hasPerms)
+                {
+                    if (ezp.getLastWarned().before(new Date()))
+                    {
+                        Message.Send(player, Message_ID.Warning_00032_Perm_DestroyInZone);
+                        ezp.Warn();
+                    }
+                    event.setCancelled(true);
+                }
+            }
+            else
+            {
+                if (ezp.getLastWarned().before(new Date()))
+                {
+                    Message.Send(player, Message_ID.Warning_00033_Perm_DestroyOutsideRadius);
+                    ezp.Warn();
+                }
+                event.setCancelled(true);
+            }
+        }
+    }
 
-	public @Override void onBlockBreak(BlockBreakEvent event)
-	{
-		if(!event.isCancelled())
-		{
-			Player player = event.getPlayer();
-			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
-			if(General.BorderLogic(blockPoint, player))
-			{
-				String worldName = player.getWorld().getName();	
-				int blockHeight = event.getBlock().getLocation().getBlockY();
-				EpicZone currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
-				boolean hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "destroy");
-				if(!hasPerms)
-				{
-					if (ezp.getLastWarned().before(new Date()))
-					{
-						Message.Send(player, Message_ID.Warning_00032_Perm_DestroyInZone);
-						ezp.Warn();
-					}
-					event.setCancelled(true);
-				}
-			}
-			else
-			{
-				if (ezp.getLastWarned().before(new Date()))
-				{
-					Message.Send(player, Message_ID.Warning_00033_Perm_DestroyOutsideRadius);
-					ezp.Warn();
-				}
-				event.setCancelled(true);
-			}
-		}
-	}
-
-	public @Override void onBlockPlace(BlockPlaceEvent event)
-	{
-		if(!event.isCancelled())
-		{
-			Player player = event.getPlayer();
-			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
-			if(General.BorderLogic(blockPoint, player))
-			{
-				String worldName = player.getWorld().getName();
-				int blockHeight = event.getBlock().getLocation().getBlockY();
-				EpicZone currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
-				boolean hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "build");
-				if(!hasPerms)
-				{
-					if (ezp.getLastWarned().before(new Date())){
-						Message.Send(player, Message_ID.Warning_00032_Perm_DestroyInZone);
-						ezp.Warn();
-					}
-					event.setCancelled(true);
-				}
-			}
-			else
-			{
-				if (ezp.getLastWarned().before(new Date())){
-					Message.Send(player, Message_ID.Warning_00033_Perm_DestroyOutsideRadius);
-					ezp.Warn();
-				}
-				event.setCancelled(true);
-			}
-		}
-	}
+    public
+    @Override
+    void onBlockPlace(BlockPlaceEvent event)
+    {
+        if (!event.isCancelled())
+        {
+            Player player = event.getPlayer();
+            EpicZonePlayer ezp = General.getPlayer(player.getName());
+            Point blockPoint = new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ());
+            if (General.BorderLogic(blockPoint, player))
+            {
+                String worldName = player.getWorld().getName();
+                int blockHeight = event.getBlock().getLocation().getBlockY();
+                EpicZone currentZone = General.GetZoneForPlayer(player, worldName, blockHeight, blockPoint);
+                boolean hasPerms = ZonePermissionsHandler.hasPermissions(player, currentZone, "build");
+                if (!hasPerms)
+                {
+                    if (ezp.getLastWarned().before(new Date()))
+                    {
+                        Message.Send(player, Message_ID.Warning_00032_Perm_DestroyInZone);
+                        ezp.Warn();
+                    }
+                    event.setCancelled(true);
+                }
+            }
+            else
+            {
+                if (ezp.getLastWarned().before(new Date()))
+                {
+                    Message.Send(player, Message_ID.Warning_00033_Perm_DestroyOutsideRadius);
+                    ezp.Warn();
+                }
+                event.setCancelled(true);
+            }
+        }
+    }
 }

@@ -31,12 +31,6 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
@@ -45,137 +39,116 @@ import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class EZZonePerm
 {
-	public EZZonePerm(String[] data, CommandSender sender)
-	{
-		EpicZonePlayer ezp;
-		if (sender instanceof Player)
-		{
-			ezp = General.getPlayer(((Player) sender).getName());
-		}
-		else
-		{
-			ezp = General.getPlayer("console");
-		}
-		if (ezp.getMode() == EpicZoneMode.ZoneEdit)
-		{
-			if (data.length > 3)
-			{
-				String member = data[1];
-				String node = data[2];
-				String perm = data[3];
-				if (ValidNode(node))
-				{
-					if (ValidPerm(perm))
-					{
-						ezp.getEditZone().addPermission(member, node, perm);
-						Message.Send(sender, Message_ID.Info_00109_PermissionAdded, new String[] { member, node, perm });
-					}
-					else
-					{
-						Message.Send(sender, Message_ID.Warning_00110_InvalidPermissionType, new String[] { perm });
-					}
-				}
-				else
-				{
-					Message.Send(sender, Message_ID.Warning_00111_InvalidPermissionNode, new String[] { node });
-				}
-			}
-			else if (data.length > 2)
-			{
-				String cmd = data[1];
-				String tag = data[2];
-				if (cmd.equalsIgnoreCase("copy"))
-				{
-					EpicZone srcZone = General.myZones.get(tag);
-					if (srcZone != null)
-					{
-						for (String permTag : srcZone.getPermissions().keySet())
-						{
-							EpicZonePermission perm = srcZone.getPermissions().get(permTag);
-							ezp.getEditZone().addPermission(perm.getMember(), perm.getNode().toString(), perm.getPermission().toString());
-						}
-						Message.Send(sender, Message_ID.Info_00128_CopiedPermissions, new String[] { tag });
-					}
-					else
-					{
-						Message.Send(sender, Message_ID.Warning_00117_Zone_X_DoesNotExist, new String[] { tag });
-					}
-				}
-				else if (cmd.equalsIgnoreCase("clear"))
-				{
-					ArrayList<EpicZonePermission> remPerms = new ArrayList<EpicZonePermission>();
-					for (String permTag : ezp.getEditZone().getPermissions().keySet())
-					{
-						EpicZonePermission perm = ezp.getEditZone().getPermissions().get(permTag);
-						if (perm.getMember().equalsIgnoreCase(tag))
-						{
-							remPerms.add(perm);
-						}
-					}
-					for (EpicZonePermission perm : remPerms)
-					{
-						ezp.getEditZone().removePermission(perm.getMember(), perm.getNode().toString(), perm.getPermission().toString());
-					}
-					Message.Send(sender, Message_ID.Info_00129_PermissionsClearedFor_X, new String[] { tag });
-				}
-			}
-			else if (data.length > 1)
-			{
-				String cmd = data[1];
-				if (cmd.equalsIgnoreCase("clear"))
-				{
-					ezp.getEditZone().setPermissions(new HashMap<String, EpicZonePermission>());
-				}
-				Message.Send(sender, Message_ID.Info_00040_PermissionsCleared);
-			}
-			else
-			{
-				new EZZoneHelp(ZoneCommand.PERM, sender, ezp);
-			}
-		}
-		else
-		{
-			new EZZoneHelp(ZoneCommand.PERM, sender, ezp);
-		}
+    public EZZonePerm(String[] data, CommandSender sender)
+    {
+        EpicZonePlayer ezp;
+        if (sender instanceof Player)
+        {
+            ezp = General.getPlayer(sender.getName());
+        }
+        else
+        {
+            ezp = General.getPlayer("console");
+        }
+        if (ezp.getMode() == EpicZoneMode.ZoneEdit)
+        {
+            if (data.length > 3)
+            {
+                String member = data[1];
+                String node = data[2];
+                String perm = data[3];
+                if (ValidNode(node))
+                {
+                    if (ValidPerm(perm))
+                    {
+                        ezp.getEditZone().addPermission(member, node, perm);
+                        Message.Send(sender, Message_ID.Info_00109_PermissionAdded, new String[]{member, node, perm});
+                    }
+                    else
+                    {
+                        Message.Send(sender, Message_ID.Warning_00110_InvalidPermissionType, new String[]{perm});
+                    }
+                }
+                else
+                {
+                    Message.Send(sender, Message_ID.Warning_00111_InvalidPermissionNode, new String[]{node});
+                }
+            }
+            else if (data.length > 2)
+            {
+                String cmd = data[1];
+                String tag = data[2];
+                if (cmd.equalsIgnoreCase("copy"))
+                {
+                    EpicZone srcZone = General.myZones.get(tag);
+                    if (srcZone != null)
+                    {
+                        for (String permTag : srcZone.getPermissions().keySet())
+                        {
+                            EpicZonePermission perm = srcZone.getPermissions().get(permTag);
+                            ezp.getEditZone().addPermission(perm.getMember(), perm.getNode().toString(), perm.getPermission().toString());
+                        }
+                        Message.Send(sender, Message_ID.Info_00128_CopiedPermissions, new String[]{tag});
+                    }
+                    else
+                    {
+                        Message.Send(sender, Message_ID.Warning_00117_Zone_X_DoesNotExist, new String[]{tag});
+                    }
+                }
+                else if (cmd.equalsIgnoreCase("clear"))
+                {
+                    ArrayList<EpicZonePermission> remPerms = new ArrayList<EpicZonePermission>();
+                    for (String permTag : ezp.getEditZone().getPermissions().keySet())
+                    {
+                        EpicZonePermission perm = ezp.getEditZone().getPermissions().get(permTag);
+                        if (perm.getMember().equalsIgnoreCase(tag))
+                        {
+                            remPerms.add(perm);
+                        }
+                    }
+                    for (EpicZonePermission perm : remPerms)
+                    {
+                        ezp.getEditZone().removePermission(perm.getMember(), perm.getNode().toString(), perm.getPermission().toString());
+                    }
+                    Message.Send(sender, Message_ID.Info_00129_PermissionsClearedFor_X, new String[]{tag});
+                }
+            }
+            else if (data.length > 1)
+            {
+                String cmd = data[1];
+                if (cmd.equalsIgnoreCase("clear"))
+                {
+                    ezp.getEditZone().setPermissions(new HashMap<String, EpicZonePermission>());
+                }
+                Message.Send(sender, Message_ID.Info_00040_PermissionsCleared);
+            }
+            else
+            {
+                new EZZoneHelp(ZoneCommand.PERM, sender, ezp);
+            }
+        }
+        else
+        {
+            new EZZoneHelp(ZoneCommand.PERM, sender, ezp);
+        }
 
-	}
+    }
 
-	private static boolean ValidNode(String node)
-	{
-		if (node.equals("build"))
-		{
-			return true;
-		}
-		else if (node.equals("destroy"))
-		{
-			return true;
-		}
-		else if (node.equals("entry"))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
+    private static boolean ValidNode(String node)
+    {
+        return node.equals("build") || node.equals("destroy") || node.equals("entry");
+    }
 
-	private static boolean ValidPerm(String perm)
-	{
-		if (perm.equals("allow"))
-		{
-			return true;
-		}
-		else if (perm.equals("deny"))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
+    private static boolean ValidPerm(String perm)
+    {
+        return perm.equals("allow") || perm.equals("deny");
+    }
 }

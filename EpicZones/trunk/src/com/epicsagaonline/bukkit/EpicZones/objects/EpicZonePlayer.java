@@ -31,226 +31,209 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.objects;
 
+import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.integration.HeroChatIntegration;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
-import com.epicsagaonline.bukkit.EpicZones.General;
-import com.epicsagaonline.bukkit.EpicZones.integration.HeroChatIntegration;
-
+import javax.annotation.Nullable;
 import java.util.Calendar;
 import java.util.Date;
 
 public class EpicZonePlayer
 {
 
-	private EpicZone currentZone;
-	private Player player;
-	private int entityID;
-	private String name;
-	private Location currentLocation;
-	private Date lastWarned = new Date();
-	private int distanceFromCenter;
-	private boolean teleporting = false;
-	private Date lastCheck = new Date();
-	private EpicZoneMode mode = EpicZoneMode.None;
-	private EpicZone editZone = null;
-	private boolean pastBorder = false;
-	private Date enteredZone = new Date();
-	private String previousZoneTag = "";
-	private boolean hasMoved = false;
-	private Date lastMoved = new Date();
-	private boolean admin = false;
-	private SpoutPlayer spoutPlayer = null;
-	public EpicZonePlayerUI UI = new EpicZonePlayerUI();
+    private EpicZone currentZone;
+    private Player player;
+    private String name;
+    private Location currentLocation;
+    private Date lastWarned = new Date();
+    private boolean teleporting = false;
+    private Date lastCheck = new Date();
+    private EpicZoneMode mode = EpicZoneMode.None;
+    private EpicZone editZone = null;
+    private boolean pastBorder = false;
+    private Date enteredZone = new Date();
+    private String previousZoneTag = "";
+    private boolean hasMoved = false;
+    private Date lastMoved = new Date();
+    private boolean admin = false;
+    private SpoutPlayer spoutPlayer = null;
+    public EpicZonePlayerUI UI = new EpicZonePlayerUI();
 
-	public EpicZonePlayer(Player newplayer)
-	{
-		this.player = newplayer;
-		this.entityID = newplayer.getEntityId();
-		this.name = newplayer.getName();
-		setCurrentLocation(newplayer.getWorld().getSpawnLocation());
-		setCurrentZone(General.myGlobalZones.get(newplayer.getWorld().getName().toLowerCase()));
-	}
+    public EpicZonePlayer(Player newplayer)
+    {
+        this.player = newplayer;
+        this.name = newplayer.getName();
+        setCurrentLocation(newplayer.getWorld().getSpawnLocation());
+        setCurrentZone(General.myGlobalZones.get(newplayer.getWorld().getName().toLowerCase()));
+    }
 
-	public EpicZonePlayer(String username)
-	{
-		this.player = null;
-		this.entityID = -9999;
-		this.name = username;
-		this.admin = true;
-		setCurrentLocation(General.plugin.getServer().getWorlds().get(0).getSpawnLocation());
-		setCurrentZone(General.myGlobalZones.get(General.plugin.getServer().getWorlds().get(0).getName().toLowerCase()));
-	}
-	
-	public SpoutPlayer getSpoutPlayer()
-	{
-		if (spoutPlayer == null)
-		{
-			spoutPlayer = SpoutManager.getPlayer(this.player);
-		}
-		return spoutPlayer;
-	}
+    public EpicZonePlayer(String username)
+    {
+        this.player = null;
+        this.name = username;
+        this.admin = true;
+        setCurrentLocation(General.plugin.getServer().getWorlds().get(0).getSpawnLocation());
+        setCurrentZone(General.myGlobalZones.get(General.plugin.getServer().getWorlds().get(0).getName().toLowerCase()));
+    }
 
-	public EpicZone getCurrentZone()
-	{
-		return currentZone;
-	}
+    public SpoutPlayer getSpoutPlayer()
+    {
+        if (General.plugin.getServer().getPluginManager().isPluginEnabled("Spout"))
+        {
+            if (spoutPlayer == null)
+            {
+                spoutPlayer = SpoutManager.getPlayer(this.player);
+            }
+            return spoutPlayer;
+        }
+        else
+        {
+            return null;
+        }
+    }
 
-	public int getEntityID()
-	{
-		return entityID;
-	}
+    public EpicZone getCurrentZone()
+    {
+        return currentZone;
+    }
 
-	public String getName()
-	{
-		return name;
-	}
+    public String getName()
+    {
+        return name;
+    }
 
-	public Location getCurrentLocation()
-	{
-		return currentLocation;
-	}
+    public Location getCurrentLocation()
+    {
+        return currentLocation;
+    }
 
-	public Date getLastWarned()
-	{
-		return lastWarned;
-	}
+    public Date getLastWarned()
+    {
+        return lastWarned;
+    }
 
-	public Date getLastCheck()
-	{
-		return lastCheck;
-	}
+    public Date getLastCheck()
+    {
+        return lastCheck;
+    }
 
-	public int getDistanceFromCenter()
-	{
-		return distanceFromCenter;
-	}
+    public boolean isTeleporting()
+    {
+        return teleporting;
+    }
 
-	public boolean isTeleporting()
-	{
-		return teleporting;
-	}
+    public EpicZoneMode getMode()
+    {
+        return mode;
+    }
 
-	public EpicZoneMode getMode()
-	{
-		return mode;
-	}
+    public EpicZone getEditZone()
+    {
+        return editZone;
+    }
 
-	public EpicZone getEditZone()
-	{
-		return editZone;
-	}
+    public boolean getPastBorder()
+    {
+        return pastBorder;
+    }
 
-	public boolean getPastBorder()
-	{
-		return pastBorder;
-	}
+    public Date getEnteredZone()
+    {
+        return enteredZone;
+    }
 
-	public Date getEnteredZone()
-	{
-		return enteredZone;
-	}
+    public String getPreviousZoneTag()
+    {
+        return previousZoneTag;
+    }
 
-	public String getPreviousZoneTag()
-	{
-		return previousZoneTag;
-	}
+    public boolean getHasMoved()
+    {
+        return hasMoved;
+    }
 
-	public boolean getHasMoved()
-	{
-		return hasMoved;
-	}
+    public Date getLastMoved()
+    {
+        return lastMoved;
+    }
 
-	public Date getLastMoved()
-	{
-		return lastMoved;
-	}
+    public boolean getAdmin()
+    {
+        return admin;
+    }
 
-	public boolean getAdmin()
-	{
-		return admin;
-	}
+    public enum EpicZoneMode
+    {
+        None, ZoneDraw, ZoneEdit, ZoneDrawConfirm, ZoneDeleteConfirm
+    }
 
-	public enum EpicZoneMode
-	{
-		None, ZoneDraw, ZoneEdit, ZoneDrawConfirm, ZoneDeleteConfirm
-	}
+    public void setHasMoved(boolean value)
+    {
+        this.hasMoved = value;
+    }
 
-	public void setHasMoved(boolean value)
-	{
-		this.hasMoved = value;
-	}
+    public void setPreviousZoneTag(String value)
+    {
+        previousZoneTag = value;
+    }
 
-	public void setPreviousZoneTag(String value)
-	{
-		previousZoneTag = value;
-	}
+    public void setPastBorder(boolean value)
+    {
+        this.pastBorder = value;
+    }
 
-	public void setPastBorder(boolean value)
-	{
-		this.pastBorder = value;
-	}
+    public void setMode(EpicZoneMode value)
+    {
+        this.mode = value;
+    }
 
-	public void setEntityID(int value)
-	{
-		this.entityID = value;
-	}
+    public void setEditZone(@Nullable EpicZone value)
+    {
+        this.editZone = value;
+    }
 
-	public void setMode(EpicZoneMode value)
-	{
-		this.mode = value;
-	}
+    public void setAdmin(boolean value)
+    {
+        this.admin = value;
+    }
 
-	public void setEditZone(EpicZone value)
-	{
-		this.editZone = value;
-	}
+    public void setCurrentZone(EpicZone z)
+    {
+        if (this.currentZone != null)
+        {
+            HeroChatIntegration.leaveChat(this.currentZone.getTag(), this);
+        }
+        this.currentZone = z;
+        this.enteredZone = new Date();
+        HeroChatIntegration.joinChat(z.getTag(), this);
+    }
 
-	public void setAdmin(boolean value)
-	{
-		this.admin = value;
-	}
+    public void setCurrentLocation(Location l)
+    {
+        this.currentLocation = l;
+    }
 
-	public void setCurrentZone(EpicZone z)
-	{
-		if (this.currentZone != null)
-		{
-			HeroChatIntegration.leaveChat(this.currentZone.getTag(), this);
-		}
-		this.currentZone = z;
-		this.enteredZone = new Date();
-		HeroChatIntegration.joinChat(z.getTag(), this);
-	}
+    public void Warn()
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.SECOND, 2);
+        this.lastWarned = cal.getTime();
+    }
 
-	public void setDistanceFromCenter(int distance)
-	{
-		this.distanceFromCenter = distance;
-	}
+    public void Check()
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MILLISECOND, 500);
+        this.lastCheck = cal.getTime();
+        this.lastMoved = cal.getTime();
+    }
 
-	public void setCurrentLocation(Location l)
-	{
-		this.currentLocation = l;
-	}
-
-	public void Warn()
-	{
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.SECOND, 2);
-		this.lastWarned = cal.getTime();
-	}
-
-	public void Check()
-	{
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MILLISECOND, 500);
-		this.lastCheck = cal.getTime();
-		this.lastMoved = cal.getTime();
-	}
-
-	public void setIsTeleporting(boolean value)
-	{
-		teleporting = value;
-	}
+    public void setIsTeleporting(boolean value)
+    {
+        teleporting = value;
+    }
 }

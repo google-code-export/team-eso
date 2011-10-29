@@ -31,94 +31,123 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class EZZoneFlag 
+public class EZZoneFlag
 {
-	public EZZoneFlag(String[] data, CommandSender sender)
-	{
-		if(sender instanceof Player)
-		{
-			Player player = (Player)sender;
-			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			if(ezp.getAdmin()) //Owners are not allowed to edit flags on a zone.
-			{
-				if(ezp.getMode() == EpicZoneMode.ZoneEdit)
-				{
-					if(data.length > 2 && data[1].length() > 0 && data[2].length() > 0)
-					{
-						String flag = data[1];
-						String value = "";
-						for(int i = 2; i < data.length; i++)
-						{
-							value = value + data[i] + " ";
-						}			
-						if(SetFlag(flag.toLowerCase(), ezp, value))
-						{
-							Message.Send(sender, Message_ID.Info_00107_ZoneFlagUpdated_X_to_Y, new String[]{flag, value});
-						}
-						else
-						{
-							Message.Send(sender, Message_ID.Warning_00108_InvalidFlag, new String[]{flag});
-						}
-					}
-				}
-			}
-			else
-			{
-				new EZZoneHelp(ZoneCommand.FLAG, sender, ezp);
-			}
-		}
-	}
+    public EZZoneFlag(String[] data, CommandSender sender)
+    {
+        if (sender instanceof Player)
+        {
+            Player player = (Player) sender;
+            EpicZonePlayer ezp = General.getPlayer(player.getName());
+            if (ezp.getAdmin()) //Owners are not allowed to edit flags on a zone.
+            {
+                if (ezp.getMode() == EpicZoneMode.ZoneEdit)
+                {
+                    if (data.length > 2 && data[1].length() > 0 && data[2].length() > 0)
+                    {
+                        String flag = data[1];
+                        String value = "";
+                        for (int i = 2; i < data.length; i++)
+                        {
+                            value = value + data[i] + " ";
+                        }
+                        if (SetFlag(flag.toLowerCase(), ezp, value))
+                        {
+                            Message.Send(sender, Message_ID.Info_00107_ZoneFlagUpdated_X_to_Y, new String[]{flag, value});
+                        }
+                        else
+                        {
+                            Message.Send(sender, Message_ID.Warning_00108_InvalidFlag, new String[]{flag});
+                        }
+                    }
+                }
+            }
+            else
+            {
+                new EZZoneHelp(ZoneCommand.FLAG, sender, ezp);
+            }
+        }
+    }
 
-	private boolean SetFlag(String flag, EpicZonePlayer ezp, String data)
-	{
-		boolean result = true;
-		if(flag.equals("pvp")){SetPVP(ezp, data);}
-		else if(flag.equals("mobs")){SetMobs(ezp, data);}
-		else if(flag.equals("regen")){SetRegen(ezp, data);}
-		else if(flag.equals("fire")){SetFire(ezp, data);}
-		else if(flag.equals("explode")){SetExplode(ezp, data);}
-		else if(flag.equals("sanctuary")){SetSanctuary(ezp, data);}
-		else if(flag.equals("fireburnsmobs")){SetFireBurnsMobs(ezp, data);}
-		else {result = false;}
-		return result;
-	}
+    private boolean SetFlag(String flag, EpicZonePlayer ezp, String data)
+    {
+        boolean result = true;
+        if (flag.equals("pvp"))
+        {
+            SetPVP(ezp, data);
+        }
+        else if (flag.equals("mobs"))
+        {
+            SetMobs(ezp, data);
+        }
+        else if (flag.equals("regen"))
+        {
+            SetRegen(ezp, data);
+        }
+        else if (flag.equals("fire"))
+        {
+            SetFire(ezp, data);
+        }
+        else if (flag.equals("explode"))
+        {
+            SetExplode(ezp, data);
+        }
+        else if (flag.equals("sanctuary"))
+        {
+            SetSanctuary(ezp, data);
+        }
+        else if (flag.equals("fireburnsmobs"))
+        {
+            SetFireBurnsMobs(ezp, data);
+        }
+        else
+        {
+            result = false;
+        }
+        return result;
+    }
 
-	private void SetPVP(EpicZonePlayer ezp, String data)
-	{
-		ezp.getEditZone().setPVP(Boolean.valueOf((data).trim()));
-	}
-	private void SetMobs(EpicZonePlayer ezp, String data)
-	{
-		ezp.getEditZone().setMobs(data);
-	}
-	private void SetRegen(EpicZonePlayer ezp, String data)
-	{
-		ezp.getEditZone().setRegen(data);
-	}
-	private void SetFire(EpicZonePlayer ezp, String data)
-	{
-		ezp.getEditZone().setFire(data.trim());
-	}
-	private void SetExplode(EpicZonePlayer ezp, String data)
-	{
-		ezp.getEditZone().setExplode(data.trim());
-	}
-	private void SetSanctuary(EpicZonePlayer ezp, String data)
-	{
-		ezp.getEditZone().setSanctuary(Boolean.valueOf((data).trim()));
-	}
-	private void SetFireBurnsMobs(EpicZonePlayer ezp, String data)
-	{
-		ezp.getEditZone().setFireBurnsMobs(Boolean.valueOf((data).trim()));
-	}
+    private void SetPVP(EpicZonePlayer ezp, String data)
+    {
+        ezp.getEditZone().setPVP(Boolean.valueOf((data).trim()));
+    }
+
+    private void SetMobs(EpicZonePlayer ezp, String data)
+    {
+        ezp.getEditZone().setMobs(data);
+    }
+
+    private void SetRegen(EpicZonePlayer ezp, String data)
+    {
+        ezp.getEditZone().setRegen(data);
+    }
+
+    private void SetFire(EpicZonePlayer ezp, String data)
+    {
+        ezp.getEditZone().setFire(data.trim());
+    }
+
+    private void SetExplode(EpicZonePlayer ezp, String data)
+    {
+        ezp.getEditZone().setExplode(data.trim());
+    }
+
+    private void SetSanctuary(EpicZonePlayer ezp, String data)
+    {
+        ezp.getEditZone().setSanctuary(Boolean.valueOf((data).trim()));
+    }
+
+    private void SetFireBurnsMobs(EpicZonePlayer ezp, String data)
+    {
+        ezp.getEditZone().setFireBurnsMobs(Boolean.valueOf((data).trim()));
+    }
 }

@@ -31,53 +31,52 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class EZZoneOwner 
+public class EZZoneOwner
 {
-	public EZZoneOwner(String[] data, CommandSender sender)
-	{
-		if(sender instanceof Player)
-		{
-			Player player = (Player)sender;
-			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			if(ezp.getAdmin()) //Owners cannot edit owners on a zone.
-			{
-				if(ezp.getMode() == EpicZoneMode.ZoneEdit)
-				{
-					if(data.length > 2)
-					{
-						String cmd = data[1];
-						for(int i = 2; i < data.length; i++)
-						{
-							if(data[i].length() > 0)
-							{
-								if(cmd.equalsIgnoreCase("add"))
-								{
-									ezp.getEditZone().addOwner(data[i]);
-								}
-								else if(cmd.equalsIgnoreCase("remove"))
-								{
-									ezp.getEditZone().removeOwner(data[i]);
-								}
-							}
-						}
-						Message.Send(sender, Message_ID.Info_00026_OwnersUpdated);
-					}
-				}
-			}
-			else
-			{
-				new EZZoneHelp(ZoneCommand.OWNER, sender, ezp);
-			}
-		}
-	}
+    public EZZoneOwner(String[] data, CommandSender sender)
+    {
+        if (sender instanceof Player)
+        {
+            Player player = (Player) sender;
+            EpicZonePlayer ezp = General.getPlayer(player.getName());
+            if (ezp.getAdmin()) //Owners cannot edit owners on a zone.
+            {
+                if (ezp.getMode() == EpicZoneMode.ZoneEdit)
+                {
+                    if (data.length > 2)
+                    {
+                        String cmd = data[1];
+                        for (int i = 2; i < data.length; i++)
+                        {
+                            if (data[i].length() > 0)
+                            {
+                                if (cmd.equalsIgnoreCase("add"))
+                                {
+                                    ezp.getEditZone().addOwner(data[i]);
+                                }
+                                else if (cmd.equalsIgnoreCase("remove"))
+                                {
+                                    ezp.getEditZone().removeOwner(data[i]);
+                                }
+                            }
+                        }
+                        Message.Send(sender, Message_ID.Info_00026_OwnersUpdated);
+                    }
+                }
+            }
+            else
+            {
+                new EZZoneHelp(ZoneCommand.OWNER, sender, ezp);
+            }
+        }
+    }
 }

@@ -31,273 +31,273 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.listeners;
 
-import java.awt.Point;
-
-
-import org.bukkit.entity.CreatureType;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityCombustEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityListener;
-
-import com.epicsagaonline.bukkit.EpicZones.EpicZones;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
+import org.bukkit.entity.CreatureType;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-public class EntityEvents extends EntityListener 
+import java.awt.*;
+
+public class EntityEvents extends EntityListener
 {
 
-	//private final EpicZones plugin;
+    public
+    @Override
+    void onEntityExplode(EntityExplodeEvent event)
+    {
+        EpicZone zone = General.GetZoneForPlayer(null, event.getLocation().getWorld().getName(), event.getLocation().getBlockY(), new Point(event.getLocation().getBlockX(), event.getLocation().getBlockZ()));
+        if (zone != null)
+        {
+            if (event.getEntity().toString().equalsIgnoreCase("CraftTNTPrimed"))
+            {
+                if (!zone.getExplode().getTNT())
+                {
+                    event.setYield(0);
+                    event.setCancelled(true);
+                }
+            }
+            else if (event.getEntity().toString().equalsIgnoreCase("CraftCreeper"))
+            {
+                if (!zone.getExplode().getCreeper())
+                {
+                    event.setYield(0);
+                    event.setCancelled(true);
+                }
+            }
+            else if (event.getEntity().toString().equalsIgnoreCase("CraftFireball"))
+            {
+                if (!zone.getExplode().getGhast())
+                {
+                    event.setYield(0);
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
 
-	public EntityEvents(EpicZones instance)
-	{
-		//plugin = instance;
-	}
+    public
+    @Override
+    void onEntityCombust(EntityCombustEvent event)
+    {
+        if (!event.isCancelled())
+        {
+            Entity e = event.getEntity();
+            EpicZone zone = General.GetZoneForPlayer(null, e.getLocation().getWorld().getName(), e.getLocation().getBlockY(), new Point(e.getLocation().getBlockX(), e.getLocation().getBlockZ()));
+            if (zone != null)
+            {
+                if (!zone.getFire().getIgnite())
+                {
+                    if (isPlayer(e))
+                    {
+                        e.setFireTicks(0);
+                        event.setCancelled(true);
+                    }
+                    else if (!zone.getFireBurnsMobs())
+                    {
+                        e.setFireTicks(0);
+                        event.setCancelled(true);
+                    }
+                }
+            }
+        }
+    }
 
-	public @Override void onEntityExplode(EntityExplodeEvent event)
-	{
-		EpicZone zone = General.GetZoneForPlayer(null, event.getLocation().getWorld().getName(), event.getLocation().getBlockY() ,new Point(event.getLocation().getBlockX(), event.getLocation().getBlockZ()));
-		if (zone != null)
-		{
-			if(event.getEntity().toString().equalsIgnoreCase("CraftTNTPrimed"))
-			{
-				if(!zone.getExplode().getTNT())
-				{
-					event.setYield(0);
-					event.setCancelled(true);
-				}				
-			}
-			else if(event.getEntity().toString().equalsIgnoreCase("CraftCreeper"))
-			{
-				if(!zone.getExplode().getCreeper())
-				{
-					event.setYield(0);
-					event.setCancelled(true);
-				}				
-			}
-			else if(event.getEntity().toString().equalsIgnoreCase("CraftFireball"))
-			{
-				if(!zone.getExplode().getGhast())
-				{
-					event.setYield(0);
-					event.setCancelled(true);
-				}				
-			}
-		}
-	}
+    public
+    @Override
+    void onEntityDamage(EntityDamageEvent event)
+    {
+        if (!event.isCancelled())
+        {
+            Entity e = event.getEntity();
+            EpicZone sancZone = General.GetZoneForPlayer(null, e.getLocation().getWorld().getName(), e.getLocation().getBlockY(), new Point(e.getLocation().getBlockX(), e.getLocation().getBlockZ()));
+            if ((sancZone != null && !sancZone.getSanctuary()) || sancZone == null)
+            {
+                if (event.getCause() == DamageCause.ENTITY_ATTACK)
+                {
+                    if (event instanceof EntityDamageByEntityEvent)
+                    {
+                        EntityDamageByEntityEvent sub = (EntityDamageByEntityEvent) event;
+                        if (isPlayer(sub.getEntity()) && isPlayer(sub.getDamager()))
+                        {
+                            Player player = (Player) sub.getEntity();
+                            EpicZonePlayer ezp = General.getPlayer(player.getName());
+                            EpicZone zone = ezp.getCurrentZone();
+                            if (zone != null)
+                            {
+                                if (!zone.getPVP())
+                                {
+                                    event.setCancelled(true);
+                                }
+                            }
+                            else
+                            {
+                                if (!General.myGlobalZones.get(e.getWorld().getName().toLowerCase()).getPVP())
+                                {
+                                    event.setCancelled(true);
+                                }
+                            }
+                        }
+                        else if (sub.getDamager().toString().equalsIgnoreCase("CraftGhast"))
+                        {
+                            if (sancZone != null)
+                            {
+                                if (!sancZone.getExplode().getGhast())
+                                {
+                                    event.setCancelled(true);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (event.getCause() == DamageCause.BLOCK_EXPLOSION)
+                {
+                    if (sancZone != null)
+                    {
+                        if (!sancZone.getExplode().getTNT())
+                        {
+                            event.setCancelled(true);
+                        }
+                    }
+                }
+                else if (event.getCause() == DamageCause.ENTITY_EXPLOSION)
+                {
+                    if (sancZone != null)
+                    {
+                        if (!sancZone.getExplode().getCreeper())
+                        {
+                            event.setCancelled(true);
+                        }
+                    }
+                }
+                else if (event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK)
+                {
+                    if (sancZone != null)
+                    {
+                        if (!sancZone.getFire().getIgnite())
+                        {
+                            if (isPlayer(e))
+                            {
+                                e.setFireTicks(0);
+                                event.setCancelled(true);
+                            }
+                            else if (!sancZone.getFireBurnsMobs())
+                            {
+                                e.setFireTicks(0);
+                                event.setCancelled(true);
+                            }
+                        }
+                    }
+                }
+            }
+            else //This is a sanctuary zone, no damage allowed to players.
+            {
+                if (isPlayer(e))
+                {
+                    e.setFireTicks(0);
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
 
-	public @Override void onEntityCombust(EntityCombustEvent event) 
-	{
-		if(!event.isCancelled())
-		{
-			Entity e = event.getEntity();
-			EpicZone zone = General.GetZoneForPlayer(null, e.getLocation().getWorld().getName(), e.getLocation().getBlockY() ,new Point(e.getLocation().getBlockX(), e.getLocation().getBlockZ()));
-			if(zone != null)
-			{
-				if(!zone.getFire().getIgnite())
-				{
-					if(isPlayer(e))
-					{
-						e.setFireTicks(0);
-						event.setCancelled(true);
-					}
-					else if (!zone.getFireBurnsMobs())
-					{
-						e.setFireTicks(0);
-						event.setCancelled(true);
-					}
-				}
-			}
-		}
-	}
+    public
+    @Override
+    void onCreatureSpawn(CreatureSpawnEvent event)
+    {
+        if (!event.isCancelled() && isCreature(event.getCreatureType()) && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL)
+        {
+            EpicZone zone = General.GetZoneForPlayer(null, event.getLocation().getWorld().getName(), event.getLocation().getBlockY(), new Point(event.getLocation().getBlockX(), event.getLocation().getBlockZ()));
+            if (zone != null)
+            {
+                if (zone.getMobs() != null) //If null assume all
+                {
+                    if (zone.getMobs().size() > 0) //If size = 0 assume all
+                    {
+                        if (!zone.getMobs().contains("ALL"))
+                        {
+                            if (zone.getMobs().contains("NONE") || !zone.getMobs().contains(event.getCreatureType().toString()))
+                            {
+                                event.setCancelled(true);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-	public @Override void onEntityDamage(EntityDamageEvent event)
-	{
-		if(!event.isCancelled())
-		{		
-			Entity e = event.getEntity();
-			EpicZone sancZone = General.GetZoneForPlayer(null, e.getLocation().getWorld().getName(), e.getLocation().getBlockY() ,new Point(e.getLocation().getBlockX(), e.getLocation().getBlockZ()));
-			if((sancZone != null && !sancZone.getSanctuary()) || sancZone == null)
-			{
-				if(event.getCause() == DamageCause.ENTITY_ATTACK)
-				{
-					if (event instanceof EntityDamageByEntityEvent) 
-					{
-						EntityDamageByEntityEvent sub = (EntityDamageByEntityEvent)event;
-						if(isPlayer(sub.getEntity()) && isPlayer(sub.getDamager()))
-						{
-							Player player = (Player)sub.getEntity();
-							EpicZonePlayer ezp = General.getPlayer(player.getName());
-							EpicZone zone = ezp.getCurrentZone();
-							if(zone != null)
-							{
-								if(!zone.getPVP())
-								{
-									event.setCancelled(true);
-								}
-							}
-							else
-							{
-								if(!General.myGlobalZones.get(e.getWorld().getName().toLowerCase()).getPVP())
-								{
-									event.setCancelled(true);
-								}
-							}
-						}
-						else if(sub.getDamager().toString().equalsIgnoreCase("CraftGhast"))
-						{
-							if(!sancZone.getExplode().getGhast())
-							{
-								event.setCancelled(true);
-							}
-						}
-					}
-				}
-				else if(event.getCause() == DamageCause.BLOCK_EXPLOSION)
-				{
-					if(sancZone != null)
-					{
-						if(!sancZone.getExplode().getTNT())
-						{
-							event.setCancelled(true);
-						}				
-					}
-				}
-				else if(event.getCause() == DamageCause.ENTITY_EXPLOSION)
-				{
-					if(!sancZone.getExplode().getCreeper())
-					{
-						event.setCancelled(true);
-					}				
-				}
-				else if(event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK)
-				{
-					if(sancZone != null)
-					{
-						if(!sancZone.getFire().getIgnite())
-						{
-							if(isPlayer(e))
-							{
-								e.setFireTicks(0);
-								event.setCancelled(true);
-							}
-							else if (!sancZone.getFireBurnsMobs())
-							{
-								e.setFireTicks(0);
-								event.setCancelled(true);
-							}
-						}
-					}
-				}
-			}
-			else //This is a sanctuary zone, no damage allowed to players.
-			{
-				if(isPlayer(e))
-				{
-					e.setFireTicks(0);
-					event.setCancelled(true);
-				}
-			}
-		}
-	}
+    private boolean isCreature(CreatureType ct)
+    {
+        boolean result = false;
 
-	public @Override void onCreatureSpawn(CreatureSpawnEvent event)
-	{
-		if(!event.isCancelled() && isCreature(event.getCreatureType()))
-		{
-			EpicZone zone = General.GetZoneForPlayer(null, event.getLocation().getWorld().getName(), event.getLocation().getBlockY() ,new Point(event.getLocation().getBlockX(),event.getLocation().getBlockZ()));
-			if(zone != null)
-			{
-				if(zone.getMobs() != null) //If null assume all
-				{
-					if(zone.getMobs().size() > 0) //If size = 0 assume all
-					{
-						if(!zone.getMobs().contains("ALL"))
-						{
-							if (zone.getMobs().contains("NONE") || !zone.getMobs().contains(event.getCreatureType().toString()))
-							{
-								event.setCancelled(true);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+        if (ct != null)
+        {
+            switch (ct)
+            {
+                case CHICKEN:
+                    result = true;
+                    break;
+                case COW:
+                    result = true;
+                    break;
+                case CREEPER:
+                    result = true;
+                    break;
+                case GHAST:
+                    result = true;
+                    break;
+                case GIANT:
+                    result = true;
+                    break;
+                case PIG:
+                    result = true;
+                    break;
+                case PIG_ZOMBIE:
+                    result = true;
+                    break;
+                case SHEEP:
+                    result = true;
+                    break;
+                case SKELETON:
+                    result = true;
+                    break;
+                case SLIME:
+                    result = true;
+                    break;
+                case SPIDER:
+                    result = true;
+                    break;
+                case SQUID:
+                    result = true;
+                    break;
+                case ZOMBIE:
+                    result = true;
+                    break;
+            }
+        }
 
-	private boolean isCreature(CreatureType ct)
-	{
-		boolean result = false;
+        return result;
+    }
 
-		if(ct != null)
-		{
-			switch(ct)
-			{
-			case CHICKEN:
-				result = true;
-				break;
-			case COW:
-				result = true;
-				break;
-			case CREEPER:
-				result = true;
-				break;
-			case GHAST:
-				result = true;
-				break;
-			case GIANT:
-				result = true;
-				break;
-			case PIG:
-				result = true;
-				break;
-			case PIG_ZOMBIE:
-				result = true;
-				break;
-			case SHEEP:
-				result = true;
-				break;
-			case SKELETON:
-				result = true;
-				break;
-			case SLIME:
-				result = true;
-				break;
-			case SPIDER:
-				result = true;
-				break;
-			case SQUID:
-				result = true;
-				break;
-			case ZOMBIE:
-				result = true;
-				break;
-			}
-		}
+    private boolean isPlayer(Entity entity)
+    {
 
-		return result;
-	}
-	private boolean isPlayer(Entity entity)
-	{
+        boolean result = false;
 
-		boolean result = false;
+        if (entity instanceof Player)
+        {
+            Player player = (Player) entity;
+            if (General.getPlayer(player.getName()) != null)
+            {
+                result = true;
+            }
+        }
 
-		if(entity instanceof Player)
-		{
-			Player player = (Player) entity;
-			if(General.getPlayer(player.getName()) != null)
-			{
-				result = true;
-			}
-		}
+        return result;
 
-		return result;
-
-	}
+    }
 }

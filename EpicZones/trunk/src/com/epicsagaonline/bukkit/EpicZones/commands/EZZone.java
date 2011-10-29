@@ -31,43 +31,109 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.command.CommandSender;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
+import org.bukkit.command.CommandSender;
 
-public class EZZone implements CommandHandler 
+public class EZZone implements CommandHandler
 {
-	public boolean onCommand(String command, CommandSender sender, String[] args) 
-	{
-		if(args.length > 0)
-		{
-			String subCommand = args[0].toLowerCase().trim();
-			if(subCommand.equals("create")){new EZZoneCreate(args, sender);}
-			else if(subCommand.equals("save")){new EZZoneSave(args, sender);}
-			else if(subCommand.equals("flag")){new EZZoneFlag(args, sender);}
-			else if(subCommand.equals("radius")){new EZZoneRadius(args, sender);}
-			else if(subCommand.equals("floor")){new EZZoneFloor(args, sender);}
-			else if(subCommand.equals("ceiling")){new EZZoneCeiling(args, sender);}
-			else if(subCommand.equals("child")){new EZZoneChild(args, sender);}
-			else if(subCommand.equals("parent")){new EZZoneParent(args, sender);}
-			else if(subCommand.equals("owner")){new EZZoneOwner(args, sender);}
-			else if(subCommand.equals("name")){new EZZoneName(args, sender);}
-			else if(subCommand.equals("message")){new EZZoneMessage(args, sender);}
-			else if(subCommand.equals("draw")){new EZZoneDraw(args, sender);}
-			else if(subCommand.equals("confirm")){new EZZoneConfirm(args, sender);}
-			else if(subCommand.equals("edit")){new EZZoneEdit(args, sender);}
-			else if(subCommand.equals("world")){new EZZoneWorld(args, sender);}
-			else if(subCommand.equals("cancel")){new EZZoneCancel(args, sender);}
-			else if(subCommand.equals("delete")){new EZZoneDelete(args, sender);}
-			else if(subCommand.equals("list")){new EZZoneList(args, sender);}
-			else if(subCommand.equals("info")){new EZZoneInfo(args, sender);}
-			else if(subCommand.equals("perm")){new EZZonePerm(args, sender);}
-			else if(subCommand.equals("debug")){new EZZoneDebug(args, sender);}
-			else {new EZZoneHelp(ZoneCommand.NONE, sender, null);}
-		}
-		else
-		{
-			new EZZoneHelp(ZoneCommand.NONE, sender, null);
-		}
-		return true;	
-	}
+    public boolean onCommand(String command, CommandSender sender, String[] args)
+    {
+        if (args.length > 0)
+        {
+            String subCommand = args[0].toLowerCase().trim();
+            if (subCommand.equals("create"))
+            {
+                new EZZoneCreate(args, sender);
+            }
+            else if (subCommand.equals("save"))
+            {
+                new EZZoneSave(sender);
+            }
+            else if (subCommand.equals("flag"))
+            {
+                new EZZoneFlag(args, sender);
+            }
+            else if (subCommand.equals("radius"))
+            {
+                new EZZoneRadius(args, sender);
+            }
+            else if (subCommand.equals("floor"))
+            {
+                new EZZoneFloor(args, sender);
+            }
+            else if (subCommand.equals("ceiling"))
+            {
+                new EZZoneCeiling(args, sender);
+            }
+            else if (subCommand.equals("child"))
+            {
+                new EZZoneChild(args, sender);
+            }
+            else if (subCommand.equals("parent"))
+            {
+                new EZZoneParent(args, sender);
+            }
+            else if (subCommand.equals("owner"))
+            {
+                new EZZoneOwner(args, sender);
+            }
+            else if (subCommand.equals("name"))
+            {
+                new EZZoneName(args, sender);
+            }
+            else if (subCommand.equals("message"))
+            {
+                new EZZoneMessage(args, sender);
+            }
+            else if (subCommand.equals("draw"))
+            {
+                new EZZoneDraw(args, sender);
+            }
+            else if (subCommand.equals("confirm"))
+            {
+                new EZZoneConfirm(sender);
+            }
+            else if (subCommand.equals("edit"))
+            {
+                new EZZoneEdit(args, sender);
+            }
+            else if (subCommand.equals("world"))
+            {
+                new EZZoneWorld(args, sender);
+            }
+            else if (subCommand.equals("cancel"))
+            {
+                new EZZoneCancel(sender);
+            }
+            else if (subCommand.equals("delete"))
+            {
+                new EZZoneDelete(sender);
+            }
+            else if (subCommand.equals("list"))
+            {
+                new EZZoneList(sender);
+            }
+            else if (subCommand.equals("info"))
+            {
+                new EZZoneInfo(args, sender);
+            }
+            else if (subCommand.equals("perm"))
+            {
+                new EZZonePerm(args, sender);
+            }
+            else if (subCommand.equals("debug"))
+            {
+                new EZZoneDebug(sender);
+            }
+            else
+            {
+                new EZZoneHelp(ZoneCommand.NONE, sender, null);
+            }
+        }
+        else
+        {
+            new EZZoneHelp(ZoneCommand.NONE, sender, null);
+        }
+        return true;
+    }
 }

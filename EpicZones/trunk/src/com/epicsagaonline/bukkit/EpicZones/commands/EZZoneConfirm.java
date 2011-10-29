@@ -31,9 +31,6 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
@@ -41,44 +38,46 @@ import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZoneDAL;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class EZZoneConfirm 
+public class EZZoneConfirm
 {
-	public EZZoneConfirm(String[] data, CommandSender sender)
-	{
-		if(sender instanceof Player)
-		{
-			Player player = (Player)sender;
-			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			if(ezp.getAdmin()) //Only admin will ever be to this point.
-			{
-				if(ezp.getMode() == EpicZoneMode.ZoneDeleteConfirm)
-				{
+    public EZZoneConfirm(CommandSender sender)
+    {
+        if (sender instanceof Player)
+        {
+            Player player = (Player) sender;
+            EpicZonePlayer ezp = General.getPlayer(player.getName());
+            if (ezp.getAdmin()) //Only admin will ever be to this point.
+            {
+                if (ezp.getMode() == EpicZoneMode.ZoneDeleteConfirm)
+                {
 
-					if(ezp.getEditZone().hasParent())
-					{
-						General.myZones.get(ezp.getEditZone().getParent().getTag()).removeChild(ezp.getEditZone().getTag());
-					}
-					ezp.getEditZone().HidePillars();
-					EpicZoneDAL.DeleteZone(ezp.getEditZone().getTag());
-					Message.Send(sender, Message_ID.Info_00102_Zone_X_Deleted, new String[]{ezp.getEditZone().getTag()});
+                    if (ezp.getEditZone().hasParent())
+                    {
+                        General.myZones.get(ezp.getEditZone().getParent().getTag()).removeChild(ezp.getEditZone().getTag());
+                    }
+                    ezp.getEditZone().HidePillars();
+                    EpicZoneDAL.DeleteZone(ezp.getEditZone().getTag());
+                    Message.Send(sender, Message_ID.Info_00102_Zone_X_Deleted, new String[]{ezp.getEditZone().getTag()});
 
-					ezp.setMode(EpicZoneMode.None);
-					ezp.setEditZone(null);
+                    ezp.setMode(EpicZoneMode.None);
+                    ezp.setEditZone(null);
 
-				}
-				else if(ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
-				{
-					ezp.setMode(EpicZoneMode.ZoneDraw);
-					ezp.getEditZone().clearPolyPoints();
-					ezp.getEditZone().HidePillars();
-					Message.Send(sender, Message_ID.Mode_00019_Draw_StartMessage);
-				}
-			}
-			else
-			{
-				new EZZoneHelp(ZoneCommand.CONFIRM, sender, ezp);
-			}
-		}
-	}
+                }
+                else if (ezp.getMode() == EpicZoneMode.ZoneDrawConfirm)
+                {
+                    ezp.setMode(EpicZoneMode.ZoneDraw);
+                    ezp.getEditZone().clearPolyPoints();
+                    ezp.getEditZone().HidePillars();
+                    Message.Send(sender, Message_ID.Mode_00019_Draw_StartMessage);
+                }
+            }
+            else
+            {
+                new EZZoneHelp(ZoneCommand.CONFIRM, sender, ezp);
+            }
+        }
+    }
 }

@@ -31,45 +31,44 @@ THE SOFTWARE.
 
 package com.epicsagaonline.bukkit.EpicZones.commands;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class EZZoneName 
+public class EZZoneName
 {
-	public EZZoneName(String[] data, CommandSender sender)
-	{
-		if(sender instanceof Player)
-		{
-			Player player = (Player)sender;
-			EpicZonePlayer ezp = General.getPlayer(player.getName());
-			
-			if(ezp.getMode() == EpicZoneMode.ZoneEdit)
-			{
-				if(data.length > 1)
-				{
-					String message = "";
-					for(int i = 1; i < data.length; i++)
-					{
-						message = message + data[i] + " ";
-					}
-					if(message.length() > 0)
-					{
-						ezp.getEditZone().setName(message.trim());
-						Message.Send(sender, Message_ID.Info_00100_ZoneUpdatedSet_X_to_Y, new String[]{"name", message});
-					}
-				}
-			}
-			else
-			{
-				new EZZoneHelp(ZoneCommand.NAME, sender, ezp);
-			}
-		}
-	}
+    public EZZoneName(String[] data, CommandSender sender)
+    {
+        if (sender instanceof Player)
+        {
+            Player player = (Player) sender;
+            EpicZonePlayer ezp = General.getPlayer(player.getName());
+
+            if (ezp.getMode() == EpicZoneMode.ZoneEdit)
+            {
+                if (data.length > 1)
+                {
+                    String message = "";
+                    for (int i = 1; i < data.length; i++)
+                    {
+                        message = message + data[i] + " ";
+                    }
+                    if (message.length() > 0)
+                    {
+                        ezp.getEditZone().setName(message.trim());
+                        Message.Send(sender, Message_ID.Info_00100_ZoneUpdatedSet_X_to_Y, new String[]{"name", message});
+                    }
+                }
+            }
+            else
+            {
+                new EZZoneHelp(ZoneCommand.NAME, sender, ezp);
+            }
+        }
+    }
 }
