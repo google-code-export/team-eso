@@ -42,7 +42,9 @@ public class Config
     private static File file;
     public static boolean enableRadius;
     public static boolean enableHeroChat;
-    public static boolean globalZoneDefaultAllow;
+    public static boolean globalZoneDefaultBuild;
+    public static boolean globalZoneDefaultDestroy;
+    public static boolean globalZoneDefaultEnter;
     public static int zoneTool = 280; // Default Tool Is Stick
     public static String language = "EN_US";
     public static boolean enableSpout;
@@ -53,7 +55,9 @@ public class Config
 
         enableRadius = true;
         enableHeroChat = false;
-        globalZoneDefaultAllow = true;
+        globalZoneDefaultBuild = true;
+        globalZoneDefaultDestroy = true;
+        globalZoneDefaultEnter = true;
         zoneTool = 280;
         language = "EN_US";
         enableSpout = true;
@@ -95,7 +99,20 @@ public class Config
 
                 enableRadius = Util.getBooleanValueFromHashSet("enableRadius", root);
                 enableHeroChat = Util.getBooleanValueFromHashSet("enableHeroChat", root);
-                globalZoneDefaultAllow = Util.getBooleanValueFromHashSet("globalZoneDefaultAllow", root);
+
+                if (Util.getObjectValueFromHashSet("globalZoneDefaultAllow", root) == null)
+                {
+                    globalZoneDefaultBuild = Util.getBooleanValueFromHashSet("globalZoneDefaultBuild", root);
+                    globalZoneDefaultDestroy = Util.getBooleanValueFromHashSet("globalZoneDefaultDestroy", root);
+                    globalZoneDefaultEnter = Util.getBooleanValueFromHashSet("globalZoneDefaultEnter", root);
+                }
+                else
+                {
+                    globalZoneDefaultBuild = Util.getBooleanValueFromHashSet("globalZoneDefaultAllow", root);
+                    globalZoneDefaultDestroy = globalZoneDefaultBuild;
+                    globalZoneDefaultEnter = globalZoneDefaultBuild;
+                }
+
                 zoneTool = Util.getIntegerValueFromHashSet("zoneTool", root);
                 language = Util.getStringValueFromHashSet("language", root);
                 enableSpout = Util.getBooleanValueFromHashSet("enableSpout", root);
@@ -117,7 +134,9 @@ public class Config
 
         root.put("enableRadius", enableRadius);
         root.put("enableHeroChat", enableHeroChat);
-        root.put("globalZoneDefaultAllow", globalZoneDefaultAllow);
+        root.put("globalZoneDefaultBuild", globalZoneDefaultBuild);
+        root.put("globalZoneDefaultDestroy", globalZoneDefaultDestroy);
+        root.put("globalZoneDefaultEnter", globalZoneDefaultEnter);
         root.put("zoneTool", zoneTool);
         root.put("language", language);
         root.put("enableSpout", enableSpout);

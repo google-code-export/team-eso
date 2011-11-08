@@ -44,7 +44,7 @@ public class EZZoneHelp
 
     public enum ZoneCommand
     {
-        CANCEL, CEILING, CHILD, CONFIRM, CREATE, DELETE, DRAW, EDIT, FLAG, FLOOR, HELP, INFO, LIST, MESSAGE, NAME, NONE, OWNER, PARENT, PERM, RADIUS, SAVE, WORLD
+        CANCEL, CEILING, CHILD, CONFIRM, CREATE, DELETE, DRAW, EDIT, FLAG, FLOOR, HELP, INFO, LIST, MESSAGE, NAME, NONE, OWNER, PARENT, PERM, RADIUS, SAVE, WORLD, COMMAND
     }
 
     public EZZoneHelp(ZoneCommand command, CommandSender sender, EpicZonePlayer ezp)

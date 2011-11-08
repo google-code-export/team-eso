@@ -66,15 +66,19 @@ public class EZZoneEdit
                         if (General.myZones.get(data[1]) != null)
                         {
                             String tag = data[1].replaceAll("[^a-zA-Z0-9_]", "");
+
                             EpicZone zone = General.myZones.get(tag);
                             if (zone.getType() != ZoneType.GLOBAL)
                             {
+
                                 if (ezp.getAdmin() || zone.isOwner(ezp.getName()))
                                 {
+
                                     ezp.setEditZone(new EpicZone(zone));
                                     ezp.setMode(EpicZoneMode.ZoneEdit);
                                     ezp.getEditZone().ShowPillars();
                                     Message.Send(sender, Message_ID.Info_00105_Mode_Edit, new String[]{tag});
+
                                 }
                                 else
                                 {

@@ -32,10 +32,7 @@ import com.epicsagaonline.bukkit.EpicZones.Util;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @SuppressWarnings({"ResultOfMethodCallIgnored"})
 public class EpicZoneDAL
@@ -58,7 +55,10 @@ public class EpicZoneDAL
         for (String fileName : fileNames)
         {
             EpicZone zone = Load(new File(file.getAbsolutePath() + File.separator + fileName));
-            result.put(zone.getTag(), zone);
+            if ((zone.getType() != EpicZone.ZoneType.GLOBAL) || (zone.getType() == EpicZone.ZoneType.GLOBAL && General.plugin.getServer().getWorld(zone.getWorld()) != null))
+            {
+                result.put(zone.getTag(), zone);
+            }
         }
 
         return result;
@@ -121,6 +121,7 @@ public class EpicZoneDAL
                 result.setFire(getFire(root));
                 result.setExplode(getExplode(root));
                 result.setSanctuary(Util.getBooleanValueFromHashSet("sanctuary", root));
+                result.setAllowEndermenPick(Util.getBooleanValueFromHashSet("endermenpick", root));
                 result.setFireBurnsMobs(Util.getBooleanValueFromHashSet("fireburnsmobs", root));
                 result.setPolygon(Util.getStringValueFromHashSet("points", root));
                 result.setRegen(getRegen(root));
@@ -150,6 +151,18 @@ public class EpicZoneDAL
                         if (playerName != null)
                         {
                             result.addOwner(playerName);
+                        }
+                    }
+                }
+
+                HashSet<String> disallowedCommands = (HashSet<String>) Util.getObjectValueFromHashSet("disallowedcommands", root);
+                if (disallowedCommands != null)
+                {
+                    for (String command : disallowedCommands)
+                    {
+                        if (command != null)
+                        {
+                            result.getDisallowedCommands().add(command);
                         }
                     }
                 }
@@ -306,6 +319,7 @@ public class EpicZoneDAL
             root.put("regen", regen);
 
             root.put("owners", zone.getOwners());
+            root.put("disallowedcommands", zone.getDisallowedCommands());
             root.put("childzones", zone.getChildrenTags().toArray());
             root.put("points", zone.getPoints());
             root.put("permissions", BuildPerms(zone.getPermissions()));

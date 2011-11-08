@@ -109,6 +109,10 @@ public class EZZoneFlag
         {
             SetFireBurnsMobs(ezp, data);
         }
+        else if (flag.equals("endermenpick"))
+        {
+            SetEndermenPick(ezp, data);
+        }
         else
         {
             result = false;
@@ -143,11 +147,16 @@ public class EZZoneFlag
 
     private void SetSanctuary(EpicZonePlayer ezp, String data)
     {
-        ezp.getEditZone().setSanctuary(Boolean.valueOf((data).trim()));
+        ezp.getEditZone().setSanctuary(Boolean.valueOf(data.trim()));
     }
 
     private void SetFireBurnsMobs(EpicZonePlayer ezp, String data)
     {
-        ezp.getEditZone().setFireBurnsMobs(Boolean.valueOf((data).trim()));
+        ezp.getEditZone().setFireBurnsMobs(Boolean.valueOf(data.trim()));
+    }
+
+    private void SetEndermenPick(EpicZonePlayer ezp, String data)
+    {
+        ezp.getEditZone().setAllowEndermenPick(Boolean.valueOf(data.trim()));
     }
 }

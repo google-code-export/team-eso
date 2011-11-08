@@ -38,6 +38,7 @@ import com.epicsagaonline.bukkit.EpicZones.commands.EZZoneHelp.ZoneCommand;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePermission;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -148,6 +149,7 @@ public class EZZoneInfo
                     {
                         messageText = messageText + Message.get(Message_ID.Format_Flag_Off, new String[]{"SANCTUARY"}) + " ";
                     }
+
                     Message.Send(sender, messageText);
                     messageText = "";
                     if (zone.getFireBurnsMobs())
@@ -158,6 +160,16 @@ public class EZZoneInfo
                     {
                         messageText = messageText + Message.get(Message_ID.Format_Flag_Off, new String[]{"FIREBURNSMOBS"}) + " ";
                     }
+
+                    if (zone.getAllowEndermenPick())
+                    {
+                        messageText = messageText + Message.get(Message_ID.Format_Flag_On, new String[]{"ENDERMENPICK"}) + " ";
+                    }
+                    else
+                    {
+                        messageText = messageText + Message.get(Message_ID.Format_Flag_Off, new String[]{"ENDERMENPICK"}) + " ";
+                    }
+
                     if (zone.hasRegen())
                     {
                         messageText = messageText + Message.get(Message_ID.Info_00118_Zone_Regen, new String[]{zone.getRegen().getDelay() + "", zone.getRegen().getAmount() + "", zone.getRegen().getInterval() + ""});
@@ -173,6 +185,37 @@ public class EZZoneInfo
                         messageText = messageText + " " + mobType;
                     }
                     Message.Send(sender, Message_ID.Info_00119_Zone_Mobs, new String[]{messageText});
+
+                    messageText = "";
+                    if (zone.getDisallowedCommands().size() > 0)
+                    {
+                        Message.Send(sender, Message_ID.Info_00042_DeniedCommands);
+                        int counter = 0;
+                        for (String cmd : zone.getDisallowedCommands())
+                        {
+                            if (messageText.length() == 0)
+                            {
+                                messageText = ChatColor.AQUA + cmd;
+                            }
+                            else
+                            {
+                                messageText = messageText +  ChatColor.WHITE +  ", " + ChatColor.AQUA + cmd;
+                            }
+                            if (counter == 5)
+                            {
+                                Message.Send(sender, messageText);
+                                messageText = "";
+                                counter = 0;
+                            }
+                            counter++;
+                        }
+                        if (messageText.length() > 0)
+                        {
+                            Message.Send(sender, messageText);
+                        }
+                        messageText = "";
+                    }
+
                     Message.Send(sender, Message_ID.Info_00039_Permissions);
                     for (String permKey : zone.getPermissions().keySet())
                     {

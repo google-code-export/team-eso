@@ -41,6 +41,7 @@ import com.epicsagaonline.bukkit.EpicZones.listeners.*;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
 import com.herocraftonline.dthielke.herochat.HeroChat;
+import com.randomappdev.bukkitstats.CallHome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -105,6 +106,7 @@ public class EpicZones extends JavaPlugin
             pm.registerEvent(Event.Type.PLAYER_INTERACT, this.playerListener, Event.Priority.Normal, this);
             pm.registerEvent(Event.Type.PLAYER_BUCKET_EMPTY, this.playerListener, Event.Priority.Normal, this);
             pm.registerEvent(Event.Type.PLAYER_BUCKET_FILL, this.playerListener, Event.Priority.Normal, this);
+            pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, this.playerListener, Event.Priority.Highest, this);
 
             pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Event.Priority.Normal, this);
             pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Event.Priority.Normal, this);
@@ -115,12 +117,15 @@ public class EpicZones extends JavaPlugin
             pm.registerEvent(Event.Type.ENTITY_DAMAGE, this.entityListener, Event.Priority.Normal, this);
             pm.registerEvent(Event.Type.CREATURE_SPAWN, this.entityListener, Event.Priority.Normal, this);
             pm.registerEvent(Event.Type.ENTITY_EXPLODE, this.entityListener, Event.Priority.Normal, this);
+            pm.registerEvent(Event.Type.ENDERMAN_PICKUP, this.entityListener, Event.Priority.Normal, this);
+            pm.registerEvent(Event.Type.ENDERMAN_PLACE, this.entityListener, Event.Priority.Normal, this);
 
             pm.registerEvent(Event.Type.VEHICLE_MOVE, this.vehicleListener, Event.Priority.Normal, this);
 
             pm.registerEvent(Event.Type.WORLD_LOAD, this.worldListener, Event.Priority.Highest, this);
+            pm.registerEvent(Event.Type.WORLD_UNLOAD, this.worldListener, Event.Priority.Highest, this);
 
-            scheduleID = getServer().getScheduler().scheduleAsyncRepeatingTask(this, regen, 10, 10);
+            scheduleID = getServer().getScheduler().scheduleSyncRepeatingTask(this, regen, 10, 10);
 
             registerCommands();
 
@@ -129,6 +134,8 @@ public class EpicZones extends JavaPlugin
             setupEpicZones();
             setupHeroChat();
             setupSpout(pm);
+
+            CallHome.load(this);
 
             Log.Write("version " + pdfFile.getVersion() + " is enabled.");
 
@@ -160,6 +167,7 @@ public class EpicZones extends JavaPlugin
                 }
             }
         }
+
         General.HeroChatEnabled = false;
         General.SpoutEnabled = false;
         Log.Write("version " + pdfFile.getVersion() + " is disabled.");
@@ -186,20 +194,6 @@ public class EpicZones extends JavaPlugin
     {
         PermissionsManager.Init(this);
     }
-
-    // public void setupMultiWorld()
-    // {
-    // EnablePlugin("EpicGates", "Multi World");
-    // EnablePlugin("MultiVerse", "Multi World");
-    // EnablePlugin("WorldWarp", "Multi World");
-    // EnablePlugin("WormholeXTremeWorlds", "Multi World");
-    // EnablePlugin("NetherPlugin", "Multi World");
-    // EnablePlugin("Nethrar", "Multi World");
-    // EnablePlugin("NetherPortal", "Multi World");
-    // EnablePlugin("Nether", "Multi World");
-    // EnablePlugin("NetherGate", "Multi World");
-    // EnablePlugin("Stargate", "Multi World");
-    // }
 
     private void EnablePlugin(String pluginName, String pluginType)
     {
@@ -300,12 +294,13 @@ public class EpicZones extends JavaPlugin
         Message.messageList = new HashMap<Integer, String>();
         boolean updateNeeded = false;
         boolean foundVersion = false;
+
         try
         {
 
             InitMessageList();
-
             Scanner scanner = new Scanner(file);
+
             try
             {
                 while (scanner.hasNext())
@@ -393,12 +388,10 @@ public class EpicZones extends JavaPlugin
         if (!file.exists() || force)
         {
             InputStream jarURL;
-            Log.Write("Deploying Language File: " + FileName);
-            jarURL = getClass().getResourceAsStream("/com/epicsagaonline/bukkit/EpicZones/resources/" + FileName + ".txt");
+            jarURL = getClass().getResourceAsStream("/com/epicsagaonline/bukkit/EpicZones/res/" + FileName + ".txt");
             try
             {
                 copyFile(jarURL, file);
-
             } catch (Exception ex)
             {
                 Log.Write(ex.getMessage());

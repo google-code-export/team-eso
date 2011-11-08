@@ -63,8 +63,6 @@ public class PermissionsManager
         boolean permStart;
         plugin = inPlugin;
 
-        Log.Init(plugin.getDescription().getName());
-
         permStart = startPermissionsEX();
         if (permStart)
         {

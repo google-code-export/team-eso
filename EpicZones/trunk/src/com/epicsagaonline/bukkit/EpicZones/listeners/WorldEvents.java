@@ -34,13 +34,19 @@ package com.epicsagaonline.bukkit.EpicZones.listeners;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import org.bukkit.event.world.WorldListener;
 import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 
 public class WorldEvents extends WorldListener
 {
-    public
     @Override
-    void onWorldLoad(WorldLoadEvent event)
+    public void onWorldLoad(WorldLoadEvent event)
     {
         General.AddWorld(event.getWorld());
+    }
+
+    @Override
+    public void onWorldUnload(WorldUnloadEvent event)
+    {
+        General.removeWorld(event.getWorld());
     }
 }

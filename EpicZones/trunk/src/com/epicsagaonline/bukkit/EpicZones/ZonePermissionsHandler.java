@@ -45,7 +45,18 @@ public class ZonePermissionsHandler
                     }
                     else
                     {
-                        return Config.globalZoneDefaultAllow;
+                        if (flag.equalsIgnoreCase("build"))
+                        {
+                            return Config.globalZoneDefaultBuild;
+                        }
+                        else if (flag.equalsIgnoreCase("destroy"))
+                        {
+                            return Config.globalZoneDefaultDestroy;
+                        }
+                        else //If for some reason anything other than build, deny or enter come thru, its going to default to the enter permission.
+                        {
+                            return Config.globalZoneDefaultEnter;
+                        }
                     }
                 }
                 else

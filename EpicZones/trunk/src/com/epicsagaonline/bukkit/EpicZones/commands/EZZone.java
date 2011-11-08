@@ -38,7 +38,7 @@ public class EZZone implements CommandHandler
 {
     public boolean onCommand(String command, CommandSender sender, String[] args)
     {
-        if (args.length > 0)
+        if (args != null && args.length > 0)
         {
             String subCommand = args[0].toLowerCase().trim();
             if (subCommand.equals("create"))
@@ -124,6 +124,10 @@ public class EZZone implements CommandHandler
             else if (subCommand.equals("debug"))
             {
                 new EZZoneDebug(sender);
+            }
+            else if(subCommand.equals("command"))
+            {
+                new EZZoneCommand(args, sender);
             }
             else
             {

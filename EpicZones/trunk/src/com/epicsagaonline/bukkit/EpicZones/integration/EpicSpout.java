@@ -32,6 +32,7 @@ THE SOFTWARE.
 package com.epicsagaonline.bukkit.EpicZones.integration;
 
 import com.epicsagaonline.bukkit.EpicZones.General;
+import com.epicsagaonline.bukkit.EpicZones.Log;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import org.bukkit.Location;
@@ -47,9 +48,12 @@ public class EpicSpout
     private static GenericLabel lblZoneName;
     private static GenericLabel lblXYZ;
 
+    private static Spout spoutPlugin;
+
     public static void Init(Spout spout)
     {
-        Spout spoutPlugin = spout;
+
+        spoutPlugin = spout;
 
         lblZoneName = new GenericLabel(spoutPlugin.toString());
         lblZoneName.shiftYPos(2);
@@ -60,6 +64,29 @@ public class EpicSpout
         lblXYZ.shiftYPos(2);
         lblXYZ.setVisible(false);
         lblXYZ.setAuto(true);
+    }
+
+    public static boolean UseSpout(EpicZonePlayer ezp)
+    {
+        Log.Write("0");
+        boolean result = false;
+        Log.Write("1");
+        if (General.SpoutEnabled)
+        {
+            Log.Write("2");
+            SpoutPlayer sp = ezp.getSpoutPlayer();
+            Log.Write("3");
+            if (sp != null)
+            {
+                Log.Write("4");
+                if (sp.isSpoutCraftEnabled())
+                {
+                    Log.Write("5");
+                    result = true;
+                }
+            }
+        }
+        return result;
     }
 
     public static void UpdatePlayerZone(EpicZonePlayer ezp, EpicZone zone)
@@ -128,4 +155,35 @@ public class EpicSpout
         }
     }
 
+//    public static void EditZone(EpicZonePlayer ezp)
+//    {
+//
+//        Log.Write("WOO!");
+//
+//        PopupScreen screen = new GenericPopup();
+//        Label lblZoneName = new GenericLabel();
+//        TextField txtZoneName = new GenericTextField();
+//        Button btnOK = new GenericButton("OK");
+//        lblZoneName.setText("Zone Name:");
+//        lblZoneName.setX(10);
+//        lblZoneName.setY(10);
+//
+//        txtZoneName.setX(10);
+//        txtZoneName.setY(30);
+//        txtZoneName.setWidth(200);
+//        txtZoneName.setHeight(15);
+//
+//        btnOK.setWidth(20);
+//        btnOK.setHeight(15);
+//        btnOK.setX(10);
+//        btnOK.setY(50);
+//
+//        screen.attachWidget(spoutPlugin, lblZoneName);
+//        screen.attachWidget(spoutPlugin, txtZoneName);
+//        screen.attachWidget(spoutPlugin, btnOK);
+//
+//        SpoutPlayer sp = ezp.getSpoutPlayer();
+//
+//        sp.getMainScreen().attachPopupScreen(screen);
+//    }
 }

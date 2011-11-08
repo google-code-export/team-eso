@@ -240,6 +240,12 @@ public class General
         }
     }
 
+    public static void removeWorld(World world)
+    {
+        myZones.remove(world.getName().toLowerCase());
+        myGlobalZones.remove(world.getName().toLowerCase());
+    }
+
     private static void reconcileChildren()
     {
 

@@ -69,8 +69,32 @@ public class EZZonePerm
                 {
                     if (ValidPerm(perm))
                     {
-                        ezp.getEditZone().addPermission(member, node, perm);
-                        Message.Send(sender, Message_ID.Info_00109_PermissionAdded, new String[]{member, node, perm});
+                        if (node.equals("command"))
+                        {
+                            if (data.length > 4)
+                            {
+                                String command = data[4].toLowerCase();
+                                if (perm.equals("allow"))
+                                {
+                                    ezp.getEditZone().getDisallowedCommands().remove(command);
+                                    Message.Send(sender, Message_ID.Info_00131_CommandNotDenied, new String[]{command, ezp.getEditZone().getName()});
+                                }
+                                else
+                                {
+                                    ezp.getEditZone().getDisallowedCommands().add(command);
+                                    Message.Send(sender, Message_ID.Info_00132_CommandDenied, new String[]{command, ezp.getEditZone().getName()});
+                                }
+                            }
+                            else
+                            {
+                                new EZZoneHelp(ZoneCommand.PERM, sender, ezp);
+                            }
+                        }
+                        else
+                        {
+                            ezp.getEditZone().addPermission(member, node, perm);
+                            Message.Send(sender, Message_ID.Info_00109_PermissionAdded, new String[]{member, node, perm});
+                        }
                     }
                     else
                     {
@@ -144,7 +168,7 @@ public class EZZonePerm
 
     private static boolean ValidNode(String node)
     {
-        return node.equals("build") || node.equals("destroy") || node.equals("entry");
+        return node.equals("build") || node.equals("destroy") || node.equals("entry") || node.equals("command");
     }
 
     private static boolean ValidPerm(String perm)

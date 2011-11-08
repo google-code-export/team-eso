@@ -37,6 +37,7 @@ import com.epicsagaonline.bukkit.EpicZones.Message;
 import com.epicsagaonline.bukkit.EpicZones.Message.Message_ID;
 import com.epicsagaonline.bukkit.EpicZones.ZonePermissionsHandler;
 import com.epicsagaonline.bukkit.EpicZones.integration.EpicSpout;
+import com.epicsagaonline.bukkit.EpicZones.integration.PermissionsManager;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer.EpicZoneMode;
@@ -222,6 +223,29 @@ public class PlayerEvents extends PlayerListener
                             ezp.getEditZone().ShowPillar(point);
                             Message.Send(event.getPlayer(), Message_ID.Info_00112_Point_XZ_Added, new String[]{Integer.toString(point.x), Integer.toString(point.y)});
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event)
+    {
+        if (!event.isCancelled())
+        {
+            Player player = event.getPlayer();
+            if (!PermissionsManager.hasPermission(player, "epiczones.ignorepermissions"))
+            {
+                EpicZone zone = General.GetZoneForPlayer(player, player.getWorld().getName(), player.getLocation().getBlockY(), new Point(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
+                if (zone != null)
+                {
+                    String command = event.getMessage().toLowerCase().trim().replace("/", "");
+                    System.out.println(command);
+                    if (zone.getDisallowedCommands().contains(command))
+                    {
+                        event.setCancelled(true);
+                        Message.Send(event.getPlayer(), Message_ID.Info_00133_CommandDenied, new String[]{command, zone.getName()});
                     }
                 }
             }

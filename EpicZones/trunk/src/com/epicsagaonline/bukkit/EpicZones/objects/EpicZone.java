@@ -80,7 +80,9 @@ public class EpicZone
     private boolean fireBurnsMobs = true;
     private Map<String, EpicZonePermission> permissions = new HashMap<String, EpicZonePermission>();
     private ArrayList<PillarBlock> pillarBlocks = new ArrayList<PillarBlock>();
-    private Set<String> childrenTags = new HashSet<String>();
+    private HashSet<String> childrenTags = new HashSet<String>();
+    private boolean allowEndermenPick = true;
+    private HashSet<String> disallowedCommands = new HashSet<String>();
 
     public EpicZone()
     {
@@ -112,6 +114,8 @@ public class EpicZone
         this.owners = prime.owners;
         this.sanctuary = prime.sanctuary;
         this.permissions = prime.permissions;
+        this.allowEndermenPick = prime.allowEndermenPick;
+        this.disallowedCommands = prime.disallowedCommands;
     }
 
     public EpicZone(String zoneData)
@@ -246,6 +250,20 @@ public class EpicZone
     public ArrayList<String> getOwners()
     {
         return owners;
+    }
+
+    public HashSet<String> getDisallowedCommands()
+    {
+        if (this.disallowedCommands == null)
+        {
+            this.disallowedCommands = new HashSet<String>();
+        }
+        return this.disallowedCommands;
+    }
+
+    public void setDisallowedCommands(HashSet<String> value)
+    {
+        this.disallowedCommands = value;
     }
 
     public boolean getFireBurnsMobs()
@@ -419,6 +437,11 @@ public class EpicZone
         this.sanctuary = value;
     }
 
+    public void setAllowEndermenPick(Boolean value)
+    {
+        this.allowEndermenPick = value;
+    }
+
     public void setExplode(String value)
     {
         this.explode = new EpicZoneExplode(value);
@@ -568,6 +591,10 @@ public class EpicZone
                 else if (flag.equals("sanctuary"))
                 {
                     this.sanctuary = split[1].equalsIgnoreCase("true");
+                }
+                else if (flag.equals("endermenpick"))
+                {
+                    this.allowEndermenPick = split[1].equalsIgnoreCase("true");
                 }
             }
         }
@@ -833,6 +860,11 @@ public class EpicZone
         double distanceFromCenter = Math.sqrt(xsquared + ysquared);
         return distanceFromCenter <= this.radius;
 
+    }
+
+    public boolean getAllowEndermenPick()
+    {
+        return this.allowEndermenPick;
     }
 
     public boolean isOwner(String playerName)

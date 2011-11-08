@@ -34,20 +34,28 @@ package com.epicsagaonline.bukkit.EpicZones.listeners;
 import com.epicsagaonline.bukkit.EpicZones.General;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZone;
 import com.epicsagaonline.bukkit.EpicZones.objects.EpicZonePlayer;
-import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.awt.*;
+import java.util.HashSet;
 
 public class EntityEvents extends EntityListener
 {
 
-    public
+    private HashSet<SpawnReason> spawnReasonsToBlock = new HashSet<SpawnReason>();
+
+    public EntityEvents()
+    {
+        spawnReasonsToBlock.add(SpawnReason.NATURAL);
+        spawnReasonsToBlock.add(SpawnReason.BED);
+    }
+
     @Override
-    void onEntityExplode(EntityExplodeEvent event)
+    public void onEntityExplode(EntityExplodeEvent event)
     {
         EpicZone zone = General.GetZoneForPlayer(null, event.getLocation().getWorld().getName(), event.getLocation().getBlockY(), new Point(event.getLocation().getBlockX(), event.getLocation().getBlockZ()));
         if (zone != null)
@@ -79,9 +87,8 @@ public class EntityEvents extends EntityListener
         }
     }
 
-    public
     @Override
-    void onEntityCombust(EntityCombustEvent event)
+    public void onEntityCombust(EntityCombustEvent event)
     {
         if (!event.isCancelled())
         {
@@ -106,9 +113,8 @@ public class EntityEvents extends EntityListener
         }
     }
 
-    public
     @Override
-    void onEntityDamage(EntityDamageEvent event)
+    public void onEntityDamage(EntityDamageEvent event)
     {
         if (!event.isCancelled())
         {
@@ -204,11 +210,10 @@ public class EntityEvents extends EntityListener
         }
     }
 
-    public
     @Override
-    void onCreatureSpawn(CreatureSpawnEvent event)
+    public void onCreatureSpawn(CreatureSpawnEvent event)
     {
-        if (!event.isCancelled() && isCreature(event.getCreatureType()) && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL)
+        if (!event.isCancelled() && spawnReasonsToBlock.contains(event.getSpawnReason()))
         {
             EpicZone zone = General.GetZoneForPlayer(null, event.getLocation().getWorld().getName(), event.getLocation().getBlockY(), new Point(event.getLocation().getBlockX(), event.getLocation().getBlockZ()));
             if (zone != null)
@@ -230,57 +235,36 @@ public class EntityEvents extends EntityListener
         }
     }
 
-    private boolean isCreature(CreatureType ct)
+    @Override
+    public void onEndermanPickup(EndermanPickupEvent event)
     {
-        boolean result = false;
-
-        if (ct != null)
+        if (!event.isCancelled())
         {
-            switch (ct)
+            EpicZone zone = General.GetZoneForPlayer(null, event.getBlock().getLocation().getWorld().getName(), event.getBlock().getLocation().getBlockY(), new Point(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockZ()));
+            if (zone != null)
             {
-                case CHICKEN:
-                    result = true;
-                    break;
-                case COW:
-                    result = true;
-                    break;
-                case CREEPER:
-                    result = true;
-                    break;
-                case GHAST:
-                    result = true;
-                    break;
-                case GIANT:
-                    result = true;
-                    break;
-                case PIG:
-                    result = true;
-                    break;
-                case PIG_ZOMBIE:
-                    result = true;
-                    break;
-                case SHEEP:
-                    result = true;
-                    break;
-                case SKELETON:
-                    result = true;
-                    break;
-                case SLIME:
-                    result = true;
-                    break;
-                case SPIDER:
-                    result = true;
-                    break;
-                case SQUID:
-                    result = true;
-                    break;
-                case ZOMBIE:
-                    result = true;
-                    break;
+                if (!zone.getAllowEndermenPick())
+                {
+                    event.setCancelled(true);
+                }
             }
         }
+    }
 
-        return result;
+    @Override
+    public void onEndermanPlace(EndermanPlaceEvent event)
+    {
+        if (!event.isCancelled())
+        {
+            EpicZone zone = General.GetZoneForPlayer(null, event.getLocation().getWorld().getName(), event.getLocation().getBlockY(), new Point(event.getLocation().getBlockX(), event.getLocation().getBlockZ()));
+            if (zone != null)
+            {
+                if (!zone.getAllowEndermenPick())
+                {
+                    event.setCancelled(true);
+                }
+            }
+        }
     }
 
     private boolean isPlayer(Entity entity)
