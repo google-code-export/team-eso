@@ -1,4 +1,4 @@
-#VERSION: 0.28.3
+#VERSION: 0.29
 #Author: ST-DDT@gmx.de
 #--------------------------
 #Formatting Strings
@@ -40,6 +40,7 @@
 00039: &6Berechtigungen:
 00040: Berechtigungen gel�scht.
 00041: Debug Information Generated.
+00042: &6Disallowed Commands.
 
 #Variable Strings
 00100: Zone geupdated. (0) auf [(1)] gesetzt
@@ -73,6 +74,9 @@
 00128: Berechtigungen erfolgreich von &A[(0)] kopiert
 00129: Berechtigungen von &A[(0)] gels�cht
 00130: You do not have permission to enter &A[(0)]
+00131: Command [(0)] is not denied in [(1)].
+00132: Command [(0)] is denied in [(1)].
+00133: The command [(0)] is not allowed in [(1)].
 
 #Help Strings
 01000: &6Hilfe f�r /zone Kommando.

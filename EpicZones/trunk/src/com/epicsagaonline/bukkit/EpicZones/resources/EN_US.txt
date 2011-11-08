@@ -1,4 +1,4 @@
-#VERSION: 0.28.3
+#VERSION: 0.29
 #Author: jblaske@gmail.com
 #--------------------------
 #Formatting Strings
@@ -40,6 +40,7 @@
 00039: &6Permissions:
 00040: Permissions cleared.
 00041: Debug Information Generated.
+00042: &6Disallowed Commands.
 
 #Variable Strings
 00100: Zone Updated. Set (0) to [(1)]
@@ -73,6 +74,9 @@
 00128: Successfully copied permissions from &A[(0)]
 00129: Permissions cleared for &A[(0)]
 00130: You do not have permission to enter &A[(0)]
+00131: Command [(0)] is not denied in [(1)].
+00132: Command [(0)] is denied in [(1)].
+00133: The command [(0)] is not allowed in [(1)].
 
 #Help Strings
 01000: &6Help for /zone command.
